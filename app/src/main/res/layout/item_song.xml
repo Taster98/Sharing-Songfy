@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    android:id="@+id/item_songs_id"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+    <TextView
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="37sp"
+        android:textStyle="bold"
+        android:padding="8dp"
+        android:text="Tutte le canzoni"/>
+    <TextView
+        android:id="@+id/titolo_canzone"
+        android:orientation="vertical" android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        tools:ignore="ExtraText"
+        android:textSize="20sp"
+        android:padding="30dp"/>
+    <TextView
+        android:id="@+id/autore_canzone"
+        android:orientation="vertical" android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        tools:ignore="ExtraText"
+        android:paddingTop="0dp"
+        android:textSize="10sp"
+        android:paddingLeft="30dp"
+        android:paddingStart="30dp" />
+</LinearLayout>
