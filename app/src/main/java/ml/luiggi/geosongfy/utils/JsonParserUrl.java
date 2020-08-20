@@ -1,9 +1,12 @@
-package ml.luiggi.geosongfy;
+package ml.luiggi.geosongfy.utils;
 import com.google.gson.Gson;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+
+import ml.luiggi.geosongfy.scaffoldings.Song;
+
 /*
 * Questa classe serve per parsare un JSON presente in uno specifico URL, che contiene un array chiamato allmusic contenente una lista di tutte le canzoni,
 * ciascuna delle quali avrà un titolo, una stringa di autori, una stringa di featuring artists, un url della canzone, un url della copertina dell'album

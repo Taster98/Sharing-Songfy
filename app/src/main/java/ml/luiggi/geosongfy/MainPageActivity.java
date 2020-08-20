@@ -9,6 +9,10 @@ import android.os.Bundle;
 import android.view.MenuItem;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+
+import ml.luiggi.geosongfy.fragments.FragmentHome;
+import ml.luiggi.geosongfy.fragments.FragmentPeople;
+
 /*
 * Questa classe rappresenta l'activity principale dell'app. Al suo interno è presente un BottomNavigationView che consente di navigare tra Fragment.*/
 public class MainPageActivity extends AppCompatActivity implements BottomNavigationView.OnNavigationItemSelectedListener{

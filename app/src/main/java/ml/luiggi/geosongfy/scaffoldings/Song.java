@@ -1,4 +1,4 @@
-package ml.luiggi.geosongfy;
+package ml.luiggi.geosongfy.scaffoldings;
 
 import android.os.Build;
 

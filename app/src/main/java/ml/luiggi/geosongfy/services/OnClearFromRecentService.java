@@ -1,4 +1,4 @@
-package ml.luiggi.geosongfy;
+package ml.luiggi.geosongfy.services;
 
 import android.app.Service;
 import android.content.Intent;

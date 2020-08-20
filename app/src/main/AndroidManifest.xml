@@ -9,7 +9,7 @@
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <application
         android:allowBackup="true"
-        android:icon="@mipmap/ic_icon"
+        android:icon="@drawable/ic_icon"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
@@ -30,10 +30,8 @@
         <activity android:name=".SongActivity"
             android:theme="@style/Platform.MaterialComponents.Light">
         </activity>
-        <activity android:name=".SongActivityTwo"
-            android:theme="@style/Platform.MaterialComponents.Light">
-        </activity>
-        <receiver android:name=".NotificationActionService"/>
-        <service android:name=".OnClearFromRecentService"/>
+
+        <receiver android:name=".services.NotificationActionService"/>
+        <service android:name=".services.OnClearFromRecentService"/>
     </application>
 </manifest>

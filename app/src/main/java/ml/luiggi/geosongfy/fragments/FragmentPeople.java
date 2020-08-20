@@ -1,4 +1,4 @@
-package ml.luiggi.geosongfy;
+package ml.luiggi.geosongfy.fragments;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -9,6 +9,8 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+
+import ml.luiggi.geosongfy.R;
 
 public class FragmentPeople extends Fragment {
     private TextView peopleTextView;

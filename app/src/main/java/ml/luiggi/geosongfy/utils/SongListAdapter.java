@@ -1,4 +1,4 @@
-package ml.luiggi.geosongfy;
+package ml.luiggi.geosongfy.utils;
 
 import android.content.Intent;
 import android.view.LayoutInflater;
@@ -15,8 +15,13 @@ import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
+import ml.luiggi.geosongfy.R;
+import ml.luiggi.geosongfy.SongActivity;
+import ml.luiggi.geosongfy.scaffoldings.Song;
+
 /*
-* Questa classe rappresenta l'Adapter per poter correttamente visualizzare la lista delle canzoni all'interno dell'oggetto RecyclerView.*/
+* Questa classe rappresenta l'Adapter per poter correttamente visualizzare la lista delle canzoni all'interno dell'oggetto RecyclerView.
+* */
 public class SongListAdapter extends RecyclerView.Adapter<SongListAdapter.SongListViewHolder> {
     private ArrayList<Song> songList;
 
@@ -46,8 +51,7 @@ public class SongListAdapter extends RecyclerView.Adapter<SongListAdapter.SongLi
         holder.mLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(view.getContext(),SongActivity.class);
-                //Intent intent = new Intent(view.getContext(),SongActivityTwo.class);
+                Intent intent = new Intent(view.getContext(), SongActivity.class);
                 intent.putExtra("songSelected",songList.get(holder.getAdapterPosition()));
                 //passo anche l'arraylist totale perchè potrebbe servirmi per implementare poi il pulsante avanti/indietro
                 intent.putExtra("allSongs",songList);

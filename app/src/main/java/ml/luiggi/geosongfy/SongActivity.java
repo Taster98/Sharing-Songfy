@@ -1,50 +1,37 @@
 package ml.luiggi.geosongfy;
 
 import android.annotation.SuppressLint;
-import android.app.ActionBar;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.ServiceConnection;
-import android.graphics.drawable.Drawable;
 import android.media.AudioAttributes;
 import android.media.MediaPlayer;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.IBinder;
-import android.os.PersistableBundle;
-import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.ContextCompat;
-
-import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.squareup.picasso.Picasso;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.concurrent.TimeUnit;
 
-import static com.squareup.picasso.Picasso.get;
+import ml.luiggi.geosongfy.scaffoldings.Playable;
+import ml.luiggi.geosongfy.scaffoldings.Song;
+import ml.luiggi.geosongfy.services.OnClearFromRecentService;
+import ml.luiggi.geosongfy.utils.CreateNotification;
 
-public class SongActivity extends AppCompatActivity implements Playable{
+public class SongActivity extends AppCompatActivity implements Playable {
     private static MediaPlayer mPlayer;
     private Song mSong;
     private ArrayList<Song> songList;
@@ -82,13 +69,13 @@ public class SongActivity extends AppCompatActivity implements Playable{
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
             createChannel();
             //registro il receiver per la notifica
-            registerReceiver(broadcastReceiver,new IntentFilter("TRACKS_TRACKS"));
-            startService(new Intent(getBaseContext(),OnClearFromRecentService.class));
+            registerReceiver(broadcastReceiver,new IntentFilter("ALL_SONGS"));
+            startService(new Intent(getBaseContext(), OnClearFromRecentService.class));
         }
         //creo la notifica
-        CreateNotification.createNotification(SongActivity.this, mSong,R.drawable.ic_pause,songList.indexOf(mSong),songList.size()-1);
+        CreateNotification.createNotification(SongActivity.this, mSong,R.drawable.ic_pause);
     }
-
+    //funzione che mi crea un canale univoco per la notifica
     private void createChannel() {
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
             NotificationChannel channel = new NotificationChannel(CreateNotification.CHANNEL_ID,"Luiggi", NotificationManager.IMPORTANCE_HIGH);
@@ -99,6 +86,7 @@ public class SongActivity extends AppCompatActivity implements Playable{
         }
     }
 
+    //funzione per inizializzare il mediaPlayer
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     private void initializeMediaPlayer() {
         String url = mSong.getUrl();
@@ -170,11 +158,10 @@ public class SongActivity extends AppCompatActivity implements Playable{
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
             }
-
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
             }
-
+            //L'unico metodo che mi interessa è quello che attende che il seekbar cambi posizione
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 if(mPlayer != null && fromUser){
@@ -184,6 +171,7 @@ public class SongActivity extends AppCompatActivity implements Playable{
                 }
             }
         });
+        //INIZIO GESTIONE CONTROLLI
 
         //Imposto un listener sul bottone Play
         mPlay.setOnClickListener(new View.OnClickListener() {
@@ -221,11 +209,9 @@ public class SongActivity extends AppCompatActivity implements Playable{
                         @Override
                         public void onStopTrackingTouch(SeekBar seekBar) {
                         }
-
                         @Override
                         public void onStartTrackingTouch(SeekBar seekBar) {
                         }
-
                         @Override
                         public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                             if(mPlayer != null && fromUser){
@@ -254,7 +240,6 @@ public class SongActivity extends AppCompatActivity implements Playable{
                     mSong = songList.get(actualPos);
                     mPlayer.stop();
                     initializeMediaPlayer();
-                    //handleMusic();
                     mPlayer.start();
                     mPlay.setImageResource(R.drawable.ic_pause);
                     onTrackPrevious();
@@ -276,13 +261,13 @@ public class SongActivity extends AppCompatActivity implements Playable{
                 mSong = songList.get(actualPos);
                 mPlayer.stop();
                 initializeMediaPlayer();
-                //handleMusic();
                 mPlayer.start();
                 mPlay.setImageResource(R.drawable.ic_pause);
                 onTrackNext();
                 initializeMusicUI();
             }
         });
+
         //Imposto lo scorrimento automatico quando la canzone finisce
         mPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
@@ -295,7 +280,6 @@ public class SongActivity extends AppCompatActivity implements Playable{
                 mSong = songList.get(actualPos);
                 mPlayer.stop();
                 initializeMediaPlayer();
-                //handleMusic();
                 mPlayer.start();
                 mPlay.setImageResource(R.drawable.ic_pause);
                 initializeMusicUI();
@@ -328,8 +312,6 @@ public class SongActivity extends AppCompatActivity implements Playable{
         mText2.setText(mSong.getTitle());
 
     }
-
-
     //Bottone indietro
     @Override
     public boolean onSupportNavigateUp() {
@@ -337,13 +319,15 @@ public class SongActivity extends AppCompatActivity implements Playable{
         return true;
     }
 
+
     boolean isPlaying = false;
+    //Creo un nuovo broadcast receiver per gestire le azioni ricevute dalla notifica
     BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
         @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
         @Override
         public void onReceive(Context context, Intent intent) {
             String action = intent.getExtras().getString("actionName");
-
+            //controllo l'azione ricevuta
             switch(action){
                 case CreateNotification.ACTION_PREV:
                     onTrackPrevious();
@@ -360,6 +344,8 @@ public class SongActivity extends AppCompatActivity implements Playable{
             }
         }
     };
+
+    //Implemento i metodi dell'interfaccia Playable, facendo attenzione a modificare anche la UI qualora l'app fosse aperta
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     public void onTrackPrevious() {
@@ -367,7 +353,7 @@ public class SongActivity extends AppCompatActivity implements Playable{
         if(actualPos <0)
             actualPos=songList.size()-1;
         mSong = songList.get(actualPos);
-        CreateNotification.createNotification(SongActivity.this,mSong,R.drawable.ic_pause,actualPos,songList.size()-1);
+        CreateNotification.createNotification(SongActivity.this,mSong,R.drawable.ic_pause);
         mText2.setText(mSong.getTitle());
         String aut_feat = mSong.getAuthors();
         if(!mSong.getFeats().equals(""))
@@ -383,7 +369,7 @@ public class SongActivity extends AppCompatActivity implements Playable{
 
     @Override
     public void onTrackPlay() {
-        CreateNotification.createNotification(SongActivity.this,mSong,R.drawable.ic_pause,actualPos,songList.size()-1);
+        CreateNotification.createNotification(SongActivity.this,mSong,R.drawable.ic_pause);
         mText2.setText(mSong.getTitle());
         String aut_feat = mSong.getAuthors();
         if(!mSong.getFeats().equals(""))
@@ -402,7 +388,7 @@ public class SongActivity extends AppCompatActivity implements Playable{
         if(actualPos >=songList.size())
             actualPos=0;
         mSong = songList.get(actualPos);
-        CreateNotification.createNotification(SongActivity.this,mSong,R.drawable.ic_pause,actualPos,songList.size()-1);
+        CreateNotification.createNotification(SongActivity.this,mSong,R.drawable.ic_pause);
         mText2.setText(mSong.getTitle());
         String aut_feat = mSong.getAuthors();
         if(!mSong.getFeats().equals(""))
@@ -418,7 +404,7 @@ public class SongActivity extends AppCompatActivity implements Playable{
 
     @Override
     public void onTrackPause() {
-        CreateNotification.createNotification(SongActivity.this,mSong,R.drawable.ic_play,actualPos,songList.size()-1);
+        CreateNotification.createNotification(SongActivity.this,mSong,R.drawable.ic_play);
         mText2.setText(mSong.getTitle());
         String aut_feat = mSong.getAuthors();
         if(!mSong.getFeats().equals(""))
