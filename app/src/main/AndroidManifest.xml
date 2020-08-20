@@ -1,21 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="ml.luiggi.geosongfy">
-
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <permission android:name="android.permission.MEDIA_CONTENT_CONTROL" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <application
         android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@mipmap/ic_icon"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme">
-        <activity android:name=".MusicListActivity">
+        android:networkSecurityConfig="@xml/network_security_config"
+        android:theme="@style/AppTheme"
+        tools:targetApi="n">
+        <activity android:name=".MainPageActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
+                <action android:name="ml.luiggi.geosongfy.action.PAUSE" />
+                <action android:name="ml.luiggi.geosongfy.action.PLAY" />
+                <action android:name="ml.luiggi.geosongfy.action.NEXT" />
+                <action android:name="ml.luiggi.geosongfy.action.PREV" />
+                <action android:name="ml.luiggi.geosongfy.action.STOP" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".SongActivity"
+            android:theme="@style/Platform.MaterialComponents.Light">
+        </activity>
+        <activity android:name=".SongActivityTwo"
+            android:theme="@style/Platform.MaterialComponents.Light">
+        </activity>
+        <receiver android:name=".NotificationActionService"/>
+        <service android:name=".OnClearFromRecentService"/>
     </application>
-
 </manifest>

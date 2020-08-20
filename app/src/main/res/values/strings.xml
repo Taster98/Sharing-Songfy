@@ -3,4 +3,5 @@
     <string name="hello_world">helloWorld</string>
     <string name="home">Home</string>
     <string name="friend_listen">Ascolta con i tuoi amici</string>
+    <string name="tutte_le_canzoni">Tutte le canzoni</string>
 </resources>

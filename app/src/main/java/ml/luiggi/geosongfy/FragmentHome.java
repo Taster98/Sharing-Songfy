@@ -24,17 +24,35 @@ public class FragmentHome extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.fragment_home,container,false);
-        songList = new ArrayList<>();
-        ArrayList<String> auths = new ArrayList<>();
-        auths.add("Eminem");
-        ArrayList<String> feats = new ArrayList<>();
-        songList.add(new Song("Lose Yourself","",auths,feats));
-        initHomeFragment(v);
+        final View v = inflater.inflate(R.layout.fragment_home,container,false);
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try{
+                    loadSongs(v);
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+            }
+        }).start();
 
         return v;
     }
 
+    private void loadSongs(final View v){
+        songList = new ArrayList<>();
+        JsonParserUrl mp = new JsonParserUrl("http://luiggi.altervista.org/song_db.json");
+        songList = mp.getSongs();
+        getActivity().runOnUiThread(new Runnable() {
+            public void run() {
+                try {
+                    initHomeFragment(v);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+    }
     private void initHomeFragment(View v){
         //riferimento all'oggetto
         recyclerView = (RecyclerView)v.findViewById(R.id.songList);
