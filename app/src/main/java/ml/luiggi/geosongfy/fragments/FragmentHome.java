@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -14,6 +15,7 @@ import java.util.ArrayList;
 
 import ml.luiggi.geosongfy.R;
 import ml.luiggi.geosongfy.scaffoldings.Song;
+import ml.luiggi.geosongfy.utils.DrawerLocker;
 import ml.luiggi.geosongfy.utils.SongListAdapter;
 import ml.luiggi.geosongfy.utils.JsonParserUrl;
 
@@ -29,7 +31,9 @@ public class FragmentHome extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        final View v = inflater.inflate(R.layout.fragment_home,container,false);
+        View v = inflater.inflate(R.layout.fragment_home,container,false);
+        //disabilito il menudrawer
+        ((DrawerLocker) getActivity()).setDrawerEnabled(false);
         //carico canzoni
         initSongs(v);
         return v;
@@ -65,9 +69,9 @@ public class FragmentHome extends Fragment {
         });
     }
     //Funzione che inizializza il fragment con il recyclerView
-    private void initHomeFragment(View v){
+    private void initHomeFragment(View v) {
         //riferimento all'oggetto
-        recyclerView = (RecyclerView)v.findViewById(R.id.songList);
+        recyclerView = (RecyclerView) v.findViewById(R.id.songList);
         //dimensione nel layout fissata
         recyclerView.setHasFixedSize(true);
         //imposto un layout manager per la recycler view

@@ -21,6 +21,7 @@ import android.widget.TextView;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
+
 import com.squareup.picasso.Picasso;
 
 import java.io.IOException;
@@ -36,17 +37,18 @@ public class SongActivity extends AppCompatActivity implements Playable {
     private Song mSong;
     private ArrayList<Song> songList;
     private int actualPos;
-    ImageButton mPlay,mBack,mNext;
+    ImageButton mPlay, mBack, mNext;
     SeekBar mSeek;
     TextView mSeekTitle;
     NotificationManager notificationManager;
     ImageView mImageView;
     TextView mText2;
     TextView mTextView;
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             notificationManager.cancelAll();
         }
         unregisterReceiver(broadcastReceiver);
@@ -66,21 +68,22 @@ public class SongActivity extends AppCompatActivity implements Playable {
         //gestisco la musica
         handleMusic();
         //creo canale per la notifica
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             createChannel();
             //registro il receiver per la notifica
-            registerReceiver(broadcastReceiver,new IntentFilter("ALL_SONGS"));
+            registerReceiver(broadcastReceiver, new IntentFilter("ALL_SONGS"));
             startService(new Intent(getBaseContext(), OnClearFromRecentService.class));
         }
         //creo la notifica
-        CreateNotification.createNotification(SongActivity.this, mSong,R.drawable.ic_pause);
+        CreateNotification.createNotification(SongActivity.this, mSong, R.drawable.ic_pause);
     }
+
     //funzione che mi crea un canale univoco per la notifica
     private void createChannel() {
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
-            NotificationChannel channel = new NotificationChannel(CreateNotification.CHANNEL_ID,"Luiggi", NotificationManager.IMPORTANCE_HIGH);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel channel = new NotificationChannel(CreateNotification.CHANNEL_ID, "Luiggi", NotificationManager.IMPORTANCE_HIGH);
             notificationManager = getSystemService(NotificationManager.class);
-            if(notificationManager != null){
+            if (notificationManager != null) {
                 notificationManager.createNotificationChannel(channel);
             }
         }
@@ -90,7 +93,7 @@ public class SongActivity extends AppCompatActivity implements Playable {
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     private void initializeMediaPlayer() {
         String url = mSong.getUrl();
-        if(mPlayer != null){
+        if (mPlayer != null) {
             mPlayer.release();
             mPlayer = null;
         }
@@ -111,6 +114,7 @@ public class SongActivity extends AppCompatActivity implements Playable {
         }
 
     }
+
     //funzione che converte i millisecondi in minuti e secondi, riformattando il tutto:
     private String getTimeString(long millis) {
         StringBuffer buf = new StringBuffer();
@@ -121,22 +125,23 @@ public class SongActivity extends AppCompatActivity implements Playable {
                 .append(String.format("%02d", seconds));
         return buf.toString();
     }
+
     //avvia la musica
     private void handleMusic() {
         //Ripesco la lista di tutti i brani per i pulsanti Back e Next
-        songList = (ArrayList<Song>)getIntent().getSerializableExtra("allSongs");
+        songList = (ArrayList<Song>) getIntent().getSerializableExtra("allSongs");
         //prelevo la posizione attuale nell'arraylist
         actualPos = songList.indexOf(mSong);
         //Riferimenti alle varie viste
-        mPlay = (ImageButton)findViewById(R.id.song_item_play);
-        mSeek = (SeekBar)findViewById(R.id.song_item_seekbar);
-        mSeekTitle = (TextView)findViewById(R.id.song_item_seekTitle);
-        mBack = (ImageButton)findViewById(R.id.song_item_previous);
-        mNext = (ImageButton)findViewById(R.id.song_item_next);
+        mPlay = (ImageButton) findViewById(R.id.song_item_play);
+        mSeek = (SeekBar) findViewById(R.id.song_item_seekbar);
+        mSeekTitle = (TextView) findViewById(R.id.song_item_seekTitle);
+        mBack = (ImageButton) findViewById(R.id.song_item_previous);
+        mNext = (ImageButton) findViewById(R.id.song_item_next);
         //Imposto la durata (da ms a s)
-        mSeek.setMax(mPlayer.getDuration()/1000);
+        mSeek.setMax(mPlayer.getDuration() / 1000);
         //Inizializzo il titolo della SeekBar
-        String seekTitle = getTimeString(mPlayer.getCurrentPosition())+"/"+getTimeString(mPlayer.getDuration());
+        String seekTitle = getTimeString(mPlayer.getCurrentPosition()) + "/" + getTimeString(mPlayer.getDuration());
         mSeekTitle.setText(seekTitle);
         mPlay.setImageResource(R.drawable.ic_pause);
         final Handler mHandler = new Handler();
@@ -144,10 +149,10 @@ public class SongActivity extends AppCompatActivity implements Playable {
         SongActivity.this.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                if(mPlayer != null){
-                    int mCurrentPosition = mPlayer.getCurrentPosition()/1000;
+                if (mPlayer != null) {
+                    int mCurrentPosition = mPlayer.getCurrentPosition() / 1000;
                     mSeek.setProgress(mCurrentPosition);
-                    String seekTitle = getTimeString(mPlayer.getCurrentPosition())+"/"+getTimeString(mPlayer.getDuration());
+                    String seekTitle = getTimeString(mPlayer.getCurrentPosition()) + "/" + getTimeString(mPlayer.getDuration());
                     mSeekTitle.setText(seekTitle);
                 }
                 mHandler.postDelayed(this, 1000);
@@ -158,15 +163,17 @@ public class SongActivity extends AppCompatActivity implements Playable {
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
             }
+
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
             }
+
             //L'unico metodo che mi interessa è quello che attende che il seekbar cambi posizione
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                if(mPlayer != null && fromUser){
+                if (mPlayer != null && fromUser) {
                     mPlayer.seekTo(progress * 1000);
-                    String seekTitle = getTimeString(mPlayer.getCurrentPosition())+"/"+getTimeString(mPlayer.getDuration());
+                    String seekTitle = getTimeString(mPlayer.getCurrentPosition()) + "/" + getTimeString(mPlayer.getDuration());
                     mSeekTitle.setText(seekTitle);
                 }
             }
@@ -180,11 +187,11 @@ public class SongActivity extends AppCompatActivity implements Playable {
             public void onClick(View view) {
                 //GESTIONE PLAY E PAUSE
                 //Pause:
-                if(mPlayer.isPlaying()) {
+                if (mPlayer.isPlaying()) {
                     mPlayer.pause();
                     mPlay.setImageResource(R.drawable.ic_play);
                     onTrackPause();
-                }else{
+                } else {
                     //Play:
                     mPlayer.start();
                     onTrackPlay();
@@ -194,10 +201,10 @@ public class SongActivity extends AppCompatActivity implements Playable {
                     SongActivity.this.runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            if(mPlayer != null){
-                                int mCurrentPosition = mPlayer.getCurrentPosition()/1000;
+                            if (mPlayer != null) {
+                                int mCurrentPosition = mPlayer.getCurrentPosition() / 1000;
                                 mSeek.setProgress(mCurrentPosition);
-                                String seekTitle = getTimeString(mPlayer.getCurrentPosition())+"/"+getTimeString(mPlayer.getDuration());
+                                String seekTitle = getTimeString(mPlayer.getCurrentPosition()) + "/" + getTimeString(mPlayer.getDuration());
                                 mSeekTitle.setText(seekTitle);
                             }
                             mHandler.postDelayed(this, 1000);
@@ -209,14 +216,16 @@ public class SongActivity extends AppCompatActivity implements Playable {
                         @Override
                         public void onStopTrackingTouch(SeekBar seekBar) {
                         }
+
                         @Override
                         public void onStartTrackingTouch(SeekBar seekBar) {
                         }
+
                         @Override
                         public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                            if(mPlayer != null && fromUser){
+                            if (mPlayer != null && fromUser) {
                                 mPlayer.seekTo(progress * 1000);
-                                String seekTitle = getTimeString(mPlayer.getCurrentPosition())+"/"+getTimeString(mPlayer.getDuration());
+                                String seekTitle = getTimeString(mPlayer.getCurrentPosition()) + "/" + getTimeString(mPlayer.getDuration());
                                 mSeekTitle.setText(seekTitle);
                             }
                         }
@@ -232,7 +241,7 @@ public class SongActivity extends AppCompatActivity implements Playable {
             @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
             @Override
             public void onClick(View view) {
-                if((mPlayer.getCurrentPosition()/1000)<4) {
+                if ((mPlayer.getCurrentPosition() / 1000) < 4) {
                     actualPos--;
                     if (actualPos == -1) {
                         actualPos = songList.size() - 1;
@@ -244,7 +253,7 @@ public class SongActivity extends AppCompatActivity implements Playable {
                     mPlay.setImageResource(R.drawable.ic_pause);
                     onTrackPrevious();
                     initializeMusicUI();
-                }else{
+                } else {
                     mPlayer.seekTo(0);
                 }
             }
@@ -255,7 +264,7 @@ public class SongActivity extends AppCompatActivity implements Playable {
             @Override
             public void onClick(View view) {
                 actualPos++;
-                if(actualPos >= songList.size()){
+                if (actualPos >= songList.size()) {
                     actualPos = 0;
                 }
                 mSong = songList.get(actualPos);
@@ -274,7 +283,7 @@ public class SongActivity extends AppCompatActivity implements Playable {
             @Override
             public void onCompletion(MediaPlayer mediaPlayer) {
                 actualPos++;
-                if(actualPos >= songList.size()){
+                if (actualPos >= songList.size()) {
                     actualPos = 0;
                 }
                 mSong = songList.get(actualPos);
@@ -290,8 +299,9 @@ public class SongActivity extends AppCompatActivity implements Playable {
 
     //riempio la canzone selezionata
     private void getSong() {
-        mSong = (Song)getIntent().getSerializableExtra("songSelected");
+        mSong = (Song) getIntent().getSerializableExtra("songSelected");
     }
+
     @SuppressLint("RestrictedApi")
     private void initializeUI() {
         //Verifico che non vi siano Null values
@@ -302,17 +312,18 @@ public class SongActivity extends AppCompatActivity implements Playable {
     }
 
     private void initializeMusicUI() {
-        mImageView = (ImageView)findViewById(R.id.song_item_image);
-        mText2 = (TextView)findViewById(R.id.song_item_title);
-        mTextView = (TextView)findViewById(R.id.song_item_author);
+        mImageView = (ImageView) findViewById(R.id.song_item_image);
+        mText2 = (TextView) findViewById(R.id.song_item_title);
+        mTextView = (TextView) findViewById(R.id.song_item_author);
         Picasso.get().load(mSong.getCover()).into(mImageView);
         String aut_feat = mSong.getAuthors();
-        if(!mSong.getFeats().equals(""))
-            aut_feat +=" ft. "+mSong.getFeats();
+        if (!mSong.getFeats().equals(""))
+            aut_feat += " ft. " + mSong.getFeats();
         mTextView.setText(aut_feat);
         mText2.setText(mSong.getTitle());
 
     }
+
     //Bottone indietro
     @Override
     public boolean onSupportNavigateUp() {
@@ -329,14 +340,14 @@ public class SongActivity extends AppCompatActivity implements Playable {
         public void onReceive(Context context, Intent intent) {
             String action = intent.getExtras().getString("actionName");
             //controllo l'azione ricevuta
-            switch(action){
+            switch (action) {
                 case CreateNotification.ACTION_PREV:
                     onTrackPrevious();
                     break;
                 case CreateNotification.ACTION_PLAY:
-                    if(isPlaying){
+                    if (isPlaying) {
                         onTrackPause();
-                    }else {
+                    } else {
                         onTrackPlay();
                     }
                     break;
@@ -351,14 +362,14 @@ public class SongActivity extends AppCompatActivity implements Playable {
     @Override
     public void onTrackPrevious() {
         actualPos--;
-        if(actualPos <0)
-            actualPos=songList.size()-1;
+        if (actualPos < 0)
+            actualPos = songList.size() - 1;
         mSong = songList.get(actualPos);
-        CreateNotification.createNotification(SongActivity.this,mSong,R.drawable.ic_pause);
+        CreateNotification.createNotification(SongActivity.this, mSong, R.drawable.ic_pause);
         mText2.setText(mSong.getTitle());
         String aut_feat = mSong.getAuthors();
-        if(!mSong.getFeats().equals(""))
-            aut_feat += " ft. "+mSong.getFeats();
+        if (!mSong.getFeats().equals(""))
+            aut_feat += " ft. " + mSong.getFeats();
         mTextView.setText(aut_feat);
         Picasso.get().load(mSong.getCover()).into(mImageView);
         //CODICE PER ANDARE INDIETRO
@@ -370,30 +381,30 @@ public class SongActivity extends AppCompatActivity implements Playable {
 
     @Override
     public void onTrackPlay() {
-        CreateNotification.createNotification(SongActivity.this,mSong,R.drawable.ic_pause);
+        CreateNotification.createNotification(SongActivity.this, mSong, R.drawable.ic_pause);
         mText2.setText(mSong.getTitle());
         String aut_feat = mSong.getAuthors();
-        if(!mSong.getFeats().equals(""))
-            aut_feat += " ft. "+mSong.getFeats();
+        if (!mSong.getFeats().equals(""))
+            aut_feat += " ft. " + mSong.getFeats();
         mTextView.setText(aut_feat);
         //CODICE PER PLAY
         mPlayer.start();
         mPlay.setImageResource(R.drawable.ic_pause);
-        isPlaying=true;
+        isPlaying = true;
     }
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     public void onTrackNext() {
         actualPos++;
-        if(actualPos >=songList.size())
-            actualPos=0;
+        if (actualPos >= songList.size())
+            actualPos = 0;
         mSong = songList.get(actualPos);
-        CreateNotification.createNotification(SongActivity.this,mSong,R.drawable.ic_pause);
+        CreateNotification.createNotification(SongActivity.this, mSong, R.drawable.ic_pause);
         mText2.setText(mSong.getTitle());
         String aut_feat = mSong.getAuthors();
-        if(!mSong.getFeats().equals(""))
-            aut_feat += " ft. "+mSong.getFeats();
+        if (!mSong.getFeats().equals(""))
+            aut_feat += " ft. " + mSong.getFeats();
         mTextView.setText(aut_feat);
         Picasso.get().load(mSong.getCover()).into(mImageView);
         //CODICE PER ANDARE AVANTI
@@ -405,15 +416,15 @@ public class SongActivity extends AppCompatActivity implements Playable {
 
     @Override
     public void onTrackPause() {
-        CreateNotification.createNotification(SongActivity.this,mSong,R.drawable.ic_play);
+        CreateNotification.createNotification(SongActivity.this, mSong, R.drawable.ic_play);
         mText2.setText(mSong.getTitle());
         String aut_feat = mSong.getAuthors();
-        if(!mSong.getFeats().equals(""))
-            aut_feat += " ft. "+mSong.getFeats();
+        if (!mSong.getFeats().equals(""))
+            aut_feat += " ft. " + mSong.getFeats();
         mTextView.setText(aut_feat);
         //CODICE PER PLAY
         mPlayer.pause();
         mPlay.setImageResource(R.drawable.ic_play);
-        isPlaying=false;
+        isPlaying = false;
     }
 }

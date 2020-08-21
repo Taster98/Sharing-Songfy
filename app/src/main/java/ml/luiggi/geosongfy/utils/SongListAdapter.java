@@ -20,19 +20,19 @@ import ml.luiggi.geosongfy.SongActivity;
 import ml.luiggi.geosongfy.scaffoldings.Song;
 
 /*
-* Questa classe rappresenta l'Adapter per poter correttamente visualizzare la lista delle canzoni all'interno dell'oggetto RecyclerView.
-* */
+ * Questa classe rappresenta l'Adapter per poter correttamente visualizzare la lista delle canzoni all'interno dell'oggetto RecyclerView.
+ * */
 public class SongListAdapter extends RecyclerView.Adapter<SongListAdapter.SongListViewHolder> {
     private ArrayList<Song> songList;
 
-    public SongListAdapter(ArrayList<Song> songList){
-        this.songList=songList;
+    public SongListAdapter(ArrayList<Song> songList) {
+        this.songList = songList;
     }
 
     @NonNull
     @Override
     public SongListViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View layoutView = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_song,null,false);
+        View layoutView = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_song, null, false);
         SongListViewHolder mSongVH = new SongListViewHolder(layoutView);
         return mSongVH;
     }
@@ -41,10 +41,10 @@ public class SongListAdapter extends RecyclerView.Adapter<SongListAdapter.SongLi
     public void onBindViewHolder(@NonNull final SongListViewHolder holder, final int position) {
         holder.mTitle.setText(songList.get(position).getTitle());
 
-        if(!songList.get(position).getFeats().equals("")) {
-            String aut_feat = songList.get(position).getAuthors() + " ft. "+songList.get(position).getFeats();
+        if (!songList.get(position).getFeats().equals("")) {
+            String aut_feat = songList.get(position).getAuthors() + " ft. " + songList.get(position).getFeats();
             holder.mAuthors.setText(aut_feat);
-        }else{
+        } else {
             holder.mAuthors.setText(songList.get(position).getAuthors());
         }
         Picasso.get().load(songList.get(position).getCover()).into(holder.mCover);
@@ -52,9 +52,31 @@ public class SongListAdapter extends RecyclerView.Adapter<SongListAdapter.SongLi
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(view.getContext(), SongActivity.class);
-                intent.putExtra("songSelected",songList.get(holder.getAdapterPosition()));
+                intent.putExtra("songSelected", songList.get(holder.getAdapterPosition()));
                 //passo anche l'arraylist totale perchè potrebbe servirmi per implementare poi il pulsante avanti/indietro
-                intent.putExtra("allSongs",songList);
+                intent.putExtra("allSongs", songList);
+                view.getContext().startActivity(intent);
+
+            }
+        });
+        holder.mCover.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(view.getContext(), SongActivity.class);
+                intent.putExtra("songSelected", songList.get(holder.getAdapterPosition()));
+                //passo anche l'arraylist totale perchè potrebbe servirmi per implementare poi il pulsante avanti/indietro
+                intent.putExtra("allSongs", songList);
+                view.getContext().startActivity(intent);
+
+            }
+        });
+        holder.mPlay.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(view.getContext(), SongActivity.class);
+                intent.putExtra("songSelected", songList.get(holder.getAdapterPosition()));
+                //passo anche l'arraylist totale perchè potrebbe servirmi per implementare poi il pulsante avanti/indietro
+                intent.putExtra("allSongs", songList);
                 view.getContext().startActivity(intent);
 
             }
@@ -67,16 +89,18 @@ public class SongListAdapter extends RecyclerView.Adapter<SongListAdapter.SongLi
     }
 
     //Questa classe mi serve per poter gestire le viste varie (il ViewHolder)
-    public class SongListViewHolder extends RecyclerView.ViewHolder{
-        public TextView mTitle,mAuthors;
-        public ImageView mCover;
+    public class SongListViewHolder extends RecyclerView.ViewHolder {
+        public TextView mTitle, mAuthors;
+        public ImageView mCover,mPlay;
         public LinearLayout mLayout;
-        public SongListViewHolder(View view){
+
+        public SongListViewHolder(View view) {
             super(view);
             mTitle = view.findViewById(R.id.titolo_canzone);
             mAuthors = view.findViewById(R.id.autore_canzone);
             mLayout = view.findViewById(R.id.item_songs_id);
             mCover = view.findViewById(R.id.cover_image);
+            mPlay = view.findViewById(R.id.play_right_icon);
         }
     }
 }

@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "623505621601",
+    "firebase_url": "https://sharing-songfy.firebaseio.com",
+    "project_id": "sharing-songfy",
+    "storage_bucket": "sharing-songfy.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:623505621601:android:8a14904f035bbe1f3d2020",
+        "android_client_info": {
+          "package_name": "ml.luiggi.geosongfy"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "623505621601-nms9n956797m9uncvm6ieogsmreofl86.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "ml.luiggi.geosongfy",
+            "certificate_hash": "91a1be9537a5bf71578018d7350e8cc0c13c5216"
+          }
+        },
+        {
+          "client_id": "623505621601-716nhin4onqgg8puj26u2a5n79s479o4.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD2dLezZo02fdvSO30OveD0pW1_lEvffMo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "623505621601-716nhin4onqgg8puj26u2a5n79s479o4.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

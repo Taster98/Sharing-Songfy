@@ -4,4 +4,15 @@
     <string name="home">Home</string>
     <string name="friend_listen">Ascolta con i tuoi amici</string>
     <string name="tutte_le_canzoni">Tutte le canzoni</string>
+    <string name="navigation_drawer_open">Sfoglia</string>
+    <string name="navigation_drawer_close">Menu</string>
+    <string name="naviga">Naviga</string>
+    <string name="playlists">Le tue Playlist</string>
+    <string name="crea_playlist">Crea Playlist</string>
+    <string name="app_title">Sharing Songfy</string>
+    <string name="_39">+39</string>
+    <string name="phone_number">Numero di telefono</string>
+    <string name="button">Invia codice</string>
+    <string name="codice">Codice</string>
+    <string name="access_text">Registrati o accedi a Sharing SongFy</string>
 </resources>

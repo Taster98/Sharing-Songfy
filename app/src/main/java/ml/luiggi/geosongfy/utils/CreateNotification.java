@@ -8,8 +8,10 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Build;
 import android.support.v4.media.session.MediaSessionCompat;
+
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
+
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -19,8 +21,8 @@ import ml.luiggi.geosongfy.scaffoldings.Song;
 import ml.luiggi.geosongfy.services.NotificationActionService;
 
 /*
-* Questa classe rappresenta la creazione della notifica e le interpretazioni dei comandi ricevuti su di essa.
-*/
+ * Questa classe rappresenta la creazione della notifica e le interpretazioni dei comandi ricevuti su di essa.
+ */
 public class CreateNotification {
     //id del channel per la notifica
     public static final String CHANNEL_ID = "geosongfy_player";
@@ -30,29 +32,30 @@ public class CreateNotification {
     public static final String ACTION_NEXT = "ml.luiggi.action.NEXT";
 
     public static Notification notification;
+
     //funzione che crea una notifica
-    public static void createNotification(final Context context, final Song song, final int playButton){
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+    public static void createNotification(final Context context, final Song song, final int playButton) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             final NotificationManagerCompat notificationManagerCompat = NotificationManagerCompat.from(context);
-            final MediaSessionCompat mediaSessionCompat = new MediaSessionCompat(context,"tag");
+            final MediaSessionCompat mediaSessionCompat = new MediaSessionCompat(context, "tag");
             String aut_feat = song.getAuthors();
-            if(!song.getFeats().equals("")){
-                aut_feat += " ft. "+song.getFeats();
+            if (!song.getFeats().equals("")) {
+                aut_feat += " ft. " + song.getFeats();
             }
             //PRECEDENTE
             Intent previousIntent = new Intent(context, NotificationActionService.class)
                     .setAction(ACTION_PREV);
-            final PendingIntent pendingIntentPrevious = PendingIntent.getBroadcast(context,0,previousIntent,PendingIntent.FLAG_UPDATE_CURRENT);
+            final PendingIntent pendingIntentPrevious = PendingIntent.getBroadcast(context, 0, previousIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
             //PLAY
-            Intent playIntent = new Intent(context,NotificationActionService.class)
+            Intent playIntent = new Intent(context, NotificationActionService.class)
                     .setAction(ACTION_PLAY);
-            final PendingIntent pendingIntentPlay = PendingIntent.getBroadcast(context,0,playIntent,PendingIntent.FLAG_UPDATE_CURRENT);
+            final PendingIntent pendingIntentPlay = PendingIntent.getBroadcast(context, 0, playIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
             //SUCCESSIVO
-            Intent nextIntent = new Intent(context,NotificationActionService.class)
+            Intent nextIntent = new Intent(context, NotificationActionService.class)
                     .setAction(ACTION_NEXT);
-            final PendingIntent pendingIntentNext = PendingIntent.getBroadcast(context,0,nextIntent,PendingIntent.FLAG_UPDATE_CURRENT);
+            final PendingIntent pendingIntentNext = PendingIntent.getBroadcast(context, 0, nextIntent, PendingIntent.FLAG_UPDATE_CURRENT);
             final String picture = song.getCover();
 
             final String finalAut_feat = aut_feat;
@@ -60,30 +63,30 @@ public class CreateNotification {
             new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    try{
+                    try {
                         URL url = new URL(picture);
-                        HttpURLConnection connection = (HttpURLConnection)url.openConnection();
+                        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
                         connection.setDoInput(true);
                         connection.connect();
                         InputStream in = connection.getInputStream();
                         Bitmap myBitmap = BitmapFactory.decodeStream(in);
-                        notification = new NotificationCompat.Builder(context,CHANNEL_ID)
+                        notification = new NotificationCompat.Builder(context, CHANNEL_ID)
                                 .setSmallIcon(R.drawable.ic_music)
                                 .setContentTitle(song.getTitle())
                                 .setContentText(finalAut_feat)
                                 .setOnlyAlertOnce(true)
                                 .setShowWhen(false)
-                                .addAction(R.drawable.ic_prev,"Previous",pendingIntentPrevious)
-                                .addAction(playButton,"Play",pendingIntentPlay)
-                                .addAction(R.drawable.ic_next,"Next",pendingIntentNext)
+                                .addAction(R.drawable.ic_prev, "Previous", pendingIntentPrevious)
+                                .addAction(playButton, "Play", pendingIntentPlay)
+                                .addAction(R.drawable.ic_next, "Next", pendingIntentNext)
                                 .setStyle(new androidx.media.app.NotificationCompat.MediaStyle()
-                                        .setShowActionsInCompactView(0,1,2)
+                                        .setShowActionsInCompactView(0, 1, 2)
                                         .setMediaSession(mediaSessionCompat.getSessionToken()))
                                 .setPriority(NotificationCompat.PRIORITY_MAX)
                                 .setLargeIcon(myBitmap)
                                 .build();
-                        notificationManagerCompat.notify(1,notification);
-                    }catch (Exception e){
+                        notificationManagerCompat.notify(1, notification);
+                    } catch (Exception e) {
                         e.printStackTrace();
                     }
                 }

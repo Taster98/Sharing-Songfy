@@ -8,7 +8,7 @@ import java.io.Serializable;
 import java.util.Objects;
 
 /*
-*Questa classe serve per contenere invece in un oggetto i dati parsati dal file Json. Deve implementare Serializable per poter essere passata come extra all'interno di un Intent.
+ *Questa classe serve per contenere invece in un oggetto i dati parsati dal file Json. Deve implementare Serializable per poter essere passata come extra all'interno di un Intent.
  */
 public class Song implements Serializable {
     String title,
@@ -17,12 +17,12 @@ public class Song implements Serializable {
             url,
             cover;
 
-    public Song(String title, String cover,String author, String feat,String url){
-        this.title=title;
-        this.author=author;
-        this.cover=cover;
-        this.feat=feat;
-        this.url=url;
+    public Song(String title, String cover, String author, String feat, String url) {
+        this.title = title;
+        this.author = author;
+        this.cover = cover;
+        this.feat = feat;
+        this.url = url;
     }
 
     public String getUrl() {
