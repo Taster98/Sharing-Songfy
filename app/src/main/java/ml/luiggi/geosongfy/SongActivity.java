@@ -172,7 +172,7 @@ public class SongActivity extends AppCompatActivity implements Playable {
             }
         });
         //INIZIO GESTIONE CONTROLLI
-
+        onTrackPlay();
         //Imposto un listener sul bottone Play
         mPlay.setOnClickListener(new View.OnClickListener() {
             @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
@@ -282,6 +282,7 @@ public class SongActivity extends AppCompatActivity implements Playable {
                 initializeMediaPlayer();
                 mPlayer.start();
                 mPlay.setImageResource(R.drawable.ic_pause);
+                onTrackNext();
                 initializeMusicUI();
             }
         });
