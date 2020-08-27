@@ -254,6 +254,8 @@ public class PlaylistFragment extends Fragment {
         Type type = new TypeToken<ArrayList<Playlist>>() {
         }.getType();
         playlistList = gson.fromJson(json, type);
+        if(playlistList == null)
+            playlistList = new ArrayList<>();
     }
 
     @Override
@@ -265,12 +267,14 @@ public class PlaylistFragment extends Fragment {
     public void onResume() {
         super.onResume();
         loadPlaylists(bkpView);
-        Collections.sort(playlistList, new Comparator<Playlist>() {
-            @Override
-            public int compare(Playlist lhs, Playlist rhs) {
-                return lhs.getPlaylistName().compareTo(rhs.getPlaylistName());
-            }
-        });
+        if(playlistList != null) {
+            Collections.sort(playlistList, new Comparator<Playlist>() {
+                @Override
+                public int compare(Playlist lhs, Playlist rhs) {
+                    return lhs.getPlaylistName().compareTo(rhs.getPlaylistName());
+                }
+            });
+        }
         initPlaylistFragment(bkpView);
         mAdapter.notifyDataSetChanged();
     }

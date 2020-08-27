@@ -188,6 +188,8 @@ public class PlaylistActivity extends AppCompatActivity {
         Type type = new TypeToken<ArrayList<Playlist>>() {
         }.getType();
         newPlaylists = gson.fromJson(json, type);
+        if(newPlaylists == null)
+            newPlaylists = new ArrayList<>();
     }
 
     //Funzione che carica tutte le canzoni

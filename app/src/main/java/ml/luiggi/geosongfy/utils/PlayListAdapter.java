@@ -192,5 +192,7 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.PlayLi
         Type type = new TypeToken<ArrayList<Playlist>>() {
         }.getType();
         playlists = gson.fromJson(json, type);
+        if(playlists == null)
+            playlists = new ArrayList<>();
     }
 }
