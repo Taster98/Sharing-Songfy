@@ -26,6 +26,9 @@ import com.google.gson.reflect.TypeToken;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+
 import ml.luiggi.geosongfy.R;
 import ml.luiggi.geosongfy.scaffoldings.Playlist;
 import ml.luiggi.geosongfy.scaffoldings.Song;
@@ -102,6 +105,12 @@ public class PlaylistFragment extends Fragment {
         loadPlaylists(v);
         if (playlistList == null)
             playlistList = new ArrayList<>();
+        Collections.sort(playlistList, new Comparator<Playlist>() {
+            @Override
+            public int compare(Playlist lhs, Playlist rhs) {
+                return lhs.getPlaylistName().compareTo(rhs.getPlaylistName());
+            }
+        });
         initPlaylistFragment(v);
         initSongs();
         btn = v.findViewById(R.id.crea_playlist);
@@ -250,5 +259,19 @@ public class PlaylistFragment extends Fragment {
     @Override
     public void onDestroy() {
         super.onDestroy();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        loadPlaylists(bkpView);
+        Collections.sort(playlistList, new Comparator<Playlist>() {
+            @Override
+            public int compare(Playlist lhs, Playlist rhs) {
+                return lhs.getPlaylistName().compareTo(rhs.getPlaylistName());
+            }
+        });
+        initPlaylistFragment(bkpView);
+        mAdapter.notifyDataSetChanged();
     }
 }

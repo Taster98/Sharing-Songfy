@@ -23,6 +23,8 @@ import com.google.gson.reflect.TypeToken;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 
 import ml.luiggi.geosongfy.PlaylistActivity;
 import ml.luiggi.geosongfy.R;
@@ -100,6 +102,12 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.PlayLi
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         playlists.remove(pos);
+                        Collections.sort(playlists, new Comparator<Playlist>() {
+                            @Override
+                            public int compare(Playlist lhs, Playlist rhs) {
+                                return lhs.getPlaylistName().compareTo(rhs.getPlaylistName());
+                            }
+                        });
                         notifyItemRemoved(pos);
                         savePlaylists(v);
                     }
@@ -127,7 +135,14 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.PlayLi
                         else {
                             String curName = editText.getText().toString();
                             playlists.get(pos).setPlaylistName(curName);
+                            Collections.sort(playlists, new Comparator<Playlist>() {
+                                @Override
+                                public int compare(Playlist lhs, Playlist rhs) {
+                                    return lhs.getPlaylistName().compareTo(rhs.getPlaylistName());
+                                }
+                            });
                             notifyItemChanged(pos);
+                            notifyDataSetChanged();
                             savePlaylists(view);
                         }
                     }

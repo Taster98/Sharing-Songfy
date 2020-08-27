@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -118,8 +119,10 @@ public class SongListAdapter extends RecyclerView.Adapter<SongListAdapter.SongLi
         popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem menuItem) {
-                if(menuItem.getItemId() == R.id.delete_one_menu){
-                    deleteDialog(v,i);
+                switch (menuItem.getItemId()){
+                    case R.id.delete_one_menu:
+                        deleteDialog(v,i);
+                        break;
                 }
                 return true;
             }
@@ -138,6 +141,14 @@ public class SongListAdapter extends RecyclerView.Adapter<SongListAdapter.SongLi
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         //implementare eliminazione
+                        songList.remove(pos);
+                        notifyItemRemoved(pos);
+                        isPlaylist.setSongList(songList);
+                        loadPlaylists(v);
+                        allPlaylists.remove(isPlaylist);
+                        allPlaylists.add(isPlaylist);
+                        notifyItemRemoved(pos);
+                        savePlaylists(v);
                     }
                 })
                 .setNegativeButton("No",
@@ -147,7 +158,6 @@ public class SongListAdapter extends RecyclerView.Adapter<SongListAdapter.SongLi
                                 dialogInterface.dismiss();
                             }
                         });
-        notifyDataSetChanged();
         alertbox.show();
     }
     @Override

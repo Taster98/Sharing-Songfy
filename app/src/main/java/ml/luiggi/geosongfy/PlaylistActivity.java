@@ -54,9 +54,18 @@ public class PlaylistActivity extends AppCompatActivity {
 
     @Override
     protected void onResume() {
-        loadPlaylists();
-        mAdapter.notifyDataSetChanged();
+        //
         super.onResume();
+        loadPlaylists();
+        Collections.sort(newPlaylists, new Comparator<Playlist>() {
+            @Override
+            public int compare(Playlist lhs, Playlist rhs) {
+                return lhs.getPlaylistName().compareTo(rhs.getPlaylistName());
+            }
+        });
+        initSongs();
+        mAdapter.notifyDataSetChanged();
+
     }
 
     private void initUI() {
@@ -69,7 +78,8 @@ public class PlaylistActivity extends AppCompatActivity {
     private void initSongs() {
 
         Playlist curPlaylist = (Playlist) getIntent().getSerializableExtra("playlistSelected");
-        songList = (ArrayList<Song>) curPlaylist.getSongList();
+        Playlist realCur = newPlaylists.get(newPlaylists.indexOf(curPlaylist));
+        songList = (ArrayList<Song>) realCur.getSongList();
         initAllSongs();
         //riferimento all'oggetto
         RecyclerView recyclerView = (RecyclerView) findViewById(R.id.songList);
@@ -94,6 +104,12 @@ public class PlaylistActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         savePlaylists();
+        Collections.sort(newPlaylists, new Comparator<Playlist>() {
+            @Override
+            public int compare(Playlist lhs, Playlist rhs) {
+                return lhs.getPlaylistName().compareTo(rhs.getPlaylistName());
+            }
+        });
         super.onDestroy();
     }
 
@@ -136,15 +152,10 @@ public class PlaylistActivity extends AppCompatActivity {
                         curPlaylist.setSongList(actualSongs);
                         newPlaylists.remove(curPlaylist);
                         newPlaylists.add(curPlaylist);
-                        Collections.sort(newPlaylists, new Comparator<Playlist>() {
-                            @Override
-                            public int compare(Playlist lhs, Playlist rhs) {
-                                return lhs.getPlaylistName().compareTo(rhs.getPlaylistName());
-                            }
-                        });
                         mAdapter.notifyDataSetChanged();
                         //salvare nello shared preferences
                         savePlaylists();
+                        initSongs();
                     }
                 })
                 .setNegativeButton(R.string.annulla, new DialogInterface.OnClickListener() {
