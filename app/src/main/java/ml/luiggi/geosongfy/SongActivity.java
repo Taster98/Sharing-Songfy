@@ -33,7 +33,7 @@ import ml.luiggi.geosongfy.services.OnClearFromRecentService;
 import ml.luiggi.geosongfy.utils.CreateNotification;
 
 public class SongActivity extends AppCompatActivity implements Playable {
-    private static MediaPlayer mPlayer;
+    public static MediaPlayer mPlayer;
     private Song mSong;
     private ArrayList<Song> songList;
     private int actualPos;
@@ -251,7 +251,7 @@ public class SongActivity extends AppCompatActivity implements Playable {
                     initializeMediaPlayer();
                     mPlayer.start();
                     mPlay.setImageResource(R.drawable.ic_pause);
-                    onTrackPrevious();
+                    onTrackPreviousNoPlay();
                     initializeMusicUI();
                 } else {
                     mPlayer.seekTo(0);
@@ -272,7 +272,7 @@ public class SongActivity extends AppCompatActivity implements Playable {
                 initializeMediaPlayer();
                 mPlayer.start();
                 mPlay.setImageResource(R.drawable.ic_pause);
-                onTrackNext();
+                onTrackNextNoPlay();
                 initializeMusicUI();
             }
         });
@@ -378,7 +378,38 @@ public class SongActivity extends AppCompatActivity implements Playable {
         handleMusic();
         mPlayer.start();
     }
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+    public void onTrackPreviousNoPlay(){
+        mSong = songList.get(actualPos);
+        CreateNotification.createNotification(SongActivity.this, mSong, R.drawable.ic_pause);
+        mText2.setText(mSong.getTitle());
+        String aut_feat = mSong.getAuthors();
+        if (!mSong.getFeats().equals(""))
+            aut_feat += " ft. " + mSong.getFeats();
+        mTextView.setText(aut_feat);
+        Picasso.get().load(mSong.getCover()).into(mImageView);
+        //CODICE PER ANDARE INDIETRO
+        mPlayer.stop();
+        initializeMediaPlayer();
+        handleMusic();
+        mPlayer.start();
+    }
 
+    public void onTrackNextNoPlay(){
+        mSong = songList.get(actualPos);
+        CreateNotification.createNotification(SongActivity.this, mSong, R.drawable.ic_pause);
+        mText2.setText(mSong.getTitle());
+        String aut_feat = mSong.getAuthors();
+        if (!mSong.getFeats().equals(""))
+            aut_feat += " ft. " + mSong.getFeats();
+        mTextView.setText(aut_feat);
+        Picasso.get().load(mSong.getCover()).into(mImageView);
+        //CODICE PER ANDARE AVANTI
+        mPlayer.stop();
+        initializeMediaPlayer();
+        handleMusic();
+        mPlayer.start();
+    }
     @Override
     public void onTrackPlay() {
         CreateNotification.createNotification(SongActivity.this, mSong, R.drawable.ic_pause);

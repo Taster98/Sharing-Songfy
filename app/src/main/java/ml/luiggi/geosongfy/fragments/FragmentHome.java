@@ -15,38 +15,34 @@ import java.util.ArrayList;
 
 import ml.luiggi.geosongfy.R;
 import ml.luiggi.geosongfy.scaffoldings.Song;
-import ml.luiggi.geosongfy.utils.DrawerLocker;
 import ml.luiggi.geosongfy.utils.SongListAdapter;
 import ml.luiggi.geosongfy.utils.JsonParserUrl;
 
 /*
-* Questa classe rappresenta il frammento della pagina principale, ossia quello contenente il Recycler View con l'elenco di tutte le canzoni presenti nel server
-*/
+ * Questa classe rappresenta il frammento della pagina principale, ossia quello contenente il Recycler View con l'elenco di tutte le canzoni presenti nel server
+ */
 public class FragmentHome extends Fragment {
-    private RecyclerView recyclerView;
-    private RecyclerView.Adapter mAdapter;
-    private RecyclerView.LayoutManager mLayoutManager;
     //lista di canzoni da riempire poi prelevandole dal server
     private ArrayList<Song> songList;
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.fragment_home,container,false);
-        //disabilito il menudrawer
-        ((DrawerLocker) getActivity()).setDrawerEnabled(false);
+        View v = inflater.inflate(R.layout.fragment_home, container, false);
         //carico canzoni
         initSongs(v);
         return v;
     }
+
     //Funzione che carica tutte le canzoni
     private void initSongs(final View v) {
         //Uso un thread per non intasare l'UI
         new Thread(new Runnable() {
             @Override
             public void run() {
-                try{
+                try {
                     loadSongs(v);
-                }catch (Exception e){
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
@@ -54,7 +50,7 @@ public class FragmentHome extends Fragment {
     }
 
     //funzione che parsa dal server il file json contenente l'elenco di canzoni presenti in esso
-    private void loadSongs(final View v){
+    private void loadSongs(final View v) {
         songList = new ArrayList<>();
         JsonParserUrl mp = new JsonParserUrl("http://luiggi.altervista.org/song_db.json");
         songList = mp.getSongs();
@@ -68,18 +64,21 @@ public class FragmentHome extends Fragment {
             }
         });
     }
+
     //Funzione che inizializza il fragment con il recyclerView
     private void initHomeFragment(View v) {
         //riferimento all'oggetto
-        recyclerView = (RecyclerView) v.findViewById(R.id.songList);
+        RecyclerView recyclerView = (RecyclerView) v.findViewById(R.id.songList);
         //dimensione nel layout fissata
         recyclerView.setHasFixedSize(true);
         //imposto un layout manager per la recycler view
-        mLayoutManager = new LinearLayoutManager(v.getContext());
+        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(v.getContext());
         recyclerView.setLayoutManager(mLayoutManager);
         //imposto un adapter per i dati della recycler view
-        mAdapter = new SongListAdapter(songList);
+        RecyclerView.Adapter mAdapter = new SongListAdapter(songList);
         recyclerView.setAdapter(mAdapter);
 
     }
+
+
 }

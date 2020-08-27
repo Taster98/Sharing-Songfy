@@ -3,7 +3,9 @@ package ml.luiggi.geosongfy.utils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -19,9 +21,11 @@ import ml.luiggi.geosongfy.scaffoldings.Friend;
  * */
 public class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.FriendListViewHolder> {
     private ArrayList<Friend> friendList;
+    public ArrayList<Friend> checkedList;
 
     public FriendListAdapter(ArrayList<Friend> friendList) {
         this.friendList = friendList;
+        this.checkedList = new ArrayList<>();
     }
 
     @NonNull
@@ -34,19 +38,18 @@ public class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.Fr
 
     @Override
     public void onBindViewHolder(@NonNull final FriendListViewHolder holder, final int position) {
+        final Friend curFriend = friendList.get(position);
         holder.mName.setText(friendList.get(position).getName());
         holder.mNumber.setText(friendList.get(position).getPhoneNumber());
-
-        holder.mLayout.setOnClickListener(new View.OnClickListener() {
+        holder.mRelativeLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                /*
-                TODO
-
-
-                Intent intent = new Intent(view.getContext(), FriendActivity.class);
-                intent.putExtra("friendSelected",friendList.get(holder.getAdapterPosition()));
-                view.getContext().startActivity(intent);*/
+                holder.mCheckBox.setChecked(!holder.mCheckBox.isChecked());
+                if (holder.mCheckBox.isChecked()) {
+                    checkedList.add(curFriend);
+                } else {
+                    checkedList.remove(curFriend);
+                }
             }
         });
     }
@@ -60,12 +63,18 @@ public class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.Fr
     public class FriendListViewHolder extends RecyclerView.ViewHolder {
         public TextView mName, mNumber;
         public LinearLayout mLayout;
+        public CheckBox mCheckBox;
+        public RelativeLayout mRelativeLayout;
 
         public FriendListViewHolder(View view) {
             super(view);
             mName = view.findViewById(R.id.nome_friend);
             mNumber = view.findViewById(R.id.numero_friend);
             mLayout = view.findViewById(R.id.linear_item_id);
+            mCheckBox = view.findViewById(R.id.checkbox);
+            mRelativeLayout = view.findViewById(R.id.friend_item_id);
+            if (mCheckBox != null)
+                mCheckBox.setClickable(false);
         }
     }
 }

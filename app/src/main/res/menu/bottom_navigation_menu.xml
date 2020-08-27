@@ -6,8 +6,8 @@
         android:icon="@drawable/ic_home"
         android:title="@string/home"/>
     <item
-        android:id="@+id/people"
+        android:id="@+id/fragment_tue_playlist"
         android:enabled="true"
-        android:icon="@drawable/ic_people"
-        android:title="@string/friend_listen"/>
+        android:icon="@drawable/ic_playlist"
+        android:title="@string/le_tue_playlist"/>
 </menu>

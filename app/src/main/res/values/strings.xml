@@ -15,4 +15,15 @@
     <string name="button">Invia codice</string>
     <string name="codice">Codice</string>
     <string name="access_text">Registrati o accedi a Sharing SongFy</string>
+    <string name="scrivi">Scrivi</string>
+    <string name="le_tue_playlist">Le tue Playlist</string>
+    <string name="crea_nuova_playlist">+ Crea nuova playlist</string>
+    <string name="annulla">Annulla</string>
+    <string name="crea">Crea</string>
+    <string name="nome_playlist">Nome playlist</string>
+    <string name="scegli_le_canzoni_da_inserire">Scegli le canzoni da inserire</string>
+    <string name="aggiungi">Aggiungi</string>
+    <string name="elimina">Elimina</string>
+    <string name="rinomina">Rinomina</string>
+    <string name="rinomina_playlist">Rinomina playlist</string>
 </resources>
