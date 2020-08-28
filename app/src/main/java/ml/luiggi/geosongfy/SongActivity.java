@@ -13,10 +13,6 @@ import android.media.MediaPlayer;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -25,7 +21,6 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
@@ -54,7 +49,8 @@ public class SongActivity extends AppCompatActivity implements Playable {
     TextView mTextView;
     LinearLayout mLinearLayout;
     LinearLayout container;
-    MenuInflater menuInflater;
+    SeekBar volumeBar;
+    AudioManager audioManager;
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -148,6 +144,7 @@ public class SongActivity extends AppCompatActivity implements Playable {
         mSeekTitle = (TextView) findViewById(R.id.song_item_seekTitle);
         mBack = (ImageButton) findViewById(R.id.song_item_previous);
         mNext = (ImageButton) findViewById(R.id.song_item_next);
+        volumeBar = (SeekBar) findViewById(R.id.volumeBar);
         //Imposto la durata (da ms a s)
         mSeek.setMax(mPlayer.getDuration() / 1000);
 
@@ -412,7 +409,46 @@ public class SongActivity extends AppCompatActivity implements Playable {
                 super.onLongClick();
                 mPlayer.seekTo(0);
             }
-            //CONTROLLO VOLUME
+
+            @Override
+            public void onSwipeDown() {
+                super.onSwipeDown();
+                Thread volumeThread = new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            volumeBar.setVisibility(View.VISIBLE);
+                            Thread.sleep(1000);
+                            volumeBar.setVisibility(View.INVISIBLE);
+                        } catch (Exception e) {
+                            e.getLocalizedMessage();
+                        }
+                    }
+                });
+                volumeThread.start();
+            }
+
+            @Override
+            public void onSwipeUp() {
+                super.onSwipeUp();
+                Thread volumeThread = new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            volumeBar.setVisibility(View.VISIBLE);
+                            Toast.makeText(getApplicationContext(),"Volume alzato",Toast.LENGTH_SHORT).show();
+                            Thread.sleep(1000);
+                            volumeBar.setVisibility(View.INVISIBLE);
+                        } catch (Exception e) {
+                            e.getLocalizedMessage();
+                        }
+                    }
+                });
+                volumeThread.start();
+
+            }
+
+            /*//CONTROLLO VOLUME
             AudioManager audioManager = (AudioManager) getApplicationContext().getSystemService(Context.AUDIO_SERVICE);
             @Override
             public void onSwipeDown() {
@@ -424,7 +460,7 @@ public class SongActivity extends AppCompatActivity implements Playable {
             public void onSwipeUp() {
                 super.onSwipeUp();
                 audioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC,AudioManager.ADJUST_RAISE,AudioManager.FLAG_SHOW_UI);
-            }
+            }*/
 
             /*@Override
             public void onDoubleClick() {
@@ -476,6 +512,28 @@ public class SongActivity extends AppCompatActivity implements Playable {
         mTextView.setText(aut_feat);
         mText2.setText(mSong.getTitle());
         container = findViewById(R.id.song_layout);
+        audioManager = (AudioManager)getSystemService(Context.AUDIO_SERVICE);
+        volumeBar = findViewById(R.id.volumeBar);
+        volumeBar.setMax(audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC));
+        volumeBar.setProgress(audioManager.getStreamVolume(AudioManager.STREAM_MUSIC));
+        volumeBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onStopTrackingTouch(SeekBar arg0)
+            {
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar arg0)
+            {
+            }
+
+            @Override
+            public void onProgressChanged(SeekBar arg0, int progress, boolean arg2)
+            {
+                audioManager.setStreamVolume(AudioManager.STREAM_MUSIC,
+                        progress, AudioManager.FLAG_SHOW_UI);
+            }
+        });
     }
 
     //Bottone indietro
