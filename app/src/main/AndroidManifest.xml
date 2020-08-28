@@ -43,6 +43,8 @@
             android:theme="@style/Platform.MaterialComponents.Light"/>
         <activity android:name=".PlaylistActivity"
             android:theme="@style/Platform.MaterialComponents.Light"/>
+        <activity android:name=".ContactListActivity"
+            android:theme="@style/Platform.MaterialComponents.Light"/>
         <receiver android:name=".services.NotificationActionService" />
         <service android:name=".services.OnClearFromRecentService" />
     </application>

@@ -99,7 +99,6 @@ public class FragmentHome extends Fragment {
     private void initGestures(View v) {
         recyclerView = v.findViewById(R.id.songList);
         recyclerView.setOnTouchListener(new OnSwipeTouchListener(v.getContext()){
-            Fragment mFragment = null;
             @Override
             public void onSwipeLeft() {
                 super.onSwipeLeft();
@@ -110,7 +109,11 @@ public class FragmentHome extends Fragment {
             public void onSwipeRight() {
                 super.onSwipeRight();
                 Log.d("TAG","SwipeRight");
-                //non fa niente
+                //tutorial
+                if(getActivity() != null){
+                    ((MainPageActivity)getActivity()).storeDialogStatus(false);
+                    ((MainPageActivity)getActivity()).initTutorial();
+                }
             }
         });
         //Gestisco le gestures per passare da un fragment all'altro

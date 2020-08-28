@@ -179,30 +179,35 @@ public class PlaylistFragment extends Fragment {
     private void initGestures(View v) {
         recyclerView = v.findViewById(R.id.playlistList);
         recyclerView.setOnTouchListener(new OnSwipeTouchListener(v.getContext()){
-            Fragment mFragment = null;
             @Override
             public void onSwipeLeft() {
                 super.onSwipeLeft();
                 Log.d("TAG","SwipeLeft");
-                //non fa niente
+                loadFragment(0); //amici
             }
             @Override
             public void onSwipeRight() {
                 super.onSwipeRight();
                 Log.d("TAG","SwipeRight");
-                loadFragment();
+                loadFragment(1); //home
             }
         });
         //Gestisco le gestures per passare da un fragment all'altro
     }
     //funzione per caricare un fragment specifico
-    public boolean loadFragment() {
+    public boolean loadFragment(int i) {
         if(getActivity() == null)
             return true;
         BottomNavigationView navigationView = getActivity().findViewById(R.id.bottom_navigation);
         Menu menu = navigationView.getMenu();
-        MenuItem menuItem = menu.findItem(R.id.home);
-        ((MainPageActivity)getActivity()).changeFocus(R.id.home);
+        MenuItem menuItem;
+        if(i == 1) {
+            menuItem = menu.findItem(R.id.home);
+            ((MainPageActivity) getActivity()).changeFocus(R.id.home);
+        }else{
+            menuItem = menu.findItem(R.id.fragment_people);
+            ((MainPageActivity) getActivity()).changeFocus(R.id.fragment_people);
+        }
         return ((MainPageActivity)getActivity()).onNavigationItemSelected(menuItem);
     }
     //funzione che salva le playlists

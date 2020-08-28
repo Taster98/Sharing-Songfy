@@ -15,6 +15,9 @@ import java.util.ArrayList;
 
 import ml.luiggi.geosongfy.R;
 import ml.luiggi.geosongfy.scaffoldings.Friend;
+import ml.luiggi.geosongfy.scaffoldings.FriendSelected;
+import ml.luiggi.geosongfy.scaffoldings.Song;
+import ml.luiggi.geosongfy.scaffoldings.SongSelected;
 
 /*
  * Questa classe rappresenta l'Adapter per poter correttamente visualizzare la lista delle canzoni all'interno dell'oggetto RecyclerView.
@@ -41,14 +44,22 @@ public class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.Fr
         final Friend curFriend = friendList.get(position);
         holder.mName.setText(friendList.get(position).getName());
         holder.mNumber.setText(friendList.get(position).getPhoneNumber());
+        final FriendSelected friendSelected = new FriendSelected(){
+            @Override
+            public void newFriendsSelected(ArrayList<Friend> selectedList) {
+                checkedList = selectedList;
+            }
+        };
         holder.mRelativeLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 holder.mCheckBox.setChecked(!holder.mCheckBox.isChecked());
                 if (holder.mCheckBox.isChecked()) {
                     checkedList.add(curFriend);
+                    friendSelected.newFriendsSelected(checkedList);
                 } else {
                     checkedList.remove(curFriend);
+                    friendSelected.newFriendsSelected(checkedList);
                 }
             }
         });

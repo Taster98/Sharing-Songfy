@@ -61,4 +61,8 @@ public class Friend implements Serializable {
     public int hashCode() {
         return Objects.hash(phoneNumber);
     }
+
+    public void setNotificationKey(String notificationKey) {
+        this.notificationKey=notificationKey;
+    }
 }

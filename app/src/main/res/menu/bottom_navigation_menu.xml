@@ -10,4 +10,9 @@
         android:enabled="true"
         android:icon="@drawable/ic_playlist"
         android:title="@string/le_tue_playlist"/>
+    <item
+        android:id="@+id/fragment_people"
+        android:enabled="true"
+        android:icon="@drawable/ic_people"
+        android:title="@string/friend_listen"/>
 </menu>

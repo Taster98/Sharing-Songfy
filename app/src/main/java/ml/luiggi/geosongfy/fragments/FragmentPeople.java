@@ -1,11 +1,16 @@
 package ml.luiggi.geosongfy.fragments;
 
+import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.database.Cursor;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.telephony.TelephonyManager;
+import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
@@ -17,7 +22,9 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -28,7 +35,10 @@ import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+import ml.luiggi.geosongfy.ContactListActivity;
+import ml.luiggi.geosongfy.MainPageActivity;
 import ml.luiggi.geosongfy.R;
+import ml.luiggi.geosongfy.scaffoldings.Chat;
 import ml.luiggi.geosongfy.scaffoldings.Friend;
 import ml.luiggi.geosongfy.utils.FriendListAdapter;
 import ml.luiggi.geosongfy.utils.Iso2Phone;
@@ -38,7 +48,7 @@ public class FragmentPeople extends Fragment {
     private RecyclerView.Adapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
 
-    ArrayList<Friend> contactList, registeredList, allRegistered, currentSelected;
+    ArrayList<Chat> chatList;
 
     @Nullable
     @Override
@@ -48,100 +58,147 @@ public class FragmentPeople extends Fragment {
         return v;
     }
 
-    private void initPeopleFragment(View v) {
-        contactList = new ArrayList<>();
-        registeredList = new ArrayList<>();
-        allRegistered = new ArrayList<>();
-        currentSelected = new ArrayList<>();
+    private void initPeopleFragment(final View v) {
+        chatList = new ArrayList<>();
         //riferimento alla recycler view
-        recyclerView = (RecyclerView) v.findViewById(R.id.friendList);
+        recyclerView = (RecyclerView) v.findViewById(R.id.chatList);
         //associo il floating action button
-        FloatingActionButton mFloatingActionButton = (FloatingActionButton) v.findViewById(R.id.floating_send);
+        FloatingActionButton mFloatingActionButton = (FloatingActionButton) v.findViewById(R.id.floating_chat);
         //dimensione nel layout fissata
         recyclerView.setHasFixedSize(true);
         //imposto un layout manager per la recycler view
         mLayoutManager = new LinearLayoutManager(v.getContext());
-        //prelevo tutti i contatti
-        getContactList();
-        //prelevo solo i contatti registrati, togliendo quelli non registrati dalla lista dei contatti presa sopra
-        getAllRegisteredUsers();
+
+        //prelevo tutte le chat che ho TODO
+        getChatList();
+        
+        
         //gestisco il click sul bottone
         mFloatingActionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (((FriendListAdapter) mAdapter).checkedList.size() > 0) {
-                    Toast.makeText(getContext(), "EUREKA", Toast.LENGTH_LONG).show();
-                    //avvio la chat di gruppo con gli utenti selezionati
+               Intent intent = new Intent(v.getContext(),ContactListActivity.class);
+               startActivity(intent);
+            }
+        });
+        initGestures(v);
+    }
 
-                } else {
-                    Toast.makeText(getContext(), "Devi selezionare almeno un amico dalla lista", Toast.LENGTH_LONG).show();
+    private void getChatList() {
+        DatabaseReference mUserChatDB = FirebaseDatabase.getInstance().getReference().child("user").child(FirebaseAuth.getInstance().getUid()).child("chat");
+
+        mUserChatDB.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if(dataSnapshot.exists()){
+                    for (DataSnapshot childSnapshot : dataSnapshot.getChildren()){
+                        Chat mChat = new Chat(childSnapshot.getKey());
+                        boolean  exists = false;
+                        for (Chat mChatIterator : chatList){
+                            if (mChatIterator.getChatId().equals(mChat.getChatId()))
+                                exists = true;
+                        }
+                        if (exists)
+                            continue;
+                        chatList.add(mChat);
+                        getChatData(mChat.getChatId());
+                    }
                 }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
             }
         });
     }
 
-    private String getCountryISO() {
-        String iso = null;
-
-        TelephonyManager tmngr = (TelephonyManager) getActivity().getApplicationContext().getSystemService(getActivity().getApplicationContext().TELEPHONY_SERVICE);
-        if (tmngr.getNetworkCountryIso() != null) {
-            if (!tmngr.getNetworkCountryIso().toString().equals(""))
-                iso = tmngr.getNetworkCountryIso();
-        }
-        return Iso2Phone.getPhone(iso);
-    }
-
-    //funzione che prende tutta la lista dei miei contatti
-    private void getContactList() {
-        String ISOPrefix = getCountryISO();
-
-        Cursor phones = getActivity().getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null, null, null, null);
-        while (phones.moveToNext()) {
-            String curName = phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME));
-            String curNumb = phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
-
-            curNumb = curNumb.replace(" ", "");
-            curNumb = curNumb.replace("-", "");
-            curNumb = curNumb.replace("(", "");
-            curNumb = curNumb.replace(")", "");
-
-            if (!String.valueOf(curNumb.charAt(0)).equals("+"))
-                curNumb = ISOPrefix + curNumb;
-
-            Friend mContacts = new Friend("", curName, curNumb, "");
-            contactList.add(mContacts);
-        }
-    }
-
-    private void getAllRegisteredUsers() {
-        DatabaseReference userDB = FirebaseDatabase.getInstance().getReference().child("user");
-        ValueEventListener friendListener = new ValueEventListener() {
-            @RequiresApi(api = Build.VERSION_CODES.N)
+    private void getChatData(String chatId) {
+        DatabaseReference mChatDB = FirebaseDatabase.getInstance().getReference().child("chat").child(chatId).child("info");
+        mChatDB.addValueEventListener(new ValueEventListener() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                for (DataSnapshot ss : snapshot.getChildren()) {
-                    String friend = ss.child("phone").getValue(String.class);
-                    allRegistered.add(new Friend(friend));
-                    //Toast.makeText(getContext(),allRegistered.,Toast.LENGTH_LONG).show();
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if(dataSnapshot.exists()){
+                    String chatId = "";
+
+                    if(dataSnapshot.child("id").getValue() != null)
+                        chatId = dataSnapshot.child("id").getValue().toString();
+
+                    for(DataSnapshot userSnapshot : dataSnapshot.child("users").getChildren()){
+                        for(Chat mChat : chatList){
+                            if(mChat.getChatId().equals(chatId)){
+                                Friend mUser = new Friend(userSnapshot.getKey());
+                                mChat.addFriendToArrayList(mUser);
+                                getUserData(mUser);
+                            }
+                        }
+                    }
                 }
-                contactList.retainAll(allRegistered);
-                Set<Friend> contactNoDupli = new LinkedHashSet<Friend>(contactList);
-                contactList.clear();
-                contactList.addAll(contactNoDupli);
-                recyclerView.setLayoutManager(mLayoutManager);
-                //imposto un adapter per i dati della recycler view
-                mAdapter = new FriendListAdapter(contactList);
-                recyclerView.setAdapter(mAdapter);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    private void getUserData(Friend mUser) {
+        DatabaseReference mUserDb = FirebaseDatabase.getInstance().getReference().child("user").child(mUser.getUid());
+        mUserDb.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                Friend mUser = new Friend(dataSnapshot.getKey());
+
+                if(dataSnapshot.child("notificationKey").getValue() != null)
+                    mUser.setNotificationKey(dataSnapshot.child("notificationKey").getValue().toString());
+
+                for(Chat mChat : chatList){
+                    for (Friend mUserIt : mChat.getFriendArrayList()){
+                        if(mUserIt.getUid().equals(mUser.getUid())){
+                            mUserIt.setNotificationKey(mUser.getNotificationKey());
+                        }
+                    }
+                }
                 mAdapter.notifyDataSetChanged();
             }
 
             @Override
-            public void onCancelled(@NonNull DatabaseError error) {
+            public void onCancelled(@NonNull DatabaseError databaseError) {
 
             }
-        };
-        userDB.addValueEventListener(friendListener);
+        });
     }
 
+    @SuppressLint("ClickableViewAccessibility")
+    private void initGestures(View v) {
+        recyclerView = v.findViewById(R.id.chatList);
+        recyclerView.setOnTouchListener(new OnSwipeTouchListener(v.getContext()){
+            @Override
+            public void onSwipeLeft() {
+                super.onSwipeLeft();
+                Log.d("TAG","SwipeLeft");
+                //non fa nulla
+            }
+            @Override
+            public void onSwipeRight() {
+                super.onSwipeRight();
+                Log.d("TAG","SwipeRight");
+                loadFragment(); //playlist
+            }
+        });
+        //Gestisco le gestures per passare da un fragment all'altro
+    }
+    //funzione per caricare un fragment specifico
+    public boolean loadFragment() {
+        if(getActivity() == null)
+            return true;
+        BottomNavigationView navigationView = getActivity().findViewById(R.id.bottom_navigation);
+        Menu menu = navigationView.getMenu();
+        MenuItem menuItem = menu.findItem(R.id.fragment_tue_playlist);
+        ((MainPageActivity) getActivity()).changeFocus(R.id.fragment_tue_playlist);
+
+        return ((MainPageActivity)getActivity()).onNavigationItemSelected(menuItem);
+    }
 
 }
