@@ -13,6 +13,7 @@
         android:layout_weight="0.8"
         android:id="@+id/song_item_image"/>
     <LinearLayout
+        android:id="@+id/lineare_immagine_song"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_weight="0.2"
@@ -58,6 +59,7 @@
             android:scaleType="fitXY"
             android:background="@drawable/round"
             android:src="@drawable/ic_prev"
+            android:visibility="invisible"
             />
         <ImageButton
             android:id="@+id/song_item_play"
@@ -69,6 +71,7 @@
             android:layout_margin="7dp"
             android:src="@drawable/ic_play"
             android:background="@drawable/round"
+            android:visibility="invisible"
             />
         <ImageButton
             android:id="@+id/song_item_next"
@@ -78,6 +81,7 @@
             android:layout_margin="7dp"
             android:scaleType="fitXY"
             android:background="@drawable/round"
-            android:src="@drawable/ic_next"/>
+            android:src="@drawable/ic_next"
+            android:visibility="invisible"/>
     </LinearLayout>
 </LinearLayout>

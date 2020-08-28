@@ -1,13 +1,17 @@
 package ml.luiggi.geosongfy.fragments;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.media.AudioManager;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.GestureDetector;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,6 +25,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -29,6 +34,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 
+import ml.luiggi.geosongfy.MainPageActivity;
 import ml.luiggi.geosongfy.R;
 import ml.luiggi.geosongfy.scaffoldings.Playlist;
 import ml.luiggi.geosongfy.scaffoldings.Song;
@@ -40,63 +46,17 @@ public class PlaylistFragment extends Fragment {
     private RecyclerView.Adapter mAdapter;
     public Button btn;
     public EditText editText;
-    public AudioManager audioManager;
-    int currentVolume;
     private ArrayList<Playlist> playlistList;
     private ArrayList<Song> songList;
     public String curName;
     public View bkpView;
+    RecyclerView recyclerView;
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_tue_playlist, container, false);
         bkpView = v;
         initView(v);
-        final GestureDetector gesture = new GestureDetector(getActivity(),
-                new GestureDetector.SimpleOnGestureListener() {
-                    @Override
-                    public boolean onDown(MotionEvent e) {
-                        return true;
-                    }
-
-                    @Override
-                    public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
-                        final int SWIPE_MIN_DISTANCE = 120;
-                        final int SWIPE_THRESHOLD_VELOCITY = 200;
-                        try {
-                            int halfWidth = getActivity().getWindow().getDecorView().getWidth() / 2;
-                            if (e1.getX() < halfWidth) {
-                                //lato sinistro: luminosità
-                                cambiaLuminosita(e1, e2, velocityX, velocityY, SWIPE_MIN_DISTANCE, SWIPE_THRESHOLD_VELOCITY);
-                            } else {
-                                //lato destro: volume
-                                cambiaVolume(e1, e2, velocityX, velocityY, SWIPE_MIN_DISTANCE, SWIPE_THRESHOLD_VELOCITY);
-                            }
-                            if (e1.getY() - e2.getY() > SWIPE_MIN_DISTANCE
-                                    && Math.abs(velocityY) > SWIPE_THRESHOLD_VELOCITY) {
-                                Toast.makeText(getContext(), "DOWN TO UP - DESTRA", Toast.LENGTH_SHORT).show();
-                                audioManager.adjustVolume(AudioManager.ADJUST_RAISE, AudioManager.FLAG_PLAY_SOUND);
-                            } else if (e2.getY() - e1.getY() > SWIPE_MIN_DISTANCE
-                                    && Math.abs(velocityY) > SWIPE_THRESHOLD_VELOCITY) {
-                                Toast.makeText(getContext(), "UP TO DOWN - DESTRA", Toast.LENGTH_SHORT).show();
-                                currentVolume = audioManager
-                                        .getStreamVolume(AudioManager.STREAM_MUSIC);
-                                audioManager.setStreamVolume(AudioManager.STREAM_MUSIC,
-                                        currentVolume - 1, 0);
-                            }
-                        } catch (Exception e) {
-                            // nothing
-                        }
-                        return false;
-                    }
-
-                });
-        v.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                return gesture.onTouchEvent(event);
-            }
-        });
         return v;
     }
 
@@ -204,7 +164,7 @@ public class PlaylistFragment extends Fragment {
     //Funzione che inizializza il fragment con il recyclerView
     private void initPlaylistFragment(View v) {
         //riferimento all'oggetto
-        RecyclerView recyclerView = (RecyclerView) v.findViewById(R.id.playlistList);
+        recyclerView = (RecyclerView) v.findViewById(R.id.playlistList);
         //dimensione nel layout fissata
         recyclerView.setHasFixedSize(true);
         //imposto un layout manager per la recycler view
@@ -213,28 +173,38 @@ public class PlaylistFragment extends Fragment {
         //imposto un adapter per i dati della recycler view
         mAdapter = new PlayListAdapter(playlistList);
         recyclerView.setAdapter(mAdapter);
+        initGestures(v);
     }
-
-    private void cambiaVolume(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY, int swipe_min_distance, int swipe_threshold_velocity) {
-        if (e1.getX() - e2.getX() > swipe_min_distance
-                && Math.abs(velocityX) > swipe_threshold_velocity) {
-            Toast.makeText(getContext(), "RIGHT TO LEFT - DESTRA", Toast.LENGTH_SHORT).show();
-        } else if (e2.getX() - e1.getX() > swipe_min_distance
-                && Math.abs(velocityX) > swipe_threshold_velocity) {
-            Toast.makeText(getContext(), "LEFT TO RIGHT - DESTRA", Toast.LENGTH_SHORT).show();
-        }
+    @SuppressLint("ClickableViewAccessibility")
+    private void initGestures(View v) {
+        recyclerView = v.findViewById(R.id.playlistList);
+        recyclerView.setOnTouchListener(new OnSwipeTouchListener(v.getContext()){
+            Fragment mFragment = null;
+            @Override
+            public void onSwipeLeft() {
+                super.onSwipeLeft();
+                Log.d("TAG","SwipeLeft");
+                //non fa niente
+            }
+            @Override
+            public void onSwipeRight() {
+                super.onSwipeRight();
+                Log.d("TAG","SwipeRight");
+                loadFragment();
+            }
+        });
+        //Gestisco le gestures per passare da un fragment all'altro
     }
-
-    private void cambiaLuminosita(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY, int swipe_min_distance, int swipe_threshold_velocity) {
-        if (e1.getY() - e2.getY() > swipe_min_distance
-                && Math.abs(velocityY) > swipe_threshold_velocity) {
-            Toast.makeText(getContext(), "DOWN TO UP - SINISTRA", Toast.LENGTH_SHORT).show();
-        } else if (e2.getY() - e1.getY() > swipe_min_distance
-                && Math.abs(velocityY) > swipe_threshold_velocity) {
-            Toast.makeText(getContext(), "UP TO DOWN - SINISTRA", Toast.LENGTH_SHORT).show();
-        }
+    //funzione per caricare un fragment specifico
+    public boolean loadFragment() {
+        if(getActivity() == null)
+            return true;
+        BottomNavigationView navigationView = getActivity().findViewById(R.id.bottom_navigation);
+        Menu menu = navigationView.getMenu();
+        MenuItem menuItem = menu.findItem(R.id.home);
+        ((MainPageActivity)getActivity()).changeFocus(R.id.home);
+        return ((MainPageActivity)getActivity()).onNavigationItemSelected(menuItem);
     }
-
     //funzione che salva le playlists
     private void savePlaylists(View v) {
         SharedPreferences sharedPreferences = v.getContext().getSharedPreferences("saved_playlists", Context.MODE_PRIVATE);

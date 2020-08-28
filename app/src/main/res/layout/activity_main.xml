@@ -10,6 +10,7 @@
     tools:openDrawer="start">
 
     <RelativeLayout
+        android:id="@+id/main_page_id"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 

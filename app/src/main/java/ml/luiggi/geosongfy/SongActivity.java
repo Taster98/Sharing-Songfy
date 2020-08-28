@@ -8,16 +8,24 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.media.AudioAttributes;
+import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
@@ -44,7 +52,9 @@ public class SongActivity extends AppCompatActivity implements Playable {
     ImageView mImageView;
     TextView mText2;
     TextView mTextView;
-
+    LinearLayout mLinearLayout;
+    LinearLayout container;
+    MenuInflater menuInflater;
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -76,6 +86,36 @@ public class SongActivity extends AppCompatActivity implements Playable {
         }
         //creo la notifica
         CreateNotification.createNotification(SongActivity.this, mSong, R.drawable.ic_pause);
+    }
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        menuInflater = getMenuInflater();
+        menuInflater.inflate(R.menu.show_hide_buttons, menu);
+        if(mPlay.getVisibility() == View.VISIBLE){
+            menu.findItem(R.id.show_hide_button).setTitle(R.string.nascondi_pulsanti);
+
+        }else{
+            menu.findItem(R.id.show_hide_button).setTitle(R.string.mostra_pulsanti);
+        }
+        // return true so that the menu pop up is opened
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if(item.getTitle().equals("Nascondi pulsanti")) {
+            mPlay.setVisibility(View.INVISIBLE);
+            mBack.setVisibility(View.INVISIBLE);
+            mNext.setVisibility(View.INVISIBLE);
+            item.setTitle(R.string.mostra_pulsanti);
+        }else {
+            mPlay.setVisibility(View.VISIBLE);
+            item.setTitle(R.string.nascondi_pulsanti);
+            mBack.setVisibility(View.VISIBLE);
+            mNext.setVisibility(View.VISIBLE);
+        }
+
+        return true;
     }
 
     //funzione che mi crea un canale univoco per la notifica
@@ -127,6 +167,7 @@ public class SongActivity extends AppCompatActivity implements Playable {
     }
 
     //avvia la musica
+    @SuppressLint("ClickableViewAccessibility")
     private void handleMusic() {
         //Ripesco la lista di tutti i brani per i pulsanti Back e Next
         songList = (ArrayList<Song>) getIntent().getSerializableExtra("allSongs");
@@ -145,6 +186,9 @@ public class SongActivity extends AppCompatActivity implements Playable {
         mSeekTitle.setText(seekTitle);
         mPlay.setImageResource(R.drawable.ic_pause);
         final Handler mHandler = new Handler();
+
+        //CONTROLLO VOLUME
+        AudioManager audioManager = (AudioManager) getApplicationContext().getSystemService(Context.AUDIO_SERVICE);
         //Eseguo il tutto nel thread dell'UI
         SongActivity.this.runOnUiThread(new Runnable() {
             @Override
@@ -180,6 +224,10 @@ public class SongActivity extends AppCompatActivity implements Playable {
         });
         //INIZIO GESTIONE CONTROLLI
         onTrackPlay();
+
+        mImageView.setLongClickable(true);
+        mImageView.setClickable(true);
+
         //Imposto un listener sul bottone Play
         mPlay.setOnClickListener(new View.OnClickListener() {
             @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
@@ -236,6 +284,275 @@ public class SongActivity extends AppCompatActivity implements Playable {
             }
         });
 
+        //GESTURE CONTROLS
+        mLinearLayout.setOnTouchListener(new OnSwipeTouchListener(this){
+            @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+            @Override
+            public void onSwipeRight() {
+                Toast.makeText(getApplicationContext(),"Precedente",Toast.LENGTH_SHORT).show();
+                super.onSwipeRight();
+                actualPos--;
+                if (actualPos == -1) {
+                    actualPos = songList.size() - 1;
+                }
+                mSong = songList.get(actualPos);
+                mPlayer.stop();
+                initializeMediaPlayer();
+                mPlayer.start();
+                mPlay.setImageResource(R.drawable.ic_pause);
+                onTrackPreviousNoPlay();
+                initializeMusicUI();
+            }
+            @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+            @Override
+            public void onSwipeLeft() {
+                Toast.makeText(getApplicationContext(),"Successiva",Toast.LENGTH_SHORT).show();
+                super.onSwipeLeft();
+                actualPos++;
+                if (actualPos >= songList.size()) {
+                    actualPos = 0;
+                }
+                mSong = songList.get(actualPos);
+                mPlayer.stop();
+                initializeMediaPlayer();
+                mPlayer.start();
+                mPlay.setImageResource(R.drawable.ic_pause);
+                onTrackNextNoPlay();
+                initializeMusicUI();
+            }
+            @Override
+            public void onClick() {
+                super.onClick();
+                //GESTIONE PLAY E PAUSE
+                //Pause:
+                if (mPlayer.isPlaying()) {
+                    Toast.makeText(getApplicationContext(),"Pausa",Toast.LENGTH_SHORT).show();
+                    mPlayer.pause();
+                    mPlay.setImageResource(R.drawable.ic_play);
+                    onTrackPause();
+                } else {
+                    Toast.makeText(getApplicationContext(),"Play",Toast.LENGTH_SHORT).show();
+                    //Play:
+                    mPlayer.start();
+                    onTrackPlay();
+                    //Creo un handler per gestire la SeekBar
+                    final Handler mHandler = new Handler();
+                    //Eseguo il tutto nel thread dell'UI
+                    SongActivity.this.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (mPlayer != null) {
+                                int mCurrentPosition = mPlayer.getCurrentPosition() / 1000;
+                                mSeek.setProgress(mCurrentPosition);
+                                String seekTitle = getTimeString(mPlayer.getCurrentPosition()) + "/" + getTimeString(mPlayer.getDuration());
+                                mSeekTitle.setText(seekTitle);
+                            }
+                            mHandler.postDelayed(this, 1000);
+                        }
+                    });
+                    //Cambio l'icona da Play a Pause:
+                    mPlay.setImageResource(R.drawable.ic_pause);
+                }
+            }
+            @Override
+            public void onLongClick() {
+                Toast.makeText(getApplicationContext(),"Dall'inizio",Toast.LENGTH_SHORT).show();
+                super.onLongClick();
+                mPlayer.seekTo(0);
+            }
+            //CONTROLLO VOLUME
+            AudioManager audioManager = (AudioManager) getApplicationContext().getSystemService(Context.AUDIO_SERVICE);
+            @Override
+            public void onSwipeDown() {
+                super.onSwipeDown();
+                audioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC,AudioManager.ADJUST_LOWER,AudioManager.FLAG_SHOW_UI);
+            }
+
+            @Override
+            public void onSwipeUp() {
+                super.onSwipeUp();
+                audioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC,AudioManager.ADJUST_RAISE,AudioManager.FLAG_SHOW_UI);
+            }
+        });
+        mImageView.setOnTouchListener(new OnSwipeTouchListener(this){
+            @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+            @Override
+            public void onSwipeRight() {
+                Toast.makeText(getApplicationContext(),"Precedente",Toast.LENGTH_SHORT).show();
+                super.onSwipeRight();
+                actualPos--;
+                if (actualPos == -1) {
+                    actualPos = songList.size() - 1;
+                }
+                mSong = songList.get(actualPos);
+                mPlayer.stop();
+                initializeMediaPlayer();
+                mPlayer.start();
+                mPlay.setImageResource(R.drawable.ic_pause);
+                onTrackPreviousNoPlay();
+                initializeMusicUI();
+            }
+            @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+            @Override
+            public void onSwipeLeft() {
+                Toast.makeText(getApplicationContext(),"Successiva",Toast.LENGTH_SHORT).show();
+                super.onSwipeLeft();
+                actualPos++;
+                if (actualPos >= songList.size()) {
+                    actualPos = 0;
+                }
+                mSong = songList.get(actualPos);
+                mPlayer.stop();
+                initializeMediaPlayer();
+                mPlayer.start();
+                mPlay.setImageResource(R.drawable.ic_pause);
+                onTrackNextNoPlay();
+                initializeMusicUI();
+            }
+            @Override
+            public void onClick() {
+                super.onClick();
+                //GESTIONE PLAY E PAUSE
+                //Pause:
+                if (mPlayer.isPlaying()) {
+                    Toast.makeText(getApplicationContext(),"Pausa",Toast.LENGTH_SHORT).show();
+                    mPlayer.pause();
+                    mPlay.setImageResource(R.drawable.ic_play);
+                    onTrackPause();
+                } else {
+                    Toast.makeText(getApplicationContext(),"Play",Toast.LENGTH_SHORT).show();
+                    //Play:
+                    mPlayer.start();
+                    onTrackPlay();
+                    //Creo un handler per gestire la SeekBar
+                    final Handler mHandler = new Handler();
+                    //Eseguo il tutto nel thread dell'UI
+                    SongActivity.this.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (mPlayer != null) {
+                                int mCurrentPosition = mPlayer.getCurrentPosition() / 1000;
+                                mSeek.setProgress(mCurrentPosition);
+                                String seekTitle = getTimeString(mPlayer.getCurrentPosition()) + "/" + getTimeString(mPlayer.getDuration());
+                                mSeekTitle.setText(seekTitle);
+                            }
+                            mHandler.postDelayed(this, 1000);
+                        }
+                    });
+                    //Cambio l'icona da Play a Pause:
+                    mPlay.setImageResource(R.drawable.ic_pause);
+                }
+            }
+            @Override
+            public void onLongClick() {
+                Toast.makeText(getApplicationContext(),"Dall'inizio",Toast.LENGTH_SHORT).show();
+                super.onLongClick();
+                mPlayer.seekTo(0);
+            }
+            //CONTROLLO VOLUME
+            AudioManager audioManager = (AudioManager) getApplicationContext().getSystemService(Context.AUDIO_SERVICE);
+            @Override
+            public void onSwipeDown() {
+                super.onSwipeDown();
+                audioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC,AudioManager.ADJUST_LOWER,AudioManager.FLAG_SHOW_UI);
+            }
+
+            @Override
+            public void onSwipeUp() {
+                super.onSwipeUp();
+                audioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC,AudioManager.ADJUST_RAISE,AudioManager.FLAG_SHOW_UI);
+            }
+        });
+        container.setOnTouchListener(new OnSwipeTouchListener(this){
+            @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+            @Override
+            public void onSwipeRight() {
+                Toast.makeText(getApplicationContext(),"Precedente",Toast.LENGTH_SHORT).show();
+                super.onSwipeRight();
+                actualPos--;
+                if (actualPos == -1) {
+                    actualPos = songList.size() - 1;
+                }
+                mSong = songList.get(actualPos);
+                mPlayer.stop();
+                initializeMediaPlayer();
+                mPlayer.start();
+                mPlay.setImageResource(R.drawable.ic_pause);
+                onTrackPreviousNoPlay();
+                initializeMusicUI();
+            }
+            @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+            @Override
+            public void onSwipeLeft() {
+                Toast.makeText(getApplicationContext(),"Successiva",Toast.LENGTH_SHORT).show();
+                super.onSwipeLeft();
+                actualPos++;
+                if (actualPos >= songList.size()) {
+                    actualPos = 0;
+                }
+                mSong = songList.get(actualPos);
+                mPlayer.stop();
+                initializeMediaPlayer();
+                mPlayer.start();
+                mPlay.setImageResource(R.drawable.ic_pause);
+                onTrackNextNoPlay();
+                initializeMusicUI();
+            }
+            @Override
+            public void onClick() {
+                super.onClick();
+                //GESTIONE PLAY E PAUSE
+                //Pause:
+                if (mPlayer.isPlaying()) {
+                    Toast.makeText(getApplicationContext(),"Pausa",Toast.LENGTH_SHORT).show();
+                    mPlayer.pause();
+                    mPlay.setImageResource(R.drawable.ic_play);
+                    onTrackPause();
+                } else {
+                    Toast.makeText(getApplicationContext(),"Play",Toast.LENGTH_SHORT).show();
+                    //Play:
+                    mPlayer.start();
+                    onTrackPlay();
+                    //Creo un handler per gestire la SeekBar
+                    final Handler mHandler = new Handler();
+                    //Eseguo il tutto nel thread dell'UI
+                    SongActivity.this.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (mPlayer != null) {
+                                int mCurrentPosition = mPlayer.getCurrentPosition() / 1000;
+                                mSeek.setProgress(mCurrentPosition);
+                                String seekTitle = getTimeString(mPlayer.getCurrentPosition()) + "/" + getTimeString(mPlayer.getDuration());
+                                mSeekTitle.setText(seekTitle);
+                            }
+                            mHandler.postDelayed(this, 1000);
+                        }
+                    });
+                    //Cambio l'icona da Play a Pause:
+                    mPlay.setImageResource(R.drawable.ic_pause);
+                }
+            }
+            @Override
+            public void onLongClick() {
+                Toast.makeText(getApplicationContext(),"Dall'inizio",Toast.LENGTH_SHORT).show();
+                super.onLongClick();
+                mPlayer.seekTo(0);
+            }
+            //CONTROLLO VOLUME
+            AudioManager audioManager = (AudioManager) getApplicationContext().getSystemService(Context.AUDIO_SERVICE);
+            @Override
+            public void onSwipeDown() {
+                super.onSwipeDown();
+                audioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC,AudioManager.ADJUST_LOWER,AudioManager.FLAG_SHOW_UI);
+            }
+
+            @Override
+            public void onSwipeUp() {
+                super.onSwipeUp();
+                audioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC,AudioManager.ADJUST_RAISE,AudioManager.FLAG_SHOW_UI);
+            }
+        });
+
         //Imposto un listener sul bottone Back
         mBack.setOnClickListener(new View.OnClickListener() {
             @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
@@ -258,6 +575,7 @@ public class SongActivity extends AppCompatActivity implements Playable {
                 }
             }
         });
+
         //Imposto un listener sul bottone Next
         mNext.setOnClickListener(new View.OnClickListener() {
             @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
@@ -315,13 +633,14 @@ public class SongActivity extends AppCompatActivity implements Playable {
         mImageView = (ImageView) findViewById(R.id.song_item_image);
         mText2 = (TextView) findViewById(R.id.song_item_title);
         mTextView = (TextView) findViewById(R.id.song_item_author);
+        mLinearLayout = (LinearLayout)findViewById(R.id.lineare_immagine_song);
         Picasso.get().load(mSong.getCover()).into(mImageView);
         String aut_feat = mSong.getAuthors();
         if (!mSong.getFeats().equals(""))
             aut_feat += " ft. " + mSong.getFeats();
         mTextView.setText(aut_feat);
         mText2.setText(mSong.getTitle());
-
+        container = findViewById(R.id.song_layout);
     }
 
     //Bottone indietro
@@ -395,6 +714,7 @@ public class SongActivity extends AppCompatActivity implements Playable {
         mPlayer.start();
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     public void onTrackNextNoPlay(){
         mSong = songList.get(actualPos);
         CreateNotification.createNotification(SongActivity.this, mSong, R.drawable.ic_pause);
