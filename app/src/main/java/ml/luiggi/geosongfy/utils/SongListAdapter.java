@@ -142,7 +142,6 @@ public class SongListAdapter extends RecyclerView.Adapter<SongListAdapter.SongLi
                     public void onClick(DialogInterface dialogInterface, int i) {
                         //implementare eliminazione
                         songList.remove(pos);
-                        notifyItemRemoved(pos);
                         isPlaylist.setSongList(songList);
                         loadPlaylists(v);
                         allPlaylists.remove(isPlaylist);

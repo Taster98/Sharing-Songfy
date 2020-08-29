@@ -36,10 +36,10 @@ public class PlaylistActivity extends AppCompatActivity {
     private RecyclerView.Adapter mAdapter;
     private ArrayList<Playlist> newPlaylists;
     private ArrayList<Song> allSongs;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //newPlaylists = (ArrayList<Playlist>) getIntent().getSerializableExtra("allPlaylists");
         loadPlaylists();
         Collections.sort(newPlaylists, new Comparator<Playlist>() {
             @Override
@@ -50,6 +50,7 @@ public class PlaylistActivity extends AppCompatActivity {
         setContentView(R.layout.fragment_home);
         initUI();
         initSongs();
+        mAdapter.notifyDataSetChanged();
     }
 
     @Override
@@ -57,12 +58,6 @@ public class PlaylistActivity extends AppCompatActivity {
         //
         super.onResume();
         loadPlaylists();
-        Collections.sort(newPlaylists, new Comparator<Playlist>() {
-            @Override
-            public int compare(Playlist lhs, Playlist rhs) {
-                return lhs.getPlaylistName().compareTo(rhs.getPlaylistName());
-            }
-        });
         initSongs();
         mAdapter.notifyDataSetChanged();
 
@@ -89,7 +84,7 @@ public class PlaylistActivity extends AppCompatActivity {
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(mLayoutManager);
         //imposto un adapter per i dati della recycler view
-        mAdapter = new SongListAdapter(songList,curPlaylist);
+        mAdapter = new SongListAdapter(songList, curPlaylist);
         recyclerView.setAdapter(mAdapter);
     }
 
@@ -104,12 +99,6 @@ public class PlaylistActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         savePlaylists();
-        Collections.sort(newPlaylists, new Comparator<Playlist>() {
-            @Override
-            public int compare(Playlist lhs, Playlist rhs) {
-                return lhs.getPlaylistName().compareTo(rhs.getPlaylistName());
-            }
-        });
         super.onDestroy();
     }
 
@@ -125,7 +114,7 @@ public class PlaylistActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
-        if(id == R.id.add_playlist) {
+        if (id == R.id.add_playlist) {
             addDialog();
         }
         return super.onOptionsItemSelected(item);
@@ -152,10 +141,10 @@ public class PlaylistActivity extends AppCompatActivity {
                         curPlaylist.setSongList(actualSongs);
                         newPlaylists.remove(curPlaylist);
                         newPlaylists.add(curPlaylist);
-                        mAdapter.notifyDataSetChanged();
                         //salvare nello shared preferences
                         savePlaylists();
                         initSongs();
+                        mAdapter.notifyDataSetChanged();
                     }
                 })
                 .setNegativeButton(R.string.annulla, new DialogInterface.OnClickListener() {
@@ -188,7 +177,7 @@ public class PlaylistActivity extends AppCompatActivity {
         Type type = new TypeToken<ArrayList<Playlist>>() {
         }.getType();
         newPlaylists = gson.fromJson(json, type);
-        if(newPlaylists == null)
+        if (newPlaylists == null)
             newPlaylists = new ArrayList<>();
     }
 

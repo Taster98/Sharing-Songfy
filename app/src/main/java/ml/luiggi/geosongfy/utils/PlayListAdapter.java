@@ -102,12 +102,6 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.PlayLi
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         playlists.remove(pos);
-                        Collections.sort(playlists, new Comparator<Playlist>() {
-                            @Override
-                            public int compare(Playlist lhs, Playlist rhs) {
-                                return lhs.getPlaylistName().compareTo(rhs.getPlaylistName());
-                            }
-                        });
                         notifyItemRemoved(pos);
                         savePlaylists(v);
                     }
@@ -135,12 +129,6 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.PlayLi
                         else {
                             String curName = editText.getText().toString();
                             playlists.get(pos).setPlaylistName(curName);
-                            Collections.sort(playlists, new Comparator<Playlist>() {
-                                @Override
-                                public int compare(Playlist lhs, Playlist rhs) {
-                                    return lhs.getPlaylistName().compareTo(rhs.getPlaylistName());
-                                }
-                            });
                             notifyItemChanged(pos);
                             notifyDataSetChanged();
                             savePlaylists(view);
