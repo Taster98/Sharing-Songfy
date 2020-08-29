@@ -40,16 +40,16 @@
             android:textSize="17sp"
             />
     </LinearLayout>
-    <CheckBox
+    <ImageView
+        android:id="@+id/friend_mute_id"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:src="@drawable/ic_mute"
         android:layout_alignParentRight="true"
-        android:layout_alignBaseline="@id/friend_image_id"
-        android:id="@+id/checkbox"
-        android:layout_marginTop="35dp"
-        android:src="@drawable/ic_chat"
+        android:maxWidth="100dip"
+        android:layout_marginTop="8dp"
+        android:adjustViewBounds="true"
         android:padding="25dp"
-        android:gravity="end"
-        android:layout_alignParentEnd="true" />
+        />
 </RelativeLayout>
 

@@ -12,15 +12,47 @@ public class Friend implements Serializable {
             name,
             phoneNumber,
             notificationKey;
-
+    private Song currentSong;
+    private int songPosition;
+    private boolean isSharing;
     public Friend(String uid, String name, String phoneNumber, String notificationKey) {
         this.name = name;
         this.notificationKey = notificationKey;
         this.phoneNumber = phoneNumber;
         this.uid = uid;
+        this.currentSong = new Song();
+        songPosition = 0;
+        isSharing = false;
+    }
+
+    public void setUid(String uid) {
+        this.uid = uid;
+    }
+
+    public void setSharing(boolean sharing) {
+        isSharing = sharing;
+    }
+    public void setSongPosition(int songPosition) {
+        this.songPosition = songPosition;
+    }
+
+    public int getSongPosition() {
+        return songPosition;
     }
 
     public Friend() {
+    }
+
+    public void setCurrentSong(Song currentSong) {
+        this.currentSong = currentSong;
+    }
+
+    public Song getCurrentSong() {
+        return currentSong;
+    }
+
+    public boolean isSharing() {
+        return isSharing;
     }
 
     public Friend(String phoneNumber) {

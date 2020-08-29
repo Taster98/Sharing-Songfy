@@ -136,6 +136,12 @@ public class LoginActivity extends AppCompatActivity {
                                 if (!snapshot.exists()) {
                                     Map<String, Object> userMap = new HashMap<>();
                                     userMap.put("phone", user.getPhoneNumber());
+                                    Boolean bool = Boolean.FALSE;
+                                    Long lon = Long.valueOf(0);
+                                    String str = "";
+                                    userMap.put("isSharing",bool);
+                                    userMap.put("position",lon);
+                                    userMap.put("songUrl",str);
                                     mUserDB.updateChildren(userMap);
                                 }
                                 userAllowed();

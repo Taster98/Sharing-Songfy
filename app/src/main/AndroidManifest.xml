@@ -2,15 +2,20 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="ml.luiggi.geosongfy">
+
     <uses-permission android:name="android.permission.READ_CONTACTS" />
     <uses-permission android:name="android.permission.WRITE_CONTACTS" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
-    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS"/>
-    <uses-permission android:name="Manifest.permission.WRITE_SETTINGS"/>
+    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
+    <uses-permission android:name="Manifest.permission.WRITE_SETTINGS" />
+
     <permission android:name="android.permission.MEDIA_CONTENT_CONTROL" />
+
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+
     <application
         android:allowBackup="true"
         android:icon="@drawable/ic_icon"
@@ -20,14 +25,22 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:targetApi="n">
-        <activity android:name=".LoginActivity"
+        <service
+            android:name=".services.FriendPlayerService"
+            android:enabled="true"
+            android:exported="true"></service>
+
+        <activity
+            android:name=".LoginActivity"
             android:theme="@style/Platform.MaterialComponents.Light">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".MainPageActivity"
+        <activity
+            android:name=".MainPageActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="ml.luiggi.geosongfy.action.PAUSE" />
@@ -35,17 +48,24 @@
                 <action android:name="ml.luiggi.geosongfy.action.NEXT" />
                 <action android:name="ml.luiggi.geosongfy.action.PREV" />
                 <action android:name="ml.luiggi.geosongfy.action.STOP" />
-
             </intent-filter>
         </activity>
         <activity
             android:name=".SongActivity"
-            android:theme="@style/Platform.MaterialComponents.Light"/>
-        <activity android:name=".PlaylistActivity"
-            android:theme="@style/Platform.MaterialComponents.Light"/>
-        <activity android:name=".ContactListActivity"
-            android:theme="@style/Platform.MaterialComponents.Light"/>
+            android:theme="@style/Platform.MaterialComponents.Light" />
+        <activity
+            android:name=".PlaylistActivity"
+            android:theme="@style/Platform.MaterialComponents.Light" />
+        <activity
+            android:name=".ContactListActivity"
+            android:theme="@style/Platform.MaterialComponents.Light" />
+        <activity
+            android:name=".GestureTestsActivity"
+            android:theme="@style/Platform.MaterialComponents.Light" />
+
         <receiver android:name=".services.NotificationActionService" />
+
         <service android:name=".services.OnClearFromRecentService" />
     </application>
+
 </manifest>

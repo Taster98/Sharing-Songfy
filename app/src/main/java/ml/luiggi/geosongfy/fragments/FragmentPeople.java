@@ -1,7 +1,6 @@
 package ml.luiggi.geosongfy.fragments;
 
 import android.annotation.SuppressLint;
-import android.content.Intent;
 import android.database.Cursor;
 import android.os.Build;
 import android.os.Bundle;
@@ -13,7 +12,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
+import android.widget.Button;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -23,7 +22,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -35,144 +33,94 @@ import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import ml.luiggi.geosongfy.ContactListActivity;
 import ml.luiggi.geosongfy.MainPageActivity;
 import ml.luiggi.geosongfy.R;
-import ml.luiggi.geosongfy.scaffoldings.Chat;
+import ml.luiggi.geosongfy.SongActivity;
 import ml.luiggi.geosongfy.scaffoldings.Friend;
+import ml.luiggi.geosongfy.scaffoldings.Song;
 import ml.luiggi.geosongfy.utils.FriendListAdapter;
 import ml.luiggi.geosongfy.utils.Iso2Phone;
 
 public class FragmentPeople extends Fragment {
-    private RecyclerView recyclerView;
     private RecyclerView.Adapter mAdapter;
-    private RecyclerView.LayoutManager mLayoutManager;
-
-    ArrayList<Chat> chatList;
-
+    public Button btn;
+    private ArrayList<Friend> songListFriends;
+    public View bkpView;
+    RecyclerView recyclerView;
+    RecyclerView.LayoutManager mLayoutManager;
+    //Qui salverò i contatti che hanno l'app installata
+    ArrayList<Friend> registeredList, currentSelected;
+    Set<Friend> allRegistered,contactList;
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_people, container, false);
-        initPeopleFragment(v);
+        bkpView = v;
+        initView(v);
         return v;
     }
 
-    private void initPeopleFragment(final View v) {
-        chatList = new ArrayList<>();
-        //riferimento alla recycler view
-        recyclerView = (RecyclerView) v.findViewById(R.id.chatList);
-        //associo il floating action button
-        FloatingActionButton mFloatingActionButton = (FloatingActionButton) v.findViewById(R.id.floating_chat);
+    private void initView(final View v) {
+        songListFriends = new ArrayList<>();
+        contactList = new LinkedHashSet<>();
+        registeredList = new ArrayList<>();
+        allRegistered = new LinkedHashSet<>();
+        currentSelected = new ArrayList<>();
+        //Carico tutti i contatti e poi solo quelli registrati all'app
+        getContactList();
+        //prelevo solo i contatti registrati, togliendo quelli non registrati dalla lista dei contatti presa sopra
+        getAllRegisteredUsers();
+        initPlaylistFragment(v);
+        for(int i=0;i<songListFriends.size();i++){
+            songListFriends.get(i).setCurrentSong(SongActivity.mSong);
+            songListFriends.get(i).setSongPosition((int) SongActivity.progresso);
+        }
+    }
+
+
+    //Funzione che inizializza il fragment con il recyclerView
+    private void initPlaylistFragment(View v) {
+        //riferimento all'oggetto
+        recyclerView = (RecyclerView) v.findViewById(R.id.songListFriends);
         //dimensione nel layout fissata
         recyclerView.setHasFixedSize(true);
         //imposto un layout manager per la recycler view
         mLayoutManager = new LinearLayoutManager(v.getContext());
-
-        //prelevo tutte le chat che ho TODO
-        getChatList();
-        
-        
-        //gestisco il click sul bottone
-        mFloatingActionButton.setOnClickListener(new View.OnClickListener() {
+        recyclerView.setLayoutManager(mLayoutManager);
+        //imposto un adapter per i dati della recycler view
+        mAdapter = new FriendListAdapter(songListFriends);
+        recyclerView.setAdapter(mAdapter);
+        btn = v.findViewById(R.id.crea_podcast);
+        btn.setOnClickListener(new View.OnClickListener() {
+            int condividi = 0;
+            DatabaseReference dbUsers;
             @Override
             public void onClick(View view) {
-               Intent intent = new Intent(v.getContext(),ContactListActivity.class);
-               startActivity(intent);
+                dbUsers = FirebaseDatabase.getInstance().getReference().child("user").child(FirebaseAuth.getInstance().getUid()).child("isSharing");
+                if(condividi == 0){
+                    Boolean b = Boolean.TRUE;
+                    dbUsers.setValue(b);
+                    condividi=1;
+                    btn.setText(R.string.ferma_condivisione);
+                    mAdapter.notifyDataSetChanged();
+                }else{
+                    Boolean b = Boolean.FALSE;
+                    dbUsers.setValue(b);
+                    condividi=0;
+                    btn.setText(R.string.condividi_musica);
+                    mAdapter.notifyDataSetChanged();
+                }
             }
         });
         initGestures(v);
     }
 
-    private void getChatList() {
-        DatabaseReference mUserChatDB = FirebaseDatabase.getInstance().getReference().child("user").child(FirebaseAuth.getInstance().getUid()).child("chat");
+    private void loadFriendsSongs(){
 
-        mUserChatDB.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if(dataSnapshot.exists()){
-                    for (DataSnapshot childSnapshot : dataSnapshot.getChildren()){
-                        Chat mChat = new Chat(childSnapshot.getKey());
-                        boolean  exists = false;
-                        for (Chat mChatIterator : chatList){
-                            if (mChatIterator.getChatId().equals(mChat.getChatId()))
-                                exists = true;
-                        }
-                        if (exists)
-                            continue;
-                        chatList.add(mChat);
-                        getChatData(mChat.getChatId());
-                    }
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
     }
-
-    private void getChatData(String chatId) {
-        DatabaseReference mChatDB = FirebaseDatabase.getInstance().getReference().child("chat").child(chatId).child("info");
-        mChatDB.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if(dataSnapshot.exists()){
-                    String chatId = "";
-
-                    if(dataSnapshot.child("id").getValue() != null)
-                        chatId = dataSnapshot.child("id").getValue().toString();
-
-                    for(DataSnapshot userSnapshot : dataSnapshot.child("users").getChildren()){
-                        for(Chat mChat : chatList){
-                            if(mChat.getChatId().equals(chatId)){
-                                Friend mUser = new Friend(userSnapshot.getKey());
-                                mChat.addFriendToArrayList(mUser);
-                                getUserData(mUser);
-                            }
-                        }
-                    }
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
-    }
-
-    private void getUserData(Friend mUser) {
-        DatabaseReference mUserDb = FirebaseDatabase.getInstance().getReference().child("user").child(mUser.getUid());
-        mUserDb.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                Friend mUser = new Friend(dataSnapshot.getKey());
-
-                if(dataSnapshot.child("notificationKey").getValue() != null)
-                    mUser.setNotificationKey(dataSnapshot.child("notificationKey").getValue().toString());
-
-                for(Chat mChat : chatList){
-                    for (Friend mUserIt : mChat.getFriendArrayList()){
-                        if(mUserIt.getUid().equals(mUser.getUid())){
-                            mUserIt.setNotificationKey(mUser.getNotificationKey());
-                        }
-                    }
-                }
-                mAdapter.notifyDataSetChanged();
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
-    }
-
     @SuppressLint("ClickableViewAccessibility")
     private void initGestures(View v) {
-        recyclerView = v.findViewById(R.id.chatList);
+        recyclerView = v.findViewById(R.id.songListFriends);
         recyclerView.setOnTouchListener(new OnSwipeTouchListener(v.getContext()){
             @Override
             public void onSwipeLeft() {
@@ -201,4 +149,85 @@ public class FragmentPeople extends Fragment {
         return ((MainPageActivity)getActivity()).onNavigationItemSelected(menuItem);
     }
 
+    private String getCountryISO() {
+        String iso = null;
+
+        TelephonyManager tmngr = (TelephonyManager) getActivity().getSystemService(getActivity().TELEPHONY_SERVICE);
+        if (tmngr.getNetworkCountryIso() != null) {
+            if (!tmngr.getNetworkCountryIso().toString().equals(""))
+                iso = tmngr.getNetworkCountryIso();
+        }
+        return Iso2Phone.getPhone(iso);
+    }
+
+    //funzione che prende tutta la lista dei miei contatti
+    private void getContactList() {
+        String ISOPrefix = getCountryISO();
+
+        Cursor phones = getActivity().getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null, null, null, null);
+        while (phones.moveToNext()) {
+            String curName = phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME));
+            String curNumb = phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
+
+            curNumb = curNumb.replace(" ", "");
+            curNumb = curNumb.replace("-", "");
+            curNumb = curNumb.replace("(", "");
+            curNumb = curNumb.replace(")", "");
+
+            if (!String.valueOf(curNumb.charAt(0)).equals("+"))
+                curNumb = ISOPrefix + curNumb;
+            Friend mContacts = new Friend("", curName, curNumb, "");
+            contactList.add(mContacts);
+        }
+    }
+
+    private void getAllRegisteredUsers() {
+        DatabaseReference userDB = FirebaseDatabase.getInstance().getReference().child("user");
+        ValueEventListener friendListener = new ValueEventListener() {
+            @RequiresApi(api = Build.VERSION_CODES.N)
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                //songListFriends.clear();
+                for (DataSnapshot ss : snapshot.getChildren()) {
+                    String friend = ss.child("phone").getValue(String.class);
+                    Boolean sharing = ss.child("isSharing").getValue(Boolean.class);
+                    String songUrl = ss.child("songUrl").getValue(String.class);
+                    Long position = ss.child("position").getValue(Long.class);
+                    if(sharing){
+                        Friend actFr = new Friend(friend);
+                        actFr.setUid(ss.getKey());
+                        actFr.setSongPosition(Math.toIntExact(position));
+                        //actFr.setUid(FirebaseAuth.getInstance().getUid());
+                        Song curSong = new Song("","","","",songUrl);
+                        String name;
+                        actFr.setCurrentSong(curSong);
+                        if(contactList.contains(actFr)) {
+                            contactList.remove(actFr);
+                            contactList.add(actFr);
+                        }
+                        if(!actFr.getUid().equals(FirebaseAuth.getInstance().getUid()))
+                            allRegistered.add(actFr);
+                        //Toast.makeText(getContext(),allRegistered.,Toast.LENGTH_LONG).show();
+                    }
+
+                }
+                contactList.retainAll(allRegistered);
+                recyclerView.setLayoutManager(mLayoutManager);
+                //imposto un adapter per i dati della recycler view
+                //Metto nella lista solo i contatti che stanno condividendo
+                if(songListFriends.isEmpty()){
+                    songListFriends.addAll(contactList);
+                }
+                mAdapter = new FriendListAdapter(songListFriends);
+                recyclerView.setAdapter(mAdapter);
+                mAdapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        };
+        userDB.addValueEventListener(friendListener);
+    }
 }

@@ -49,7 +49,7 @@ public class MainPageActivity extends AppCompatActivity implements BottomNavigat
         View mView = getLayoutInflater().inflate(R.layout.tutorial_gestures, null);
         CheckBox mCheck = mView.findViewById(R.id.tutorial_checkbox);
         mBuilder.setTitle("Utilizza le Gestures per ascoltare la musica!");
-        mBuilder.setMessage("1- Puoi scorrere col dito a sinistra e a destra per navigare tra le sezioni dell'app. \n2- Tocca per avviare o fermare la musica. \n3- Tieni premuto per far ricominciare il brano dall'inizio. \n4- Fai swipe a destra o a sinistra per andare alla canzone successiva o precedente. \n5- Fai swipe verso l'alto o verso il basso per regolare il volume. \n6- Per rivedere questo tutorial, fai swipe verso sinistra nella home.");
+        mBuilder.setMessage("1- Puoi scorrere col dito a sinistra e a destra per navigare tra le sezioni dell'app. \n2- Scorri con due dita verso il basso per riprodurre o mettere in pausa il brano. \n3- Disegna una freccia a sinistra (o a destra) per andare al brano precedente (o successivo) \n5- Fai swipe verso l'alto o verso il basso, nella porzione inferiore destra dello schermo, per regolare il volume. \n6- Per rivedere questo tutorial, fai swipe verso sinistra dalla home.");
         mBuilder.setView(mView);
         mBuilder.setPositiveButton("OK, Ho capito", new DialogInterface.OnClickListener() {
             @Override

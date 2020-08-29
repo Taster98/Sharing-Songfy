@@ -1,15 +1,27 @@
 package ml.luiggi.geosongfy.utils;
 
+import android.content.Intent;
+import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 
@@ -18,17 +30,15 @@ import ml.luiggi.geosongfy.scaffoldings.Friend;
 import ml.luiggi.geosongfy.scaffoldings.FriendSelected;
 import ml.luiggi.geosongfy.scaffoldings.Song;
 import ml.luiggi.geosongfy.scaffoldings.SongSelected;
+import ml.luiggi.geosongfy.services.FriendPlayerService;
 
 /*
  * Questa classe rappresenta l'Adapter per poter correttamente visualizzare la lista delle canzoni all'interno dell'oggetto RecyclerView.
  * */
 public class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.FriendListViewHolder> {
     private ArrayList<Friend> friendList;
-    public ArrayList<Friend> checkedList;
-
     public FriendListAdapter(ArrayList<Friend> friendList) {
         this.friendList = friendList;
-        this.checkedList = new ArrayList<>();
     }
 
     @NonNull
@@ -38,28 +48,43 @@ public class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.Fr
         FriendListViewHolder mFriendVH = new FriendListViewHolder(layoutView);
         return mFriendVH;
     }
-
+    int checked = 0;
     @Override
     public void onBindViewHolder(@NonNull final FriendListViewHolder holder, final int position) {
-        final Friend curFriend = friendList.get(position);
         holder.mName.setText(friendList.get(position).getName());
         holder.mNumber.setText(friendList.get(position).getPhoneNumber());
-        final FriendSelected friendSelected = new FriendSelected(){
-            @Override
-            public void newFriendsSelected(ArrayList<Friend> selectedList) {
-                checkedList = selectedList;
-            }
-        };
         holder.mRelativeLayout.setOnClickListener(new View.OnClickListener() {
+            int checkedDue = 0;
             @Override
-            public void onClick(View view) {
-                holder.mCheckBox.setChecked(!holder.mCheckBox.isChecked());
-                if (holder.mCheckBox.isChecked()) {
-                    checkedList.add(curFriend);
-                    friendSelected.newFriendsSelected(checkedList);
-                } else {
-                    checkedList.remove(curFriend);
-                    friendSelected.newFriendsSelected(checkedList);
+            public void onClick(final View view) {
+                final Intent intent = new Intent(view.getContext(), FriendPlayerService.class);
+                if(checked == 0){
+                    if(checkedDue == 0){
+                        holder.mMute.setImageResource(R.drawable.ic_volume);
+                        checkedDue=1;
+                        checked=1;
+                        //avviare musica
+                        intent.putExtra("uid",(friendList.get(position).getUid()).toString());
+                        intent.putExtra("songUrl",friendList.get(position).getCurrentSong().getUrl());
+                        intent.putExtra("position",friendList.get(position).getSongPosition());
+                        view.getContext().startService(intent);
+                    }else{
+                        holder.mMute.setImageResource(R.drawable.ic_mute);
+                        checkedDue=0;
+                        checked=0;
+                        //fermare musica
+                        view.getContext().stopService(intent);
+                    }
+                }else{
+                    if(checkedDue==1){
+                        checkedDue=0;
+                        checked=0;
+                        holder.mMute.setImageResource(R.drawable.ic_mute);
+                        //fermare musica
+                        view.getContext().stopService(intent);
+                    }else {
+                        Toast.makeText(view.getContext(), "Musica già in riproduzione!", Toast.LENGTH_SHORT).show();
+                    }
                 }
             }
         });
@@ -74,7 +99,7 @@ public class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.Fr
     public class FriendListViewHolder extends RecyclerView.ViewHolder {
         public TextView mName, mNumber;
         public LinearLayout mLayout;
-        public CheckBox mCheckBox;
+        public ImageView mMute;
         public RelativeLayout mRelativeLayout;
 
         public FriendListViewHolder(View view) {
@@ -82,10 +107,8 @@ public class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.Fr
             mName = view.findViewById(R.id.nome_friend);
             mNumber = view.findViewById(R.id.numero_friend);
             mLayout = view.findViewById(R.id.linear_item_id);
-            mCheckBox = view.findViewById(R.id.checkbox);
+            mMute = view.findViewById(R.id.friend_mute_id);
             mRelativeLayout = view.findViewById(R.id.friend_item_id);
-            if (mCheckBox != null)
-                mCheckBox.setClickable(false);
         }
     }
 }

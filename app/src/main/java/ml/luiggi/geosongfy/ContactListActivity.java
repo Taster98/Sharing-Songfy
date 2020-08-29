@@ -1,5 +1,6 @@
 package ml.luiggi.geosongfy;
 
+import android.content.Intent;
 import android.database.Cursor;
 import android.os.Build;
 import android.os.Bundle;
@@ -77,13 +78,13 @@ public class ContactListActivity extends AppCompatActivity {
         mFloatingActionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (((FriendListAdapter) mAdapter).checkedList.size() > 0) {
+                /*if (((FriendListAdapter) mAdapter).checkedList.size() > 0) {
                     //avvio la chat di gruppo con gli utenti selezionati
-                    //creaChat();
-                    Toast.makeText(getApplicationContext(),"Non oggi, magari domani",Toast.LENGTH_SHORT).show();
+                    creaChat();
+                    //Toast.makeText(getApplicationContext(),"Non oggi, magari domani",Toast.LENGTH_SHORT).show();
                 } else {
                     Toast.makeText(getApplicationContext(), "Devi selezionare almeno un amico dalla lista", Toast.LENGTH_LONG).show();
-                }
+                }*/
             }
         });
     }
@@ -93,22 +94,22 @@ public class ContactListActivity extends AppCompatActivity {
         String key = FirebaseDatabase.getInstance().getReference().child("chat").push().getKey();
 
         //Riferimento al database (chat e utenti)
-        DatabaseReference chatInfoDB = FirebaseDatabase.getInstance().getReference().child("chat").child(key).child("info");
+        DatabaseReference chatInfoDb = FirebaseDatabase.getInstance().getReference().child("chat").child(key).child("info");
         DatabaseReference userDb = FirebaseDatabase.getInstance().getReference().child("user");
 
         //Nuova chat
         HashMap newChatMap = new HashMap();
-        newChatMap.put("id",key);
-        newChatMap.put("users/"+ FirebaseAuth.getInstance().getUid(),true);
+        newChatMap.put("id", key);
+        newChatMap.put("users/" + FirebaseAuth.getInstance().getUid(), true);
 
-        //aggiungo tutti gli utenti selezionati alla chat
-        for(Friend mFriend : ((FriendListAdapter)mAdapter).checkedList){
-            newChatMap.put("users/"+mFriend.getUid(),true);
-            userDb.child(mFriend.getUid()).child("chat").child(key).setValue(true);
-        }
+        /*//aggiungo tutti gli utenti selezionati alla chat
+        for(Friend mUser : ((FriendListAdapter)mAdapter).checkedList){
+            newChatMap.put("users/" + mUser.getUid(), true);
+            userDb.child(mUser.getUid()).child("chat").child(key).setValue(true);
+        }*/
 
         //aggiorno i db
-        chatInfoDB.updateChildren(newChatMap);
+        chatInfoDb.updateChildren(newChatMap);
         userDb.child(FirebaseAuth.getInstance().getUid()).child("chat").child(key).setValue(true);
     }
 

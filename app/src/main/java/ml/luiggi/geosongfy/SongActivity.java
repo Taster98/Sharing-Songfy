@@ -1,6 +1,7 @@
 package ml.luiggi.geosongfy;
 
 import android.annotation.SuppressLint;
+import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
@@ -10,9 +11,14 @@ import android.content.IntentFilter;
 import android.media.AudioAttributes;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
+import android.opengl.Visibility;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.VibrationEffect;
+import android.os.Vibrator;
+import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -24,7 +30,12 @@ import android.widget.Toast;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.squareup.picasso.Picasso;
 
 import java.io.IOException;
@@ -35,15 +46,16 @@ import ml.luiggi.geosongfy.scaffoldings.Song;
 import ml.luiggi.geosongfy.services.OnClearFromRecentService;
 import ml.luiggi.geosongfy.utils.CreateNotification;
 
-public class SongActivity extends AppCompatActivity implements Playable {
+public class SongActivity extends AppCompatActivity implements Playable, View.OnTouchListener {
     public static MediaPlayer mPlayer;
-    private Song mSong;
+    public static Song mSong;
     private ArrayList<Song> songList;
     private int actualPos;
+    public static long progresso;
     ImageButton mPlay, mBack, mNext;
     SeekBar mSeek;
     TextView mSeekTitle;
-    NotificationManager notificationManager;
+    static NotificationManager notificationManager;
     ImageView mImageView;
     TextView mText2;
     TextView mTextView;
@@ -51,13 +63,14 @@ public class SongActivity extends AppCompatActivity implements Playable {
     LinearLayout container;
     SeekBar volumeBar;
     AudioManager audioManager;
+    Vibrator vib;
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        /*if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             notificationManager.cancelAll();
-        }
-        unregisterReceiver(broadcastReceiver);
+        }*/
+        //unregisterReceiver(broadcastReceiver);
     }
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
@@ -89,10 +102,13 @@ public class SongActivity extends AppCompatActivity implements Playable {
     private void createChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel channel = new NotificationChannel(CreateNotification.CHANNEL_ID, "Luiggi", NotificationManager.IMPORTANCE_HIGH);
+            channel.enableLights(true);
+            channel.enableVibration(true);
             notificationManager = getSystemService(NotificationManager.class);
             if (notificationManager != null) {
                 notificationManager.createNotificationChannel(channel);
             }
+            NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(SongActivity.this, CreateNotification.CHANNEL_ID);
         }
     }
 
@@ -116,6 +132,10 @@ public class SongActivity extends AppCompatActivity implements Playable {
             mPlayer.setDataSource(url);
             mPlayer.prepare();
             mPlayer.start();
+            dbUsers.child("isSharing").setValue(true);
+            dbUsers.child("songUrl").setValue(mSong.getUrl());
+            progresso = mPlayer.getCurrentPosition();
+            dbUsers.child("position").setValue(progresso);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -145,6 +165,8 @@ public class SongActivity extends AppCompatActivity implements Playable {
         mBack = (ImageButton) findViewById(R.id.song_item_previous);
         mNext = (ImageButton) findViewById(R.id.song_item_next);
         volumeBar = (SeekBar) findViewById(R.id.volumeBar);
+        //vibration object
+        vib = (Vibrator) this.getSystemService(Context.VIBRATOR_SERVICE);
         //Imposto la durata (da ms a s)
         mSeek.setMax(mPlayer.getDuration() / 1000);
 
@@ -168,6 +190,8 @@ public class SongActivity extends AppCompatActivity implements Playable {
                     mPlayer.seekTo(progress * 1000);
                     String seekTitle = getTimeString(mPlayer.getCurrentPosition()) + "/" + getTimeString(mPlayer.getDuration());
                     mSeekTitle.setText(seekTitle);
+                    progresso = mPlayer.getCurrentPosition();
+                    dbUsers.child("position").setValue(progresso);
                 }
             }
         });
@@ -187,10 +211,17 @@ public class SongActivity extends AppCompatActivity implements Playable {
                     mPlayer.pause();
                     mPlay.setImageResource(R.drawable.ic_play);
                     onTrackPause();
+                    Boolean b = Boolean.FALSE;
+                    dbUsers.child("isSharing").setValue(b);
+                    progresso = mPlayer.getCurrentPosition();
+                    dbUsers.child("position").setValue(progresso);
                 } else {
                     //Play:
                     mPlayer.start();
                     onTrackPlay();
+                    Boolean b = Boolean.TRUE;
+                    dbUsers.child("isSharing").setValue(b);
+                    dbUsers.child("songUrl").setValue(mSong.getUrl());
                     //Creo un handler per gestire la SeekBar
                     final Handler mHandler = new Handler();
                     //Eseguo il tutto nel thread dell'UI
@@ -200,6 +231,8 @@ public class SongActivity extends AppCompatActivity implements Playable {
                             if (mPlayer != null) {
                                 int mCurrentPosition = mPlayer.getCurrentPosition() / 1000;
                                 mSeek.setProgress(mCurrentPosition);
+                                progresso = mPlayer.getCurrentPosition();
+                                dbUsers.child("position").setValue(progresso);
                                 String seekTitle = getTimeString(mPlayer.getCurrentPosition()) + "/" + getTimeString(mPlayer.getDuration());
                                 mSeekTitle.setText(seekTitle);
                             }
@@ -221,6 +254,8 @@ public class SongActivity extends AppCompatActivity implements Playable {
                         public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                             if (mPlayer != null && fromUser) {
                                 mPlayer.seekTo(progress * 1000);
+                                progresso = mPlayer.getCurrentPosition();
+                                dbUsers.child("position").setValue(progresso);
                                 String seekTitle = getTimeString(mPlayer.getCurrentPosition()) + "/" + getTimeString(mPlayer.getDuration());
                                 mSeekTitle.setText(seekTitle);
                             }
@@ -245,6 +280,9 @@ public class SongActivity extends AppCompatActivity implements Playable {
                         actualPos = songList.size() - 1;
                     }
                     mSong = songList.get(actualPos);
+                    dbUsers.child("songUrl").setValue(mSong.getUrl());
+                    progresso = mPlayer.getCurrentPosition();
+                    dbUsers.child("position").setValue(progresso);
                     mPlayer.stop();
                     initializeMediaPlayer();
                     mPlayer.start();
@@ -253,6 +291,9 @@ public class SongActivity extends AppCompatActivity implements Playable {
                     initializeMusicUI();
                 } else {
                     mPlayer.seekTo(0);
+                    progresso = mPlayer.getCurrentPosition();
+                    dbUsers.child("position").setValue(progresso);
+
                 }
             }
         });
@@ -269,6 +310,9 @@ public class SongActivity extends AppCompatActivity implements Playable {
                     actualPos = 0;
                 }
                 mSong = songList.get(actualPos);
+                dbUsers.child("songUrl").setValue(mSong.getUrl());
+                progresso = mPlayer.getCurrentPosition();
+                dbUsers.child("position").setValue(progresso);
                 mPlayer.stop();
                 initializeMediaPlayer();
                 mPlayer.start();
@@ -290,6 +334,9 @@ public class SongActivity extends AppCompatActivity implements Playable {
                     actualPos = 0;
                 }
                 mSong = songList.get(actualPos);
+                dbUsers.child("songUrl").setValue(mSong.getUrl());
+                progresso = mPlayer.getCurrentPosition();
+                dbUsers.child("position").setValue(progresso);
                 mPlayer.stop();
                 initializeMediaPlayer();
                 mPlayer.start();
@@ -300,10 +347,13 @@ public class SongActivity extends AppCompatActivity implements Playable {
         });
     }
     //avvia la musica
+    final DatabaseReference dbUsers = FirebaseDatabase.getInstance().getReference().child("user").child(FirebaseAuth.getInstance().getUid());
     @SuppressLint("ClickableViewAccessibility")
     private void handleMusic() {
         //inizializzo i riferimenti
         initRefs();
+        //DatabaseReference riferimenti
+
         //Inizializzo il titolo della SeekBar
         String seekTitle = getTimeString(mPlayer.getCurrentPosition()) + "/" + getTimeString(mPlayer.getDuration());
         mSeekTitle.setText(seekTitle);
@@ -315,6 +365,8 @@ public class SongActivity extends AppCompatActivity implements Playable {
                 if (mPlayer != null) {
                     int mCurrentPosition = mPlayer.getCurrentPosition() / 1000;
                     mSeek.setProgress(mCurrentPosition);
+                    progresso = mPlayer.getCurrentPosition();
+                    dbUsers.child("position").setValue(progresso);
                     String seekTitle = getTimeString(mPlayer.getCurrentPosition()) + "/" + getTimeString(mPlayer.getDuration());
                     mSeekTitle.setText(seekTitle);
                 }
@@ -333,157 +385,11 @@ public class SongActivity extends AppCompatActivity implements Playable {
         nextHandler();
        //Ascolto continuo musica
         continueMusic();
-        //implementazione per le gestures
-        OnSwipeTouchListener gestureListener = new OnSwipeTouchListener(SongActivity.this){
-            @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-            @Override
-            public void onSwipeRight() {
-                Toast.makeText(getApplicationContext(),"Precedente",Toast.LENGTH_SHORT).show();
-                super.onSwipeRight();
-                actualPos--;
-                if (actualPos == -1) {
-                    actualPos = songList.size() - 1;
-                }
-                mSong = songList.get(actualPos);
-                mPlayer.stop();
-                initializeMediaPlayer();
-                mPlayer.start();
-                mPlay.setImageResource(R.drawable.ic_pause);
-                onTrackPreviousNoPlay();
-                initializeMusicUI();
-            }
-            @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-            @Override
-            public void onSwipeLeft() {
-                Toast.makeText(getApplicationContext(),"Successiva",Toast.LENGTH_SHORT).show();
-                super.onSwipeLeft();
-                actualPos++;
-                if (actualPos >= songList.size()) {
-                    actualPos = 0;
-                }
-                mSong = songList.get(actualPos);
-                mPlayer.stop();
-                initializeMediaPlayer();
-                mPlayer.start();
-                mPlay.setImageResource(R.drawable.ic_pause);
-                onTrackNextNoPlay();
-                initializeMusicUI();
-            }
-            @Override
-            public void onClick() {
-                super.onClick();
-                //GESTIONE PLAY E PAUSE
-                //Pause:
-                if (mPlayer.isPlaying()) {
-                    Toast.makeText(getApplicationContext(),"Pausa",Toast.LENGTH_SHORT).show();
-                    mPlayer.pause();
-                    mPlay.setImageResource(R.drawable.ic_play);
-                    onTrackPause();
-                } else {
-                    Toast.makeText(getApplicationContext(),"Play",Toast.LENGTH_SHORT).show();
-                    //Play:
-                    mPlayer.start();
-                    onTrackPlay();
-                    //Creo un handler per gestire la SeekBar
-                    final Handler mHandler = new Handler();
-                    //Eseguo il tutto nel thread dell'UI
-                    SongActivity.this.runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            if (mPlayer != null) {
-                                int mCurrentPosition = mPlayer.getCurrentPosition() / 1000;
-                                mSeek.setProgress(mCurrentPosition);
-                                String seekTitle = getTimeString(mPlayer.getCurrentPosition()) + "/" + getTimeString(mPlayer.getDuration());
-                                mSeekTitle.setText(seekTitle);
-                            }
-                            mHandler.postDelayed(this, 1000);
-                        }
-                    });
-                    //Cambio l'icona da Play a Pause:
-                    mPlay.setImageResource(R.drawable.ic_pause);
-                }
-            }
-            @Override
-            public void onLongClick() {
-                Toast.makeText(getApplicationContext(),"Dall'inizio",Toast.LENGTH_SHORT).show();
-                super.onLongClick();
-                mPlayer.seekTo(0);
-            }
 
-            @Override
-            public void onSwipeDown() {
-                super.onSwipeDown();
-                Thread volumeThread = new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        try {
-                            volumeBar.setVisibility(View.VISIBLE);
-                            Thread.sleep(1000);
-                            volumeBar.setVisibility(View.INVISIBLE);
-                        } catch (Exception e) {
-                            e.getLocalizedMessage();
-                        }
-                    }
-                });
-                volumeThread.start();
-            }
-
-            @Override
-            public void onSwipeUp() {
-                super.onSwipeUp();
-                Thread volumeThread = new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        try {
-                            volumeBar.setVisibility(View.VISIBLE);
-                            Toast.makeText(getApplicationContext(),"Volume alzato",Toast.LENGTH_SHORT).show();
-                            Thread.sleep(1000);
-                            volumeBar.setVisibility(View.INVISIBLE);
-                        } catch (Exception e) {
-                            e.getLocalizedMessage();
-                        }
-                    }
-                });
-                volumeThread.start();
-
-            }
-
-            /*//CONTROLLO VOLUME
-            AudioManager audioManager = (AudioManager) getApplicationContext().getSystemService(Context.AUDIO_SERVICE);
-            @Override
-            public void onSwipeDown() {
-                super.onSwipeDown();
-                audioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC,AudioManager.ADJUST_LOWER,AudioManager.FLAG_SHOW_UI);
-            }
-
-            @Override
-            public void onSwipeUp() {
-                super.onSwipeUp();
-                audioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC,AudioManager.ADJUST_RAISE,AudioManager.FLAG_SHOW_UI);
-            }*/
-
-            /*@Override
-            public void onDoubleClick() {
-                super.onDoubleClick();
-                if(mPlay != null && mBack != null && mNext != null){
-                    if(mPlay.getVisibility() == View.VISIBLE){
-                        mPlay.setVisibility(View.INVISIBLE);
-                        mNext.setVisibility(View.INVISIBLE);
-                        mBack.setVisibility(View.INVISIBLE);
-                        Toast.makeText(getApplicationContext(),"Bottoni non visibili",Toast.LENGTH_SHORT).show();
-                    }else{
-                        mPlay.setVisibility(View.VISIBLE);
-                        mNext.setVisibility(View.VISIBLE);
-                        mBack.setVisibility(View.VISIBLE);
-                        Toast.makeText(getApplicationContext(),"Bottoni visibili",Toast.LENGTH_SHORT).show();
-                    }
-                }
-            }*/
-        };
         //GESTURE CONTROLS
-        mLinearLayout.setOnTouchListener(gestureListener);
-        mImageView.setOnTouchListener(gestureListener);
-        container.setOnTouchListener(gestureListener);
+        mLinearLayout.setOnTouchListener(this);
+        mImageView.setOnTouchListener(this);
+        container.setOnTouchListener(this);
     }
 
     //riempio la canzone selezionata
@@ -671,5 +577,208 @@ public class SongActivity extends AppCompatActivity implements Playable {
         mPlayer.pause();
         mPlay.setImageResource(R.drawable.ic_play);
         isPlaying = false;
+    }
+
+    /*LISTENER E ALTRE FUNZIONI PER LE GESTURES CUSTOMIZZATE*/
+
+    //un dito
+    float startX=-1,startY=-1,middleX=-1,middleY=-1,endX=-1,endY=-1;
+    static final float SOGLIA_MIN_MEDIUM_X = 120;
+    static final float SOGLIA_MAX_MEDIUM_X = 250;
+    static final float SOGLIA_MIN_Y = 200;
+    static final float SOGLIA_MAX_Y = 450;
+    static final float RANGE_MAX_ERRORE = 140;
+    boolean medium=false, finaleSin=false, finaleDes=false;
+
+    //due dita
+    float startFingerY1=-1, startFingerY2=-1,endFingerY1=-1,endFingerY2=-1;
+    static final float SOGLIA_MIN_DUE_DITA = 100;
+
+    //se true allora il range del valore medio (la 'punta') è rispettato
+    boolean rangeMedium(float medX){
+        return Math.abs(medX - startX) >= SOGLIA_MIN_MEDIUM_X && Math.abs(medX - startX) <= SOGLIA_MAX_MEDIUM_X;
+    }
+    //se true la punta è rivolta a sinistra e ho disegnato un arco (o una freccia) rivolto a sinistra
+    boolean rangeSinFinale(){
+        return Math.abs(endX - startX) <= RANGE_MAX_ERRORE && endX != -1 && startX != -1 && endX > middleX && endY > middleY && middleY != -1 && Math.abs(endY - startY) >= SOGLIA_MIN_Y && Math.abs(endY - startY) <= SOGLIA_MAX_Y;
+    }
+    //se true la punta è rivolta a destra e ho disegnato un arco (o una freccia) rivolto a destra
+    boolean rangeDesFinale(){
+        return Math.abs(endX - startX) <= RANGE_MAX_ERRORE && endX != -1 && startX != -1 && endX < middleX && endY > middleY && middleY != -1 && Math.abs(endY - startY) >= SOGLIA_MIN_Y && Math.abs(endY - startY) <= SOGLIA_MAX_Y;
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+    @Override
+    public boolean onTouch(View view, final MotionEvent motionEvent) {
+        int action = motionEvent.getAction();
+        switch(action & MotionEvent.ACTION_MASK) {
+            case (MotionEvent.ACTION_DOWN) :
+                if(motionEvent.getPointerCount() == 1){
+                    startX = motionEvent.getX();
+                    startY = motionEvent.getY();
+                }else if(motionEvent.getPointerCount() > 1){
+                    startFingerY1 = motionEvent.getY(0);
+                    startFingerY2 = motionEvent.getY(1);
+                }
+
+                return true;
+            case (MotionEvent.ACTION_MOVE) :
+                if(motionEvent.getPointerCount() == 1){
+                    if(rangeMedium(motionEvent.getX())){
+                        middleX = motionEvent.getX();
+                        middleY = motionEvent.getY();
+                        medium = true;
+                    }
+                }
+                return true;
+            case (MotionEvent.ACTION_UP) :
+                if(motionEvent.getPointerCount() == 1) {
+                    endX = motionEvent.getX();
+                    endY = motionEvent.getY();
+                    if (rangeSinFinale()) {
+                        finaleSin = true;
+                    } else if (rangeDesFinale()) {
+                        finaleDes = true;
+                    }
+                    if (medium) {
+                        if (finaleDes) {
+                            //vibra per 200 millisecondi
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                                vib.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
+                            } else {
+                                vib.vibrate(200);
+                            }
+                            actualPos++;
+                            if (actualPos >= songList.size()) {
+                                actualPos = 0;
+                            }
+                            mSong = songList.get(actualPos);
+                            mPlayer.stop();
+                            initializeMediaPlayer();
+                            mPlayer.start();
+                            mPlay.setImageResource(R.drawable.ic_pause);
+                            onTrackNextNoPlay();
+                            dbUsers.child("songUrl").setValue(mSong.getUrl());
+                            progresso=mPlayer.getCurrentPosition();
+                            dbUsers.child("position").setValue(progresso);
+                            initializeMusicUI();
+                        } else if (finaleSin) {
+                            //vibra per 200 millisecondi
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                                vib.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
+                            } else {
+                                vib.vibrate(200);
+                            }
+                            actualPos--;
+                            if (actualPos == -1) {
+                                actualPos = songList.size() - 1;
+                            }
+                            mSong = songList.get(actualPos);
+                            mPlayer.stop();
+                            initializeMediaPlayer();
+                            mPlayer.start();
+                            mPlay.setImageResource(R.drawable.ic_pause);
+                            onTrackPreviousNoPlay();
+                            dbUsers.child("songUrl").setValue(mSong.getUrl());
+                            progresso=mPlayer.getCurrentPosition();
+                            dbUsers.child("position").setValue(progresso);
+                            initializeMusicUI();
+                        }
+                    }else{
+                        Thread volumeThread = new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                try {
+                                    volumeBar.setVisibility(View.VISIBLE);
+                                    Toast.makeText(getApplicationContext(),"Volume alzato",Toast.LENGTH_SHORT).show();
+                                    Thread.sleep(1000);
+                                    volumeBar.setVisibility(View.INVISIBLE);
+                                } catch (Exception e) {
+                                    e.getLocalizedMessage();
+                                }
+                            }
+                        });
+                        volumeThread.start();
+                    }
+                }
+                //reinizializzo le variabili
+                middleY = -1;
+                middleX = -1;
+                startX = -1;
+                startY = -1;
+                endX = -1;
+                endY = -1;
+                finaleSin = false;
+                finaleDes = false;
+                medium = false;
+                return true;
+            case (MotionEvent.ACTION_CANCEL):
+            case (MotionEvent.ACTION_OUTSIDE):
+                return true;
+            case (MotionEvent.ACTION_POINTER_DOWN):
+                if(motionEvent.getPointerCount() > 1){
+                    startFingerY1 = motionEvent.getY(0);
+                    startFingerY2 = motionEvent.getY(1);
+                }
+            case (MotionEvent.ACTION_POINTER_UP):
+                if(motionEvent.getPointerCount() > 1){
+                    endFingerY1 = motionEvent.getY(0);
+                    endFingerY2 = motionEvent.getY(1);
+                    if(endFingerY1-startFingerY1>=SOGLIA_MIN_DUE_DITA && endFingerY2-startFingerY2>=SOGLIA_MIN_DUE_DITA){
+                        //GESTIONE PLAY E PAUSE
+                        //Pause:
+                        if (mPlayer.isPlaying()) {
+                            Toast.makeText(getApplicationContext(),"Pausa",Toast.LENGTH_SHORT).show();
+                            //vibra per 200 millisecondi
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                                vib.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
+                            } else {
+                                vib.vibrate(200);
+                            }
+                            mPlayer.pause();
+                            mPlay.setImageResource(R.drawable.ic_play);
+                            onTrackPause();
+                            Boolean b = Boolean.FALSE;
+                            dbUsers.child("isSharing").setValue(b);
+                            dbUsers.child("position").setValue(progresso);
+                        } else {
+                            Toast.makeText(getApplicationContext(),"Play",Toast.LENGTH_SHORT).show();
+                            //vibra per 200 millisecondi
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                                vib.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
+                            } else {
+                                vib.vibrate(200);
+                            }
+                            //Play:
+                            mPlayer.start();
+                            onTrackPlay();
+                            Boolean b = Boolean.TRUE;
+                            dbUsers.child("isSharing").setValue(b);
+                            dbUsers.child("songUrl").setValue(mSong.getUrl());
+                            //Creo un handler per gestire la SeekBar
+                            final Handler mHandler = new Handler();
+                            //Eseguo il tutto nel thread dell'UI
+                            SongActivity.this.runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    if (mPlayer != null) {
+                                        int mCurrentPosition = mPlayer.getCurrentPosition() / 1000;
+                                        mSeek.setProgress(mCurrentPosition);
+                                        String seekTitle = getTimeString(mPlayer.getCurrentPosition()) + "/" + getTimeString(mPlayer.getDuration());
+                                        mSeekTitle.setText(seekTitle);
+                                        progresso=mPlayer.getCurrentPosition();
+                                        dbUsers.child("position").setValue(progresso);
+                                    }
+                                    mHandler.postDelayed(this, 1000);
+                                }
+                            });
+                            //Cambio l'icona da Play a Pause:
+                            mPlay.setImageResource(R.drawable.ic_pause);
+                        }
+                    }
+                }
+            default :
+                return super.onTouchEvent(motionEvent);
+        }
     }
 }
