@@ -5,14 +5,10 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
-import android.media.AudioManager;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -50,35 +46,41 @@ public class PlaylistFragment extends Fragment {
     private ArrayList<Song> songList;
     public String curName;
     public View bkpView;
-    RecyclerView recyclerView;
+    private RecyclerView recyclerView;
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.fragment_tue_playlist, container, false);
-        bkpView = v;
-        initView(v);
-        return v;
+        bkpView = inflater.inflate(R.layout.fragment_tue_playlist, container, false);
+        initView();
+        return bkpView;
     }
 
-    private void initView(final View v) {
+    private void initView() {
         //Caricare dallo shared preferences
-        loadPlaylists(v);
+        loadPlaylists();
+        //se è null vuol dire che è la prima volta che apro l'app, non ho playlist
         if (playlistList == null)
             playlistList = new ArrayList<>();
+        //A questo punto posso ordinarle in ordine alfabetico
         Collections.sort(playlistList, new Comparator<Playlist>() {
             @Override
             public int compare(Playlist lhs, Playlist rhs) {
                 return lhs.getPlaylistName().compareTo(rhs.getPlaylistName());
             }
         });
-        initPlaylistFragment(v);
+        //inizializzo il fragment
+        initPlaylistFragment();
+        //inizializzo le canzoni
         initSongs();
-        btn = v.findViewById(R.id.crea_playlist);
+        //imposto un listener al bottone per creare una playlist (mostro un dialog):
+        btn = bkpView.findViewById(R.id.crea_playlist);
         btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(final View view) {
                 final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
                 LayoutInflater inflater = getLayoutInflater();
+                //Fornisco il mio layout customizzato
                 final View view1 = inflater.inflate(R.layout.nuova_playlist, null);
                 builder.setView(view1)
                         .setPositiveButton(R.string.crea, new DialogInterface.OnClickListener() {
@@ -89,7 +91,7 @@ public class PlaylistFragment extends Fragment {
                                     Toast.makeText(getContext(), "Devi inserire un nome valido per la Playlist!", Toast.LENGTH_SHORT).show();
                                 else {
                                     curName = editText.getText().toString();
-                                    scegliCanzoni(v);
+                                    scegliCanzoni();
                                 }
                             }
                         })
@@ -105,12 +107,12 @@ public class PlaylistFragment extends Fragment {
         });
     }
 
-    private void scegliCanzoni(final View v) {
+    private void scegliCanzoni() {
         final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         LayoutInflater inflater = getLayoutInflater();
         View view = inflater.inflate(R.layout.scegli_canzoni, null);
         RecyclerView list = view.findViewById(R.id.song_list_dialog);
-        list.setLayoutManager(new LinearLayoutManager(v.getContext()));
+        list.setLayoutManager(new LinearLayoutManager(bkpView.getContext()));
         list.setHasFixedSize(true);
         final DialogListAdapter adapter = new DialogListAdapter(songList);
         list.setAdapter(adapter);
@@ -124,7 +126,7 @@ public class PlaylistFragment extends Fragment {
                         Toast.makeText(getContext(), "Playlist " + curName + " creata con successo!", Toast.LENGTH_SHORT).show();
                         mAdapter.notifyDataSetChanged();
                         //salvare nello shared preferences
-                        savePlaylists(v);
+                        savePlaylists();
                     }
                 })
                 .setNegativeButton(R.string.annulla, new DialogInterface.OnClickListener() {
@@ -162,28 +164,30 @@ public class PlaylistFragment extends Fragment {
     }
 
     //Funzione che inizializza il fragment con il recyclerView
-    private void initPlaylistFragment(View v) {
+    private void initPlaylistFragment() {
         //riferimento all'oggetto
-        recyclerView = (RecyclerView) v.findViewById(R.id.playlistList);
+        recyclerView = (RecyclerView) bkpView.findViewById(R.id.playlistList);
         //dimensione nel layout fissata
         recyclerView.setHasFixedSize(true);
         //imposto un layout manager per la recycler view
-        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(v.getContext());
+        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(bkpView.getContext());
         recyclerView.setLayoutManager(mLayoutManager);
         //imposto un adapter per i dati della recycler view
         mAdapter = new PlayListAdapter(playlistList);
         recyclerView.setAdapter(mAdapter);
-        initGestures(v);
+        initGestures();
     }
+
     @SuppressLint("ClickableViewAccessibility")
-    private void initGestures(View v) {
-        recyclerView = v.findViewById(R.id.playlistList);
-        recyclerView.setOnTouchListener(new OnSwipeTouchListener(v.getContext()){
+    private void initGestures() {
+        recyclerView = bkpView.findViewById(R.id.playlistList);
+        recyclerView.setOnTouchListener(new OnSwipeTouchListener(bkpView.getContext()) {
             @Override
             public void onSwipeLeft() {
                 super.onSwipeLeft();
                 loadFragment(0); //amici
             }
+
             @Override
             public void onSwipeRight() {
                 super.onSwipeRight();
@@ -192,25 +196,27 @@ public class PlaylistFragment extends Fragment {
         });
         //Gestisco le gestures per passare da un fragment all'altro
     }
+
     //funzione per caricare un fragment specifico
     public boolean loadFragment(int i) {
-        if(getActivity() == null)
+        if (getActivity() == null)
             return true;
         BottomNavigationView navigationView = getActivity().findViewById(R.id.bottom_navigation);
         Menu menu = navigationView.getMenu();
         MenuItem menuItem;
-        if(i == 1) {
+        if (i == 1) {
             menuItem = menu.findItem(R.id.home);
             ((MainPageActivity) getActivity()).changeFocus(R.id.home);
-        }else{
+        } else {
             menuItem = menu.findItem(R.id.fragment_people);
             ((MainPageActivity) getActivity()).changeFocus(R.id.fragment_people);
         }
-        return ((MainPageActivity)getActivity()).onNavigationItemSelected(menuItem);
+        return ((MainPageActivity) getActivity()).onNavigationItemSelected(menuItem);
     }
+
     //funzione che salva le playlists
-    private void savePlaylists(View v) {
-        SharedPreferences sharedPreferences = v.getContext().getSharedPreferences("saved_playlists", Context.MODE_PRIVATE);
+    private void savePlaylists() {
+        SharedPreferences sharedPreferences = bkpView.getContext().getSharedPreferences("saved_playlists", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         Gson gson = new Gson();
         String json = gson.toJson(playlistList);
@@ -220,14 +226,14 @@ public class PlaylistFragment extends Fragment {
     }
 
     //funzione che ricarica le playlist salvate
-    private void loadPlaylists(View v) {
-        SharedPreferences sharedPreferences = v.getContext().getSharedPreferences("saved_playlists", Context.MODE_PRIVATE);
+    private void loadPlaylists() {
+        SharedPreferences sharedPreferences = bkpView.getContext().getSharedPreferences("saved_playlists", Context.MODE_PRIVATE);
         Gson gson = new Gson();
         String json = sharedPreferences.getString("playlist_list", null);
         Type type = new TypeToken<ArrayList<Playlist>>() {
         }.getType();
         playlistList = gson.fromJson(json, type);
-        if(playlistList == null)
+        if (playlistList == null)
             playlistList = new ArrayList<>();
     }
 
@@ -239,8 +245,8 @@ public class PlaylistFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        loadPlaylists(bkpView);
-        if(playlistList != null) {
+        loadPlaylists();
+        if (playlistList != null) {
             Collections.sort(playlistList, new Comparator<Playlist>() {
                 @Override
                 public int compare(Playlist lhs, Playlist rhs) {
@@ -248,7 +254,7 @@ public class PlaylistFragment extends Fragment {
                 }
             });
         }
-        initPlaylistFragment(bkpView);
+        initPlaylistFragment();
         mAdapter.notifyDataSetChanged();
     }
 }

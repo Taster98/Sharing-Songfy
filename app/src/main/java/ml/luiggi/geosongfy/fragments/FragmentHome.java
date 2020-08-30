@@ -1,16 +1,11 @@
 package ml.luiggi.geosongfy.fragments;
 
 import android.annotation.SuppressLint;
-import android.content.Intent;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.ActionProvider;
-import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.SubMenu;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -21,7 +16,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.google.android.material.navigation.NavigationView;
 
 import java.util.ArrayList;
 
@@ -30,31 +24,34 @@ import ml.luiggi.geosongfy.R;
 import ml.luiggi.geosongfy.scaffoldings.Song;
 import ml.luiggi.geosongfy.utils.SongListAdapter;
 import ml.luiggi.geosongfy.utils.JsonParserUrl;
+
 /*
  * Questa classe rappresenta il frammento della pagina principale, ossia quello contenente il Recycler View con l'elenco di tutte le canzoni presenti nel server
  */
 public class FragmentHome extends Fragment {
     //lista di canzoni da riempire poi prelevandole dal server
     private ArrayList<Song> songList;
-    //Prendo il layout per gestirci le gestures
-    RecyclerView recyclerView;
+    private RecyclerView recyclerView;
+    //Vista pubblica poichè usata anche in altre funzioni.
+    public View bkView;
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.fragment_home, container, false);
+        bkView = inflater.inflate(R.layout.fragment_home, container, false);
         //carico canzoni
-        initSongs(v);
-        return v;
+        initSongs();
+        return bkView;
     }
 
     //Funzione che carica tutte le canzoni
-    private void initSongs(final View v) {
+    private void initSongs() {
         //Uso un thread per non intasare l'UI
         new Thread(new Runnable() {
             @Override
             public void run() {
                 try {
-                    loadSongs(v);
+                    loadSongs();
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -63,16 +60,16 @@ public class FragmentHome extends Fragment {
     }
 
     //funzione che parsa dal server il file json contenente l'elenco di canzoni presenti in esso
-    private void loadSongs(final View v) {
+    private void loadSongs() {
         songList = new ArrayList<>();
         JsonParserUrl mp = new JsonParserUrl("http://luiggi.altervista.org/song_db.json");
         songList = mp.getSongs();
-        if(getActivity() == null)
+        if (getActivity() == null)
             return;
         getActivity().runOnUiThread(new Runnable() {
             public void run() {
                 try {
-                    initHomeFragment(v);
+                    initHomeFragment();
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -81,38 +78,39 @@ public class FragmentHome extends Fragment {
     }
 
     //Funzione che inizializza il fragment con il recyclerView
-    private void initHomeFragment(View v) {
+    private void initHomeFragment() {
         //riferimento all'oggetto
-        recyclerView = (RecyclerView) v.findViewById(R.id.songList);
+        recyclerView = (RecyclerView) bkView.findViewById(R.id.songList);
         //dimensione nel layout fissata
         recyclerView.setHasFixedSize(true);
         //imposto un layout manager per la recycler view
-        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(v.getContext());
+        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(bkView.getContext());
         recyclerView.setLayoutManager(mLayoutManager);
         //imposto un adapter per i dati della recycler view
         RecyclerView.Adapter mAdapter = new SongListAdapter(songList);
         recyclerView.setAdapter(mAdapter);
-        initGestures(v);
+        initGestures();
     }
 
     @SuppressLint("ClickableViewAccessibility")
-    private void initGestures(View v) {
-        recyclerView = v.findViewById(R.id.songList);
-        recyclerView.setOnTouchListener(new OnSwipeTouchListener(v.getContext()){
+    private void initGestures() {
+        recyclerView = bkView.findViewById(R.id.songList);
+        recyclerView.setOnTouchListener(new OnSwipeTouchListener(bkView.getContext()) {
             @Override
             public void onSwipeLeft() {
                 super.onSwipeLeft();
-                Log.d("TAG","SwipeLeft");
+                Log.d("TAG", "SwipeLeft");
                 loadFragment();
             }
+
             @Override
             public void onSwipeRight() {
                 super.onSwipeRight();
-                Log.d("TAG","SwipeRight");
+                Log.d("TAG", "SwipeRight");
                 //tutorial
-                if(getActivity() != null){
-                    ((MainPageActivity)getActivity()).storeDialogStatus(false);
-                    ((MainPageActivity)getActivity()).initTutorial();
+                if (getActivity() != null) {
+                    ((MainPageActivity) getActivity()).storeDialogStatus(false);
+                    ((MainPageActivity) getActivity()).initTutorial();
                 }
             }
         });
@@ -121,12 +119,12 @@ public class FragmentHome extends Fragment {
 
     //funzione per caricare un fragment specifico
     public boolean loadFragment() {
-        if(getActivity() == null)
+        if (getActivity() == null)
             return true;
         BottomNavigationView navigationView = getActivity().findViewById(R.id.bottom_navigation);
         Menu menu = navigationView.getMenu();
         MenuItem menuItem = menu.findItem(R.id.fragment_tue_playlist);
-        ((MainPageActivity)getActivity()).changeFocus(R.id.fragment_tue_playlist);
-        return ((MainPageActivity)getActivity()).onNavigationItemSelected(menuItem);
+        ((MainPageActivity) getActivity()).changeFocus(R.id.fragment_tue_playlist);
+        return ((MainPageActivity) getActivity()).onNavigationItemSelected(menuItem);
     }
 }
