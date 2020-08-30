@@ -25,6 +25,7 @@ public class FriendPlayerService extends Service {
     int position;
     Boolean isSharing;
     String uid;
+
     public FriendPlayerService() {
     }
 
@@ -34,11 +35,12 @@ public class FriendPlayerService extends Service {
     }
 
     DatabaseReference userdb = FirebaseDatabase.getInstance().getReference().child("user");
+
     @Override
     public int onStartCommand(final Intent intent, int flags, int startId) {
         //prelevo lo uid dal bundle del servizio:
         Bundle bndl = intent.getExtras();
-        if(bndl != null){
+        if (bndl != null) {
             uid = bndl.getString("uid");
         }
         //creo un riferimento al database rispettivo all'utente con uid come id
@@ -51,13 +53,13 @@ public class FriendPlayerService extends Service {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 final String prevSong;
-                if(snapshot.exists()){
+                if (snapshot.exists()) {
                     prevSong = urlMusic;
                     urlMusic = snapshot.child("songUrl").getValue(String.class);
                     position = Math.toIntExact(snapshot.child("position").getValue(Long.class));
                     isSharing = snapshot.child("isSharing").getValue(Boolean.class);
                     try {
-                        if(isSharing != null && isSharing) {
+                        if (isSharing != null && isSharing) {
                             if (!prevSong.equals(urlMusic)) {
                                 mediaPlayer.reset();
                                 mediaPlayer.setDataSource(urlMusic);
@@ -65,7 +67,7 @@ public class FriendPlayerService extends Service {
                                 mediaPlayer.seekTo(position);
                                 mediaPlayer.start();
                             }
-                        }else{
+                        } else {
                             mediaPlayer.stop();
                         }
                     } catch (IOException e) {
