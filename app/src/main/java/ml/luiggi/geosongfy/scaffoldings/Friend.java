@@ -12,11 +12,12 @@ public class Friend implements Serializable {
     //Mi servono lo uid, che coincide con l'id di Firebase
     private String uid,
     //nome e numero per poterli mostrare nel recycler view
-            name,
+    name,
             phoneNumber;
     //canzone corrente con posizione corrente per la funzionalità "ascolto condiviso"
     private Song currentSong;
     private int songPosition;
+
     public Friend(String uid, String name, String phoneNumber) {
         this.name = name;
         this.phoneNumber = phoneNumber;

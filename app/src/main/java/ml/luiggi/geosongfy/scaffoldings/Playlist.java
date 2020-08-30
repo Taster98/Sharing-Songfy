@@ -8,7 +8,9 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Objects;
 
-public class Playlist  implements Serializable {
+//Oggetto che rappresenta una playlist
+public class Playlist implements Serializable {
+    //ha una lista di canzoni associata a un nome
     private String playlistName;
     private List<Song> songList;
 
@@ -33,6 +35,7 @@ public class Playlist  implements Serializable {
         this.songList = songList;
     }
 
+    //Sovrascrivo equals e hashcode per far sì che le uguaglianze siano viste solo per i nomi delle playlist
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
     public boolean equals(Object o) {

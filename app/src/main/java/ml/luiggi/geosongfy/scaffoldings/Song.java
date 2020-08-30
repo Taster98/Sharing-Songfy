@@ -24,9 +24,11 @@ public class Song implements Serializable {
         this.feat = feat;
         this.url = url;
     }
-    public Song(){
+
+    public Song() {
 
     }
+
     public String getUrl() {
         return url;
     }
