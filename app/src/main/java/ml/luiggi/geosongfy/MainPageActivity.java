@@ -37,12 +37,12 @@ public class MainPageActivity extends AppCompatActivity implements BottomNavigat
         initTutorial();
         //carico il fragment principale (quello contenente la lista delle canzoni nel server)
         loadFragment(new FragmentHome());
-
         //Inizializzo il bottom nav menu
         initBottomView();
     }
 
     public void initTutorial() {
+        //Il mini tutorial sulle gestures è un semplice alert dialog testuale
         AlertDialog.Builder mBuilder = new AlertDialog.Builder(MainPageActivity.this);
         View mView = getLayoutInflater().inflate(R.layout.tutorial_gestures, null);
         CheckBox mCheck = mView.findViewById(R.id.tutorial_checkbox);
@@ -57,15 +57,11 @@ public class MainPageActivity extends AppCompatActivity implements BottomNavigat
         });
         AlertDialog mDialog = mBuilder.create();
         mDialog.show();
-
+        //se il dialogo non dovrà essere più visualizzato, salvo questa scelta nello Shared Preferences
         mCheck.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                if(compoundButton.isChecked()){
-                    storeDialogStatus(true);
-                }else{
-                    storeDialogStatus(false);
-                }
+                storeDialogStatus(compoundButton.isChecked());
             }
         });
         if(getDialogStatus()){
@@ -92,6 +88,7 @@ public class MainPageActivity extends AppCompatActivity implements BottomNavigat
     public void initBottomView(){
         mBottomNavView = (BottomNavigationView) findViewById(R.id.bottom_navigation);
         mBottomNavView.setOnNavigationItemSelectedListener(this);
+        //imposto questo listener per evitare che il fragment si ricarichi se riselezionato
         mBottomNavView.setOnNavigationItemReselectedListener(new BottomNavigationView.OnNavigationItemReselectedListener() {
             @Override
             public void onNavigationItemReselected(@NonNull MenuItem item) {
@@ -99,6 +96,7 @@ public class MainPageActivity extends AppCompatActivity implements BottomNavigat
             }
         });
     }
+    //funzione per cambiare l'itemId selezionato del bottomNav
     public void changeFocus(int id){
         mBottomNavView.setSelectedItemId(id);
     }
@@ -141,6 +139,8 @@ public class MainPageActivity extends AppCompatActivity implements BottomNavigat
     DatabaseReference dbUsers;
     @Override
     protected void onDestroy() {
+        //L'accesso a FirebaseAuth è perforza non nullo in quanto senza di esso non sarebbe possibile accedere a questa activity
+        assert FirebaseAuth.getInstance().getUid() != null;
         dbUsers = FirebaseDatabase.getInstance().getReference().child("user").child(FirebaseAuth.getInstance().getUid()).child("isSharing");
         Boolean b = Boolean.FALSE;
         dbUsers.setValue(b);
