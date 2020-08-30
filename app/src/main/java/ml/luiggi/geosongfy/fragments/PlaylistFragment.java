@@ -182,13 +182,11 @@ public class PlaylistFragment extends Fragment {
             @Override
             public void onSwipeLeft() {
                 super.onSwipeLeft();
-                Log.d("TAG","SwipeLeft");
                 loadFragment(0); //amici
             }
             @Override
             public void onSwipeRight() {
                 super.onSwipeRight();
-                Log.d("TAG","SwipeRight");
                 loadFragment(1); //home
             }
         });

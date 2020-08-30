@@ -54,8 +54,10 @@ public class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.Fr
                         intent.putExtra("uid",(friendList.get(position).getUid()));
                         intent.putExtra("songUrl",friendList.get(position).getCurrentSong().getUrl());
                         intent.putExtra("position",friendList.get(position).getSongPosition());
-                        SongActivity.notificationManager.cancelAll();
-                        SongActivity.mPlayer.stop();
+                        if(SongActivity.notificationManager != null)
+                            SongActivity.notificationManager.cancelAll();
+                        if(SongActivity.mPlayer != null)
+                            SongActivity.mPlayer.stop();
                         view.getContext().startService(intent);
                     }else{
                         holder.mMute.setImageResource(R.drawable.ic_mute);
@@ -65,7 +67,7 @@ public class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.Fr
                         view.getContext().stopService(intent);
                     }
                 }else{
-                    if(checkedDue==1 || !SongActivity.mPlayer.isPlaying()){
+                    if(checkedDue==1 || SongActivity.mPlayer == null){
                         checkedDue=0;
                         checked=0;
                         holder.mMute.setImageResource(R.drawable.ic_mute);
