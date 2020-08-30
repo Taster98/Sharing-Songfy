@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.ArrayList;
 
 import ml.luiggi.geosongfy.R;
+import ml.luiggi.geosongfy.SongActivity;
 import ml.luiggi.geosongfy.scaffoldings.Friend;
 import ml.luiggi.geosongfy.services.FriendPlayerService;
 
@@ -53,6 +54,8 @@ public class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.Fr
                         intent.putExtra("uid",(friendList.get(position).getUid()));
                         intent.putExtra("songUrl",friendList.get(position).getCurrentSong().getUrl());
                         intent.putExtra("position",friendList.get(position).getSongPosition());
+                        SongActivity.notificationManager.cancelAll();
+                        SongActivity.mPlayer.stop();
                         view.getContext().startService(intent);
                     }else{
                         holder.mMute.setImageResource(R.drawable.ic_mute);
@@ -62,7 +65,7 @@ public class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.Fr
                         view.getContext().stopService(intent);
                     }
                 }else{
-                    if(checkedDue==1){
+                    if(checkedDue==1 || !SongActivity.mPlayer.isPlaying()){
                         checkedDue=0;
                         checked=0;
                         holder.mMute.setImageResource(R.drawable.ic_mute);

@@ -55,7 +55,7 @@ public class SongActivity extends AppCompatActivity implements Playable, View.On
     ImageButton mPlay, mBack, mNext;
     SeekBar mSeek;
     TextView mSeekTitle;
-    static NotificationManager notificationManager;
+    public static NotificationManager notificationManager;
     ImageView mImageView;
     TextView mText2;
     TextView mTextView;
@@ -452,7 +452,7 @@ public class SongActivity extends AppCompatActivity implements Playable, View.On
 
     boolean isPlaying = false;
     //Creo un nuovo broadcast receiver per gestire le azioni ricevute dalla notifica
-    BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+    public BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
         @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
         @Override
         public void onReceive(Context context, Intent intent) {
