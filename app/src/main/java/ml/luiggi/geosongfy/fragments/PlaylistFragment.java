@@ -27,8 +27,6 @@ import com.google.gson.reflect.TypeToken;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 
 import ml.luiggi.geosongfy.MainPageActivity;
 import ml.luiggi.geosongfy.R;
@@ -63,12 +61,6 @@ public class PlaylistFragment extends Fragment {
         if (playlistList == null)
             playlistList = new ArrayList<>();
         //A questo punto posso ordinarle in ordine alfabetico
-        Collections.sort(playlistList, new Comparator<Playlist>() {
-            @Override
-            public int compare(Playlist lhs, Playlist rhs) {
-                return lhs.getPlaylistName().compareTo(rhs.getPlaylistName());
-            }
-        });
         //inizializzo il fragment
         initPlaylistFragment();
         //inizializzo le canzoni
@@ -125,6 +117,9 @@ public class PlaylistFragment extends Fragment {
                         playlistList.add(curPlaylist);
                         Toast.makeText(getContext(), "Playlist " + curName + " creata con successo!", Toast.LENGTH_SHORT).show();
                         mAdapter.notifyDataSetChanged();
+                        reloadFragment();
+                        reloadFragment();
+                        reloadFragment();
                         //salvare nello shared preferences
                         savePlaylists();
                     }
@@ -140,7 +135,21 @@ public class PlaylistFragment extends Fragment {
         adapter.notifyDataSetChanged();
         dialog.show();
     }
-
+    //funzione con la quale ricarico il fragment attuale
+    private void reloadFragment() {
+        //mi assicuro che l'activity non sia null altrimenti NullPointerException
+        if (getActivity() != null) {
+            //Per poter fare in modo che tutto il fragment si aggiorni senza "rompere" il bottomNavMenu,
+            //mi ci creo un riferimento e controllo anche quello (per lo stato di active/unactive di ciascun
+            //fragment relativo al suo menù)
+            BottomNavigationView navigationView = getActivity().findViewById(R.id.bottom_navigation);
+            Menu menu = navigationView.getMenu();
+            MenuItem menuItem = menu.findItem(R.id.fragment_tue_playlist);
+            //uso i metodi implementati nel mainpageactivity
+            ((MainPageActivity) getActivity()).changeFocus(R.id.fragment_tue_playlist);
+            ((MainPageActivity) getActivity()).onNavigationItemSelected(menuItem);
+        }
+    }
     //Funzione che carica tutte le canzoni
     private void initSongs() {
         //Uso un thread per non intasare l'UI
@@ -222,7 +231,7 @@ public class PlaylistFragment extends Fragment {
         String json = gson.toJson(playlistList);
         editor.putString("playlist_list", json);
         editor.apply();
-
+        reloadFragment();
     }
 
     //funzione che ricarica le playlist salvate
@@ -246,14 +255,6 @@ public class PlaylistFragment extends Fragment {
     public void onResume() {
         super.onResume();
         loadPlaylists();
-        if (playlistList != null) {
-            Collections.sort(playlistList, new Comparator<Playlist>() {
-                @Override
-                public int compare(Playlist lhs, Playlist rhs) {
-                    return lhs.getPlaylistName().compareTo(rhs.getPlaylistName());
-                }
-            });
-        }
         initPlaylistFragment();
         mAdapter.notifyDataSetChanged();
     }

@@ -38,8 +38,8 @@ public class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.Fr
     int checked = 0;
     @Override
     public void onBindViewHolder(@NonNull final FriendListViewHolder holder, final int position) {
-        holder.mName.setText(friendList.get(position).getName());
-        holder.mNumber.setText(friendList.get(position).getPhoneNumber());
+        holder.mName.setText(friendList.get(holder.getAdapterPosition()).getName());
+        holder.mNumber.setText(friendList.get(holder.getAdapterPosition()).getPhoneNumber());
         holder.mRelativeLayout.setOnClickListener(new View.OnClickListener() {
             int checkedDue = 0;
             @Override
@@ -51,9 +51,9 @@ public class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.Fr
                         checkedDue=1;
                         checked=1;
                         //avviare musica
-                        intent.putExtra("uid",(friendList.get(position).getUid()));
-                        intent.putExtra("songUrl",friendList.get(position).getCurrentSong().getUrl());
-                        intent.putExtra("position",friendList.get(position).getSongPosition());
+                        intent.putExtra("uid",(friendList.get(holder.getAdapterPosition()).getUid()));
+                        intent.putExtra("songUrl",friendList.get(holder.getAdapterPosition()).getCurrentSong().getUrl());
+                        intent.putExtra("position",friendList.get(holder.getAdapterPosition()).getSongPosition());
                         if(SongActivity.notificationManager != null)
                             SongActivity.notificationManager.cancelAll();
                         if(SongActivity.mPlayer != null)

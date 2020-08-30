@@ -40,21 +40,21 @@ public class DialogListAdapter extends RecyclerView.Adapter<DialogListAdapter.Di
 
     @Override
     public void onBindViewHolder(@NonNull final DialogListViewHolder holder, final int position) {
-        final Song curSong = songList.get(position);
-        holder.mTitle.setText(songList.get(position).getTitle());
+        final Song curSong = songList.get(holder.getAdapterPosition());
+        holder.mTitle.setText(songList.get(holder.getAdapterPosition()).getTitle());
         final SongSelected songSelected = new SongSelected() {
             @Override
             public void newSongsSelected(ArrayList<Song> selectedList) {
                 checkedList = selectedList;
             }
         };
-        if (!songList.get(position).getFeats().equals("")) {
-            String aut_feat = songList.get(position).getAuthors() + " ft. " + songList.get(position).getFeats();
+        if (!songList.get(holder.getAdapterPosition()).getFeats().equals("")) {
+            String aut_feat = songList.get(holder.getAdapterPosition()).getAuthors() + " ft. " + songList.get(holder.getAdapterPosition()).getFeats();
             holder.mAuthors.setText(aut_feat);
         } else {
-            holder.mAuthors.setText(songList.get(position).getAuthors());
+            holder.mAuthors.setText(songList.get(holder.getAdapterPosition()).getAuthors());
         }
-        Picasso.get().load(songList.get(position).getCover()).into(holder.mCover);
+        Picasso.get().load(songList.get(holder.getAdapterPosition()).getCover()).into(holder.mCover);
         holder.mLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

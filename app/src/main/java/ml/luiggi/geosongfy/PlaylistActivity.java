@@ -20,8 +20,6 @@ import com.google.gson.reflect.TypeToken;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 
 import ml.luiggi.geosongfy.scaffoldings.Playlist;
 import ml.luiggi.geosongfy.scaffoldings.Song;
@@ -39,12 +37,6 @@ public class PlaylistActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         loadPlaylists();
-        Collections.sort(newPlaylists, new Comparator<Playlist>() {
-            @Override
-            public int compare(Playlist lhs, Playlist rhs) {
-                return lhs.getPlaylistName().compareTo(rhs.getPlaylistName());
-            }
-        });
         setContentView(R.layout.fragment_home);
         initUI();
         initSongs();

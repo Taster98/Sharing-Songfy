@@ -44,7 +44,7 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.PlayLi
 
     @Override
     public void onBindViewHolder(@NonNull final PlayListAdapter.PlayListViewHolder holder, final int position) {
-        holder.mName.setText(playlists.get(position).getPlaylistName());
+        holder.mName.setText(playlists.get(holder.getAdapterPosition()).getPlaylistName());
         holder.mLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -59,7 +59,7 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.PlayLi
         holder.mLayout.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View view) {
-                showMenu(view, position);
+                showMenu(view, holder.getAdapterPosition());
                 return true;
             }
         });
@@ -99,8 +99,8 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.PlayLi
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         playlists.remove(pos);
-                        notifyItemRemoved(pos);
                         savePlaylists(v);
+                        notifyItemRemoved(pos);
                     }
                 })
                 .setNegativeButton("No",
@@ -126,9 +126,9 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.PlayLi
                         else {
                             String curName = editText.getText().toString();
                             playlists.get(pos).setPlaylistName(curName);
+                            savePlaylists(view);
                             notifyItemChanged(pos);
                             notifyDataSetChanged();
-                            savePlaylists(view);
                         }
                     }
                 })
