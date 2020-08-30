@@ -41,27 +41,24 @@ public class LoginActivity extends AppCompatActivity {
     private Button mSend;
     private PhoneAuthProvider.OnVerificationStateChangedCallbacks mCallbacks;
 
-    String mVerificationId;
+    private String mVerificationId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        //Inizializzo l'istanza di Firebase per il login nella piattaforma mediante numero di telefono
         FirebaseApp.initializeApp(this);
         super.onCreate(savedInstanceState);
+        //Imposto il layout principale
         setContentView(R.layout.login_layout);
-        //inizializzo Firebase
-
         mSend = findViewById(R.id.send);
         //Se l'utente è già ammesso non riandrà in questa activity
         userAllowed();
-
-        //riferisco gli elementi del layout
-        mPrefix = findViewById(R.id.prefix);
-        mPhoneNumber = findViewById(R.id.phoneNumber);
-        mCode = findViewById(R.id.code);
-
+        //riferimenti per il layout
+        getRefs();
         //stampo il countrycode in maniera automatica
         mPrefix.setText(getCountryISO());
-        //Imposto un listener nel click del bottone
+
+        //Listener per gestire la verifica del codice di autenticazione (click sul bottone)
         mSend.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -78,6 +75,7 @@ public class LoginActivity extends AppCompatActivity {
 
             }
         });
+        //Listener per la gestione della verifica
         mCallbacks = new PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
             @Override
             public void onVerificationCompleted(@NonNull PhoneAuthCredential phoneAuthCredential) {
@@ -98,7 +96,13 @@ public class LoginActivity extends AppCompatActivity {
             }
         };
     }
-
+    //Funzione che crea i riferimenti con gli elementi del Layout
+    private void getRefs(){
+        //riferisco gli elementi del layout
+        mPrefix = findViewById(R.id.prefix);
+        mPhoneNumber = findViewById(R.id.phoneNumber);
+        mCode = findViewById(R.id.code);
+    }
     @Override
     public void onBackPressed() {
         super.onBackPressed();

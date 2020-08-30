@@ -1,12 +1,9 @@
 package ml.luiggi.geosongfy.utils;
 
 import android.content.Intent;
-import android.graphics.drawable.Drawable;
-import android.os.Build;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -14,29 +11,19 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.RequiresApi;
 import androidx.recyclerview.widget.RecyclerView;
-
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 
 import ml.luiggi.geosongfy.R;
 import ml.luiggi.geosongfy.scaffoldings.Friend;
-import ml.luiggi.geosongfy.scaffoldings.FriendSelected;
-import ml.luiggi.geosongfy.scaffoldings.Song;
-import ml.luiggi.geosongfy.scaffoldings.SongSelected;
 import ml.luiggi.geosongfy.services.FriendPlayerService;
 
 /*
- * Questa classe rappresenta l'Adapter per poter correttamente visualizzare la lista delle canzoni all'interno dell'oggetto RecyclerView.
- * */
+Adapter customizzato per l'elenco degli amici che condividono gli ascolti nella recycler view.
+ */
 public class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.FriendListViewHolder> {
-    private ArrayList<Friend> friendList;
+    private final ArrayList<Friend> friendList;
     public FriendListAdapter(ArrayList<Friend> friendList) {
         this.friendList = friendList;
     }
@@ -45,8 +32,7 @@ public class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.Fr
     @Override
     public FriendListViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View layoutView = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_friend, null, false);
-        FriendListViewHolder mFriendVH = new FriendListViewHolder(layoutView);
-        return mFriendVH;
+        return new FriendListViewHolder(layoutView);
     }
     int checked = 0;
     @Override
@@ -64,7 +50,7 @@ public class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.Fr
                         checkedDue=1;
                         checked=1;
                         //avviare musica
-                        intent.putExtra("uid",(friendList.get(position).getUid()).toString());
+                        intent.putExtra("uid",(friendList.get(position).getUid()));
                         intent.putExtra("songUrl",friendList.get(position).getCurrentSong().getUrl());
                         intent.putExtra("position",friendList.get(position).getSongPosition());
                         view.getContext().startService(intent);
@@ -94,9 +80,11 @@ public class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.Fr
     public int getItemCount() {
         return friendList.size();
     }
-
-    //Questa classe mi serve per poter gestire le viste varie (il ViewHolder)
-    public class FriendListViewHolder extends RecyclerView.ViewHolder {
+    public void clear() {
+        friendList.clear();
+        notifyDataSetChanged();
+    }
+    public static class FriendListViewHolder extends RecyclerView.ViewHolder {
         public TextView mName, mNumber;
         public LinearLayout mLayout;
         public ImageView mMute;

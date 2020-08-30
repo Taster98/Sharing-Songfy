@@ -495,6 +495,9 @@ public class SongActivity extends AppCompatActivity implements Playable, View.On
         initializeMediaPlayer();
         handleMusic();
         mPlayer.start();
+        dbUsers.child("songUrl").setValue(mSong.getUrl());
+        progresso = mPlayer.getCurrentPosition();
+        dbUsers.child("position").setValue(progresso);
     }
     //Funzione per andare indietro senza decrementare la posizione (PER NOTIFICA)
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
@@ -542,6 +545,9 @@ public class SongActivity extends AppCompatActivity implements Playable, View.On
         mPlayer.start();
         mPlay.setImageResource(R.drawable.ic_pause);
         isPlaying = true;
+        Boolean b = Boolean.TRUE;
+        dbUsers.child("isSharing").setValue(b);
+        dbUsers.child("songUrl").setValue(mSong.getUrl());
     }
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
@@ -563,6 +569,9 @@ public class SongActivity extends AppCompatActivity implements Playable, View.On
         initializeMediaPlayer();
         handleMusic();
         mPlayer.start();
+        dbUsers.child("songUrl").setValue(mSong.getUrl());
+        progresso = mPlayer.getCurrentPosition();
+        dbUsers.child("position").setValue(progresso);
     }
 
     @Override
@@ -577,6 +586,10 @@ public class SongActivity extends AppCompatActivity implements Playable, View.On
         mPlayer.pause();
         mPlay.setImageResource(R.drawable.ic_play);
         isPlaying = false;
+        Boolean b = Boolean.FALSE;
+        dbUsers.child("isSharing").setValue(b);
+        progresso = mPlayer.getCurrentPosition();
+        dbUsers.child("position").setValue(progresso);
     }
 
     /*LISTENER E ALTRE FUNZIONI PER LE GESTURES CUSTOMIZZATE*/

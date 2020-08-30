@@ -7,31 +7,28 @@ import androidx.annotation.RequiresApi;
 import java.io.Serializable;
 import java.util.Objects;
 
+//implementa serializable per poter esser passata come extra tra intent
 public class Friend implements Serializable {
+    //Mi servono lo uid, che coincide con l'id di Firebase
     private String uid,
+    //nome e numero per poterli mostrare nel recycler view
             name,
-            phoneNumber,
-            notificationKey;
+            phoneNumber;
+    //canzone corrente con posizione corrente per la funzionalità "ascolto condiviso"
     private Song currentSong;
     private int songPosition;
-    private boolean isSharing;
-    public Friend(String uid, String name, String phoneNumber, String notificationKey) {
+    public Friend(String uid, String name, String phoneNumber) {
         this.name = name;
-        this.notificationKey = notificationKey;
         this.phoneNumber = phoneNumber;
         this.uid = uid;
         this.currentSong = new Song();
         songPosition = 0;
-        isSharing = false;
     }
 
     public void setUid(String uid) {
         this.uid = uid;
     }
 
-    public void setSharing(boolean sharing) {
-        isSharing = sharing;
-    }
     public void setSongPosition(int songPosition) {
         this.songPosition = songPosition;
     }
@@ -40,19 +37,12 @@ public class Friend implements Serializable {
         return songPosition;
     }
 
-    public Friend() {
-    }
-
     public void setCurrentSong(Song currentSong) {
         this.currentSong = currentSong;
     }
 
     public Song getCurrentSong() {
         return currentSong;
-    }
-
-    public boolean isSharing() {
-        return isSharing;
     }
 
     public Friend(String phoneNumber) {
@@ -67,10 +57,6 @@ public class Friend implements Serializable {
         return name;
     }
 
-    public String getNotificationKey() {
-        return notificationKey;
-    }
-
     public String getPhoneNumber() {
         return phoneNumber;
     }
@@ -79,6 +65,8 @@ public class Friend implements Serializable {
         this.name = name;
     }
 
+
+    //Riscrivo equals e hashcode per far sì che il confronto tra due oggetti di tipo Friend avvenga mediante Friend.getPhoneNumber()
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
     public boolean equals(Object o) {
@@ -94,7 +82,4 @@ public class Friend implements Serializable {
         return Objects.hash(phoneNumber);
     }
 
-    public void setNotificationKey(String notificationKey) {
-        this.notificationKey=notificationKey;
-    }
 }

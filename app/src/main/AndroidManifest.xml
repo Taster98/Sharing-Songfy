@@ -28,7 +28,7 @@
         <service
             android:name=".services.FriendPlayerService"
             android:enabled="true"
-            android:exported="true"></service>
+            android:exported="true" />
 
         <activity
             android:name=".LoginActivity"
@@ -55,9 +55,6 @@
             android:theme="@style/Platform.MaterialComponents.Light" />
         <activity
             android:name=".PlaylistActivity"
-            android:theme="@style/Platform.MaterialComponents.Light" />
-        <activity
-            android:name=".ContactListActivity"
             android:theme="@style/Platform.MaterialComponents.Light" />
         <activity
             android:name=".GestureTestsActivity"

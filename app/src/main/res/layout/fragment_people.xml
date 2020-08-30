@@ -13,16 +13,21 @@
         android:layout_marginTop="5dp"
         android:text="@string/i_tuoi_amici_ascoltano"
         android:gravity="center_horizontal" />
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:layout_marginTop="60dp"
-        android:id="@+id/songListFriends"
-        android:scrollbars="vertical"
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/swipeContainer"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:paddingBottom="55dp"
         android:layout_marginBottom="135dp"
-        tools:ignore="ObsoleteLayoutParam" />
+        android:layout_marginTop="60dp">
+        <androidx.recyclerview.widget.RecyclerView
+            android:layout_marginTop="60dp"
+            android:id="@+id/songListFriends"
+            android:scrollbars="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            tools:ignore="ObsoleteLayoutParam" />
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
     <Button
         android:id="@+id/crea_podcast"
         android:layout_width="wrap_content"
