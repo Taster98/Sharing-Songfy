@@ -30,6 +30,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -77,9 +78,9 @@ public class FragmentPeople extends Fragment {
         }
     }
 
-
+    static int condividi = 0;
     //Funzione che inizializza il fragment con il recyclerView
-    private void initPlaylistFragment(View v) {
+    private void initPlaylistFragment(final View v) {
         //riferimento all'oggetto
         recyclerView = (RecyclerView) v.findViewById(R.id.songListFriends);
         //dimensione nel layout fissata
@@ -91,8 +92,13 @@ public class FragmentPeople extends Fragment {
         mAdapter = new FriendListAdapter(songListFriends);
         recyclerView.setAdapter(mAdapter);
         btn = v.findViewById(R.id.crea_podcast);
+        if(condividi == 0){
+            btn.setText(R.string.condividi_musica);
+        }else{
+            btn.setText(R.string.ferma_condivisione);
+        }
+        //TODO Aggiustare roba non funzionante
         btn.setOnClickListener(new View.OnClickListener() {
-            int condividi = 0;
             DatabaseReference dbUsers;
             @Override
             public void onClick(View view) {
@@ -102,21 +108,17 @@ public class FragmentPeople extends Fragment {
                     dbUsers.setValue(b);
                     condividi=1;
                     btn.setText(R.string.ferma_condivisione);
-                    mAdapter.notifyDataSetChanged();
+                    //mAdapter.notifyDataSetChanged();
                 }else{
                     Boolean b = Boolean.FALSE;
                     dbUsers.setValue(b);
                     condividi=0;
                     btn.setText(R.string.condividi_musica);
-                    mAdapter.notifyDataSetChanged();
+                    //mAdapter.notifyDataSetChanged();
                 }
             }
         });
         initGestures(v);
-    }
-
-    private void loadFriendsSongs(){
-
     }
     @SuppressLint("ClickableViewAccessibility")
     private void initGestures(View v) {
@@ -180,7 +182,6 @@ public class FragmentPeople extends Fragment {
             contactList.add(mContacts);
         }
     }
-
     private void getAllRegisteredUsers() {
         DatabaseReference userDB = FirebaseDatabase.getInstance().getReference().child("user");
         ValueEventListener friendListener = new ValueEventListener() {
@@ -197,11 +198,18 @@ public class FragmentPeople extends Fragment {
                         Friend actFr = new Friend(friend);
                         actFr.setUid(ss.getKey());
                         actFr.setSongPosition(Math.toIntExact(position));
-                        //actFr.setUid(FirebaseAuth.getInstance().getUid());
                         Song curSong = new Song("","","","",songUrl);
                         String name;
                         actFr.setCurrentSong(curSong);
                         if(contactList.contains(actFr)) {
+                            Iterator<Friend> iter = contactList.iterator();
+                            while(iter.hasNext()){
+                                Friend tmp = iter.next();
+                                if(tmp.equals(actFr)){
+                                    actFr.setName(tmp.getName());
+                                    break;
+                                }
+                            }
                             contactList.remove(actFr);
                             contactList.add(actFr);
                         }
