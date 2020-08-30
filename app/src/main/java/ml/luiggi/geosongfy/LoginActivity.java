@@ -36,7 +36,9 @@ import java.util.concurrent.TimeUnit;
 import ml.luiggi.geosongfy.utils.Iso2Phone;
 
 public class LoginActivity extends AppCompatActivity {
+    //intervallo massimo per immissione codice
     private static final long INTERVALLO = 77;
+    //riferimenti varie viste
     private EditText mPrefix, mPhoneNumber, mCode;
     private Button mSend;
     private PhoneAuthProvider.OnVerificationStateChangedCallbacks mCallbacks;
@@ -48,6 +50,10 @@ public class LoginActivity extends AppCompatActivity {
         //Inizializzo l'istanza di Firebase per il login nella piattaforma mediante numero di telefono
         FirebaseApp.initializeApp(this);
         super.onCreate(savedInstanceState);
+        initView();
+    }
+    //funzione che inizializza la vista dell'activity
+    private void initView(){
         //Imposto il layout principale
         setContentView(R.layout.login_layout);
         mSend = findViewById(R.id.send);
@@ -65,8 +71,11 @@ public class LoginActivity extends AppCompatActivity {
                 if (mVerificationId != null) {
                     verifyPhoneNumberCode();
                 } else {
+                    //devo controllare il codice perchè il numero è stato inviato
                     startNumberVerification();
                 }
+
+                //tolgo la tastiera una volta immesso il numero (ingombra la vista)
                 InputMethodManager inputManager = (InputMethodManager)
                         getSystemService(Context.INPUT_METHOD_SERVICE);
 
@@ -81,7 +90,6 @@ public class LoginActivity extends AppCompatActivity {
             public void onVerificationCompleted(@NonNull PhoneAuthCredential phoneAuthCredential) {
                 signInPhoneCred(phoneAuthCredential);
             }
-
             @SuppressLint("SetTextI18n")
             @Override
             public void onCodeSent(@NonNull String s, @NonNull PhoneAuthProvider.ForceResendingToken forceResendingToken) {
@@ -114,40 +122,44 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private String getCountryISO() {
-        String iso = null;
-
+        String iso = "";
         TelephonyManager tmngr = (TelephonyManager) getApplicationContext().getSystemService(getApplicationContext().TELEPHONY_SERVICE);
         if (tmngr.getNetworkCountryIso() != null) {
-            if (!tmngr.getNetworkCountryIso().toString().equals(""))
+            if (!tmngr.getNetworkCountryIso().equals(""))
                 iso = tmngr.getNetworkCountryIso();
         }
         return Iso2Phone.getPhone(iso);
     }
 
+    //accedo con le credenziali in Firebase mediante l'autenticazione con numero di telefono:
     private void signInPhoneCred(PhoneAuthCredential phoneAuthCredential) {
+        //aggiungo un listener, per gestire se la registrazione è andata a buon fine o meno
         FirebaseAuth.getInstance().signInWithCredential(phoneAuthCredential).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
                 if (task.isSuccessful()) {
+                    //se ho avuto successo, l'utente attuale (io) viene inserito poi anche nel database (questo per poter
+                    //sfruttare la funzionalità di condivisione senza problemi)
                     final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-
+                    //naturalmente controllo se per qualche motivo l'utente fosse null
                     if (user != null) {
-
                         final DatabaseReference mUserDB = FirebaseDatabase.getInstance().getReference().child("user").child(user.getUid());
                         mUserDB.addListenerForSingleValueEvent(new ValueEventListener() {
                             @Override
                             public void onDataChange(@NonNull DataSnapshot snapshot) {
                                 if (!snapshot.exists()) {
+                                    //Al momento della registrazione immetto i seguenti valori di default:
                                     Map<String, Object> userMap = new HashMap<>();
                                     userMap.put("phone", user.getPhoneNumber());
                                     Boolean bool = Boolean.FALSE;
-                                    Long lon = Long.valueOf(0);
+                                    Long lon = 0L;
                                     String str = "";
                                     userMap.put("isSharing",bool);
                                     userMap.put("position",lon);
                                     userMap.put("songUrl",str);
                                     mUserDB.updateChildren(userMap);
                                 }
+                                //se l'utente è ammesso, avvio l'activity successiva (quella principale)
                                 userAllowed();
                             }
 
@@ -166,10 +178,10 @@ public class LoginActivity extends AppCompatActivity {
         if (user != null) {
             startActivity(new Intent(getApplicationContext(), MainPageActivity.class));
             finish();
-            return;
         }
     }
 
+    //devo controllare che il numero sia valido:
     private void startNumberVerification() {
         String completeNumber = mPrefix.getText().toString() + mPhoneNumber.getText().toString();
         PhoneAuthProvider.getInstance().verifyPhoneNumber(
