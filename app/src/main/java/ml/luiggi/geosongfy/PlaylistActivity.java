@@ -5,12 +5,10 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -130,7 +128,6 @@ public class PlaylistActivity extends AppCompatActivity {
         final DialogListAdapter adapter = new DialogListAdapter(allSongs);
         list.setAdapter(adapter);
         final Playlist curPlaylist = (Playlist) getIntent().getSerializableExtra("playlistSelected");
-        final Playlist remPlaylist = curPlaylist;
         final ArrayList<Song> actualSongs = (ArrayList<Song>) curPlaylist.getSongList();
         builder.setView(view)
                 .setPositiveButton(R.string.aggiungi, new DialogInterface.OnClickListener() {

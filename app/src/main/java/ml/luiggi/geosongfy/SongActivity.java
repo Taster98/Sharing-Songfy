@@ -1,7 +1,6 @@
 package ml.luiggi.geosongfy;
 
 import android.annotation.SuppressLint;
-import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
@@ -11,13 +10,11 @@ import android.content.IntentFilter;
 import android.media.AudioAttributes;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
-import android.opengl.Visibility;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageButton;
@@ -30,8 +27,7 @@ import android.widget.Toast;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.NotificationCompat;
-import androidx.core.app.NotificationManagerCompat;
+//import androidx.core.app.NotificationCompat;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
@@ -64,6 +60,7 @@ public class SongActivity extends AppCompatActivity implements Playable, View.On
     SeekBar volumeBar;
     AudioManager audioManager;
     Vibrator vib;
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -98,6 +95,7 @@ public class SongActivity extends AppCompatActivity implements Playable, View.On
         //creo la notifica
         CreateNotification.createNotification(SongActivity.this, mSong, R.drawable.ic_pause);
     }
+
     //funzione che mi crea un canale univoco per la notifica
     private void createChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -108,7 +106,7 @@ public class SongActivity extends AppCompatActivity implements Playable, View.On
             if (notificationManager != null) {
                 notificationManager.createNotificationChannel(channel);
             }
-            NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(SongActivity.this, CreateNotification.CHANNEL_ID);
+            //NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(SongActivity.this, CreateNotification.CHANNEL_ID);
         }
     }
 
@@ -152,8 +150,9 @@ public class SongActivity extends AppCompatActivity implements Playable, View.On
                 .append(String.format("%02d", seconds));
         return buf.toString();
     }
+
     //funzione che inizializza i riferimenti per gestire la musica
-    private void initRefs(){
+    private void initRefs() {
         //Ripesco la lista di tutti i brani per i pulsanti Back e Next
         songList = (ArrayList<Song>) getIntent().getSerializableExtra("allSongs");
         //prelevo la posizione attuale nell'arraylist
@@ -172,8 +171,9 @@ public class SongActivity extends AppCompatActivity implements Playable, View.On
 
         mPlay.setImageResource(R.drawable.ic_pause);
     }
+
     //funzione che gestisce i listener della SeekBar
-    private void seekBarHandler(){
+    private void seekBarHandler() {
         mSeek.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
@@ -196,8 +196,9 @@ public class SongActivity extends AppCompatActivity implements Playable, View.On
             }
         });
     }
+
     //funzione per la gestione dei pulsanti play/pause
-    private void playPauseHandler(){
+    private void playPauseHandler() {
         onTrackPlay();
 
         //Imposto un listener sul bottone Play
@@ -267,8 +268,9 @@ public class SongActivity extends AppCompatActivity implements Playable, View.On
             }
         });
     }
+
     //funzione per la gestione del pulsante indietro
-    private void backHandler(){
+    private void backHandler() {
         //Imposto un listener sul bottone Back
         mBack.setOnClickListener(new View.OnClickListener() {
             @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
@@ -298,8 +300,9 @@ public class SongActivity extends AppCompatActivity implements Playable, View.On
             }
         });
     }
+
     //funzione per la gestione del pulsante avanti
-    private void nextHandler(){
+    private void nextHandler() {
         //Imposto un listener sul bottone Next
         mNext.setOnClickListener(new View.OnClickListener() {
             @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
@@ -322,8 +325,9 @@ public class SongActivity extends AppCompatActivity implements Playable, View.On
             }
         });
     }
+
     //funzione per la gestione automatica ciclica
-    private void continueMusic(){
+    private void continueMusic() {
         //Imposto lo scorrimento automatico quando la canzone finisce
         mPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
@@ -346,8 +350,11 @@ public class SongActivity extends AppCompatActivity implements Playable, View.On
             }
         });
     }
+
     //avvia la musica
+    //Firebase è perforza diverso da null in quanto l'utente a questo punto è loggato
     final DatabaseReference dbUsers = FirebaseDatabase.getInstance().getReference().child("user").child(FirebaseAuth.getInstance().getUid());
+
     @SuppressLint("ClickableViewAccessibility")
     private void handleMusic() {
         //inizializzo i riferimenti
@@ -383,7 +390,7 @@ public class SongActivity extends AppCompatActivity implements Playable, View.On
         backHandler();
         //PULSANTE AVANTI
         nextHandler();
-       //Ascolto continuo musica
+        //Ascolto continuo musica
         continueMusic();
 
         //GESTURE CONTROLS
@@ -410,7 +417,7 @@ public class SongActivity extends AppCompatActivity implements Playable, View.On
         mImageView = (ImageView) findViewById(R.id.song_item_image);
         mText2 = (TextView) findViewById(R.id.song_item_title);
         mTextView = (TextView) findViewById(R.id.song_item_author);
-        mLinearLayout = (LinearLayout)findViewById(R.id.lineare_immagine_song);
+        mLinearLayout = (LinearLayout) findViewById(R.id.lineare_immagine_song);
         Picasso.get().load(mSong.getCover()).into(mImageView);
         String aut_feat = mSong.getAuthors();
         if (!mSong.getFeats().equals(""))
@@ -418,24 +425,21 @@ public class SongActivity extends AppCompatActivity implements Playable, View.On
         mTextView.setText(aut_feat);
         mText2.setText(mSong.getTitle());
         container = findViewById(R.id.song_layout);
-        audioManager = (AudioManager)getSystemService(Context.AUDIO_SERVICE);
+        audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
         volumeBar = findViewById(R.id.volumeBar);
         volumeBar.setMax(audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC));
         volumeBar.setProgress(audioManager.getStreamVolume(AudioManager.STREAM_MUSIC));
         volumeBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
-            public void onStopTrackingTouch(SeekBar arg0)
-            {
+            public void onStopTrackingTouch(SeekBar arg0) {
             }
 
             @Override
-            public void onStartTrackingTouch(SeekBar arg0)
-            {
+            public void onStartTrackingTouch(SeekBar arg0) {
             }
 
             @Override
-            public void onProgressChanged(SeekBar arg0, int progress, boolean arg2)
-            {
+            public void onProgressChanged(SeekBar arg0, int progress, boolean arg2) {
                 audioManager.setStreamVolume(AudioManager.STREAM_MUSIC,
                         progress, AudioManager.FLAG_SHOW_UI);
             }
@@ -499,9 +503,10 @@ public class SongActivity extends AppCompatActivity implements Playable, View.On
         progresso = mPlayer.getCurrentPosition();
         dbUsers.child("position").setValue(progresso);
     }
+
     //Funzione per andare indietro senza decrementare la posizione (PER NOTIFICA)
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-    public void onTrackPreviousNoPlay(){
+    public void onTrackPreviousNoPlay() {
         mSong = songList.get(actualPos);
         CreateNotification.createNotification(SongActivity.this, mSong, R.drawable.ic_pause);
         mText2.setText(mSong.getTitle());
@@ -516,9 +521,10 @@ public class SongActivity extends AppCompatActivity implements Playable, View.On
         handleMusic();
         mPlayer.start();
     }
+
     //Funzione per andare avanti senza incrementare la posizione (PER NOTIFICA)
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-    public void onTrackNextNoPlay(){
+    public void onTrackNextNoPlay() {
         mSong = songList.get(actualPos);
         CreateNotification.createNotification(SongActivity.this, mSong, R.drawable.ic_pause);
         mText2.setText(mSong.getTitle());
@@ -533,6 +539,7 @@ public class SongActivity extends AppCompatActivity implements Playable, View.On
         handleMusic();
         mPlayer.start();
     }
+
     @Override
     public void onTrackPlay() {
         CreateNotification.createNotification(SongActivity.this, mSong, R.drawable.ic_pause);
@@ -595,28 +602,30 @@ public class SongActivity extends AppCompatActivity implements Playable, View.On
     /*LISTENER E ALTRE FUNZIONI PER LE GESTURES CUSTOMIZZATE*/
 
     //un dito
-    float startX=-1,startY=-1,middleX=-1,middleY=-1,endX=-1,endY=-1;
+    float startX = -1, startY = -1, middleX = -1, middleY = -1, endX = -1, endY = -1;
     static final float SOGLIA_MIN_MEDIUM_X = 120;
     static final float SOGLIA_MAX_MEDIUM_X = 250;
     static final float SOGLIA_MIN_Y = 200;
     static final float SOGLIA_MAX_Y = 450;
     static final float RANGE_MAX_ERRORE = 140;
-    boolean medium=false, finaleSin=false, finaleDes=false;
+    boolean medium = false, finaleSin = false, finaleDes = false;
 
     //due dita
-    float startFingerY1=-1, startFingerY2=-1,endFingerY1=-1,endFingerY2=-1;
+    float startFingerY1 = -1, startFingerY2 = -1, endFingerY1 = -1, endFingerY2 = -1;
     static final float SOGLIA_MIN_DUE_DITA = 100;
 
     //se true allora il range del valore medio (la 'punta') è rispettato
-    boolean rangeMedium(float medX){
+    boolean rangeMedium(float medX) {
         return Math.abs(medX - startX) >= SOGLIA_MIN_MEDIUM_X && Math.abs(medX - startX) <= SOGLIA_MAX_MEDIUM_X;
     }
+
     //se true la punta è rivolta a sinistra e ho disegnato un arco (o una freccia) rivolto a sinistra
-    boolean rangeSinFinale(){
+    boolean rangeSinFinale() {
         return Math.abs(endX - startX) <= RANGE_MAX_ERRORE && endX != -1 && startX != -1 && endX > middleX && endY > middleY && middleY != -1 && Math.abs(endY - startY) >= SOGLIA_MIN_Y && Math.abs(endY - startY) <= SOGLIA_MAX_Y;
     }
+
     //se true la punta è rivolta a destra e ho disegnato un arco (o una freccia) rivolto a destra
-    boolean rangeDesFinale(){
+    boolean rangeDesFinale() {
         return Math.abs(endX - startX) <= RANGE_MAX_ERRORE && endX != -1 && startX != -1 && endX < middleX && endY > middleY && middleY != -1 && Math.abs(endY - startY) >= SOGLIA_MIN_Y && Math.abs(endY - startY) <= SOGLIA_MAX_Y;
     }
 
@@ -624,28 +633,28 @@ public class SongActivity extends AppCompatActivity implements Playable, View.On
     @Override
     public boolean onTouch(View view, final MotionEvent motionEvent) {
         int action = motionEvent.getAction();
-        switch(action & MotionEvent.ACTION_MASK) {
-            case (MotionEvent.ACTION_DOWN) :
-                if(motionEvent.getPointerCount() == 1){
+        switch (action & MotionEvent.ACTION_MASK) {
+            case (MotionEvent.ACTION_DOWN):
+                if (motionEvent.getPointerCount() == 1) {
                     startX = motionEvent.getX();
                     startY = motionEvent.getY();
-                }else if(motionEvent.getPointerCount() > 1){
+                } else if (motionEvent.getPointerCount() > 1) {
                     startFingerY1 = motionEvent.getY(0);
                     startFingerY2 = motionEvent.getY(1);
                 }
 
                 return true;
-            case (MotionEvent.ACTION_MOVE) :
-                if(motionEvent.getPointerCount() == 1){
-                    if(rangeMedium(motionEvent.getX())){
+            case (MotionEvent.ACTION_MOVE):
+                if (motionEvent.getPointerCount() == 1) {
+                    if (rangeMedium(motionEvent.getX())) {
                         middleX = motionEvent.getX();
                         middleY = motionEvent.getY();
                         medium = true;
                     }
                 }
                 return true;
-            case (MotionEvent.ACTION_UP) :
-                if(motionEvent.getPointerCount() == 1) {
+            case (MotionEvent.ACTION_UP):
+                if (motionEvent.getPointerCount() == 1) {
                     endX = motionEvent.getX();
                     endY = motionEvent.getY();
                     if (rangeSinFinale()) {
@@ -672,7 +681,7 @@ public class SongActivity extends AppCompatActivity implements Playable, View.On
                             mPlay.setImageResource(R.drawable.ic_pause);
                             onTrackNextNoPlay();
                             dbUsers.child("songUrl").setValue(mSong.getUrl());
-                            progresso=mPlayer.getCurrentPosition();
+                            progresso = mPlayer.getCurrentPosition();
                             dbUsers.child("position").setValue(progresso);
                             initializeMusicUI();
                         } else if (finaleSin) {
@@ -693,21 +702,21 @@ public class SongActivity extends AppCompatActivity implements Playable, View.On
                             mPlay.setImageResource(R.drawable.ic_pause);
                             onTrackPreviousNoPlay();
                             dbUsers.child("songUrl").setValue(mSong.getUrl());
-                            progresso=mPlayer.getCurrentPosition();
+                            progresso = mPlayer.getCurrentPosition();
                             dbUsers.child("position").setValue(progresso);
                             initializeMusicUI();
                         }
-                    }else{
+                    } else {
                         Thread volumeThread = new Thread(new Runnable() {
                             @Override
                             public void run() {
                                 try {
                                     volumeBar.setVisibility(View.VISIBLE);
-                                    Toast.makeText(getApplicationContext(),"Volume alzato",Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(getApplicationContext(), "Volume alzato", Toast.LENGTH_SHORT).show();
                                     Thread.sleep(1000);
                                     volumeBar.setVisibility(View.INVISIBLE);
                                 } catch (Exception e) {
-                                    e.getLocalizedMessage();
+                                    e.printStackTrace();
                                 }
                             }
                         });
@@ -729,19 +738,19 @@ public class SongActivity extends AppCompatActivity implements Playable, View.On
             case (MotionEvent.ACTION_OUTSIDE):
                 return true;
             case (MotionEvent.ACTION_POINTER_DOWN):
-                if(motionEvent.getPointerCount() > 1){
+                if (motionEvent.getPointerCount() > 1) {
                     startFingerY1 = motionEvent.getY(0);
                     startFingerY2 = motionEvent.getY(1);
                 }
             case (MotionEvent.ACTION_POINTER_UP):
-                if(motionEvent.getPointerCount() > 1){
+                if (motionEvent.getPointerCount() > 1) {
                     endFingerY1 = motionEvent.getY(0);
                     endFingerY2 = motionEvent.getY(1);
-                    if(endFingerY1-startFingerY1>=SOGLIA_MIN_DUE_DITA && endFingerY2-startFingerY2>=SOGLIA_MIN_DUE_DITA){
+                    if (endFingerY1 - startFingerY1 >= SOGLIA_MIN_DUE_DITA && endFingerY2 - startFingerY2 >= SOGLIA_MIN_DUE_DITA) {
                         //GESTIONE PLAY E PAUSE
                         //Pause:
                         if (mPlayer.isPlaying()) {
-                            Toast.makeText(getApplicationContext(),"Pausa",Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getApplicationContext(), "Pausa", Toast.LENGTH_SHORT).show();
                             //vibra per 200 millisecondi
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                                 vib.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
@@ -755,7 +764,7 @@ public class SongActivity extends AppCompatActivity implements Playable, View.On
                             dbUsers.child("isSharing").setValue(b);
                             dbUsers.child("position").setValue(progresso);
                         } else {
-                            Toast.makeText(getApplicationContext(),"Play",Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getApplicationContext(), "Play", Toast.LENGTH_SHORT).show();
                             //vibra per 200 millisecondi
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                                 vib.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
@@ -779,7 +788,7 @@ public class SongActivity extends AppCompatActivity implements Playable, View.On
                                         mSeek.setProgress(mCurrentPosition);
                                         String seekTitle = getTimeString(mPlayer.getCurrentPosition()) + "/" + getTimeString(mPlayer.getDuration());
                                         mSeekTitle.setText(seekTitle);
-                                        progresso=mPlayer.getCurrentPosition();
+                                        progresso = mPlayer.getCurrentPosition();
                                         dbUsers.child("position").setValue(progresso);
                                     }
                                     mHandler.postDelayed(this, 1000);
@@ -790,7 +799,7 @@ public class SongActivity extends AppCompatActivity implements Playable, View.On
                         }
                     }
                 }
-            default :
+            default:
                 return super.onTouchEvent(motionEvent);
         }
     }

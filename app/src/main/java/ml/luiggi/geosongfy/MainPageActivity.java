@@ -29,6 +29,7 @@ import ml.luiggi.geosongfy.fragments.PlaylistFragment;
  * Questa classe rappresenta l'activity principale dell'app. Al suo interno è presente un BottomNavigationView che consente di navigare tra Fragment.*/
 public class MainPageActivity extends AppCompatActivity implements BottomNavigationView.OnNavigationItemSelectedListener, NavigationView.OnNavigationItemSelectedListener {
     private BottomNavigationView mBottomNavView;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -64,28 +65,29 @@ public class MainPageActivity extends AppCompatActivity implements BottomNavigat
                 storeDialogStatus(compoundButton.isChecked());
             }
         });
-        if(getDialogStatus()){
+        if (getDialogStatus()) {
             mDialog.hide();
-        }else{
+        } else {
             mDialog.show();
         }
     }
 
     //Metodi per il tutorial
     //funzione che salva, se selezionato, il valore della cella "non mostrare più"
-    public void storeDialogStatus(boolean isChecked){
+    public void storeDialogStatus(boolean isChecked) {
         SharedPreferences mSharedPreferences = getSharedPreferences("rememberMe", MODE_PRIVATE);
         SharedPreferences.Editor mEditor = mSharedPreferences.edit();
         mEditor.putBoolean("ricordami", isChecked);
         mEditor.apply();
     }
+
     //funzione che legge lo stato della variabile precedentemente salvata
-    public boolean getDialogStatus(){
+    public boolean getDialogStatus() {
         SharedPreferences mSharedPreferences = getSharedPreferences("rememberMe", MODE_PRIVATE);
         return mSharedPreferences.getBoolean("ricordami", false);
     }
 
-    public void initBottomView(){
+    public void initBottomView() {
         mBottomNavView = (BottomNavigationView) findViewById(R.id.bottom_navigation);
         mBottomNavView.setOnNavigationItemSelectedListener(this);
         //imposto questo listener per evitare che il fragment si ricarichi se riselezionato
@@ -96,10 +98,12 @@ public class MainPageActivity extends AppCompatActivity implements BottomNavigat
             }
         });
     }
+
     //funzione per cambiare l'itemId selezionato del bottomNav
-    public void changeFocus(int id){
+    public void changeFocus(int id) {
         mBottomNavView.setSelectedItemId(id);
     }
+
     //funzione per caricare un fragment specifico
     public boolean loadFragment(Fragment mFragment) {
         if (mFragment != null) {
@@ -137,6 +141,7 @@ public class MainPageActivity extends AppCompatActivity implements BottomNavigat
     }
 
     DatabaseReference dbUsers;
+
     @Override
     protected void onDestroy() {
         //L'accesso a FirebaseAuth è perforza non nullo in quanto senza di esso non sarebbe possibile accedere a questa activity
