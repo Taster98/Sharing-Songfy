@@ -52,8 +52,9 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         initView();
     }
+
     //funzione che inizializza la vista dell'activity
-    private void initView(){
+    private void initView() {
         //Imposto il layout principale
         setContentView(R.layout.login_layout);
         mSend = findViewById(R.id.send);
@@ -90,6 +91,7 @@ public class LoginActivity extends AppCompatActivity {
             public void onVerificationCompleted(@NonNull PhoneAuthCredential phoneAuthCredential) {
                 signInPhoneCred(phoneAuthCredential);
             }
+
             @SuppressLint("SetTextI18n")
             @Override
             public void onCodeSent(@NonNull String s, @NonNull PhoneAuthProvider.ForceResendingToken forceResendingToken) {
@@ -104,13 +106,15 @@ public class LoginActivity extends AppCompatActivity {
             }
         };
     }
+
     //Funzione che crea i riferimenti con gli elementi del Layout
-    private void getRefs(){
+    private void getRefs() {
         //riferisco gli elementi del layout
         mPrefix = findViewById(R.id.prefix);
         mPhoneNumber = findViewById(R.id.phoneNumber);
         mCode = findViewById(R.id.code);
     }
+
     @Override
     public void onBackPressed() {
         super.onBackPressed();
@@ -154,9 +158,9 @@ public class LoginActivity extends AppCompatActivity {
                                     Boolean bool = Boolean.FALSE;
                                     Long lon = 0L;
                                     String str = "";
-                                    userMap.put("isSharing",bool);
-                                    userMap.put("position",lon);
-                                    userMap.put("songUrl",str);
+                                    userMap.put("isSharing", bool);
+                                    userMap.put("position", lon);
+                                    userMap.put("songUrl", str);
                                     mUserDB.updateChildren(userMap);
                                 }
                                 //se l'utente è ammesso, avvio l'activity successiva (quella principale)
