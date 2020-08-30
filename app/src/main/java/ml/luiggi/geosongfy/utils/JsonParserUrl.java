@@ -15,7 +15,7 @@ import ml.luiggi.geosongfy.scaffoldings.Song;
  * */
 public class JsonParserUrl {
     //url relativo al file json
-    private String url;
+    private final String url;
 
     public JsonParserUrl(String url) {
         this.url = url;

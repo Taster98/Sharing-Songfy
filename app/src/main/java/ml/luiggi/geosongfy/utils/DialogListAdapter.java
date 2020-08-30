@@ -23,7 +23,7 @@ import ml.luiggi.geosongfy.scaffoldings.SongSelected;
  * Questa classe rappresenta l'Adapter per poter correttamente visualizzare la lista delle canzoni all'interno dell'oggetto RecyclerView.
  * */
 public class DialogListAdapter extends RecyclerView.Adapter<DialogListAdapter.DialogListViewHolder> {
-    private ArrayList<Song> songList;
+    private final ArrayList<Song> songList;
     public ArrayList<Song> checkedList;
 
     public DialogListAdapter(ArrayList<Song> songList) {
@@ -35,8 +35,7 @@ public class DialogListAdapter extends RecyclerView.Adapter<DialogListAdapter.Di
     @Override
     public DialogListViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View layoutView = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_song_dialog, null, false);
-        DialogListViewHolder mSongVH = new DialogListViewHolder(layoutView);
-        return mSongVH;
+        return new DialogListViewHolder(layoutView);
     }
 
     @Override
@@ -89,7 +88,7 @@ public class DialogListAdapter extends RecyclerView.Adapter<DialogListAdapter.Di
     }
 
     //Questa classe mi serve per poter gestire le viste varie (il ViewHolder)
-    public class DialogListViewHolder extends RecyclerView.ViewHolder {
+    public static class DialogListViewHolder extends RecyclerView.ViewHolder {
         public TextView mTitle, mAuthors;
         public ImageView mCover;
         public LinearLayout mLayout;

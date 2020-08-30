@@ -2,10 +2,11 @@ package ml.luiggi.geosongfy.utils;
 
 import java.util.HashMap;
 import java.util.Map;
+
 /*
-* Per questa classe ho preso spunto da:
-* https://github.com/cognalys/cognalys-android-library/blob/master/src/com/matesnetwork/callverification/Iso2Phone.java
-* */
+ * Per questa classe ho preso spunto da:
+ * https://github.com/cognalys/cognalys-android-library/blob/master/src/com/matesnetwork/callverification/Iso2Phone.java
+ * */
 public class Iso2Phone {
     public static String getPhone(String code) {
         return country2phone.get(code.toUpperCase());

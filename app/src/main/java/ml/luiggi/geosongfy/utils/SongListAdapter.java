@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -34,25 +33,26 @@ import ml.luiggi.geosongfy.scaffoldings.Song;
  * Questa classe rappresenta l'Adapter per poter correttamente visualizzare la lista delle canzoni all'interno dell'oggetto RecyclerView.
  * */
 public class SongListAdapter extends RecyclerView.Adapter<SongListAdapter.SongListViewHolder> {
-    private ArrayList<Song> songList;
+    private final ArrayList<Song> songList;
     public Playlist isPlaylist;
     public ArrayList<Playlist> allPlaylists;
+
     public SongListAdapter(ArrayList<Song> songList) {
         this.songList = songList;
         this.isPlaylist = null;
         this.allPlaylists = null;
     }
 
-    public SongListAdapter(ArrayList<Song> songList, Playlist isPlaylist){
+    public SongListAdapter(ArrayList<Song> songList, Playlist isPlaylist) {
         this.isPlaylist = isPlaylist;
         this.songList = songList;
     }
+
     @NonNull
     @Override
     public SongListViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View layoutView = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_song, null, false);
-        SongListViewHolder mSongVH = new SongListViewHolder(layoutView);
-        return mSongVH;
+        return new SongListViewHolder(layoutView);
     }
 
     @Override
@@ -100,11 +100,11 @@ public class SongListAdapter extends RecyclerView.Adapter<SongListAdapter.SongLi
 
             }
         });
-        if(isPlaylist != null){
+        if (isPlaylist != null) {
             holder.mLayout.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View view) {
-                    showMenu(view,position);
+                    showMenu(view, position);
                     return true;
                 }
             });
@@ -112,17 +112,15 @@ public class SongListAdapter extends RecyclerView.Adapter<SongListAdapter.SongLi
     }
 
     private void showMenu(final View v, final int i) {
-        PopupMenu popup = new PopupMenu(v.getContext(),v);
+        PopupMenu popup = new PopupMenu(v.getContext(), v);
         popup.getMenuInflater()
-                .inflate(R.menu.delete_only_menu,popup.getMenu());
+                .inflate(R.menu.delete_only_menu, popup.getMenu());
 
         popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem menuItem) {
-                switch (menuItem.getItemId()){
-                    case R.id.delete_one_menu:
-                        deleteDialog(v,i);
-                        break;
+                if (menuItem.getItemId() == R.id.delete_one_menu) {
+                    deleteDialog(v, i);
                 }
                 return true;
             }
@@ -132,7 +130,7 @@ public class SongListAdapter extends RecyclerView.Adapter<SongListAdapter.SongLi
 
     private void deleteDialog(final View v, final int pos) {
         AlertDialog.Builder alertbox = new AlertDialog.Builder(v.getRootView().getContext());
-        alertbox.setMessage("Sicuro di voler eliminare la canzone '"+songList.get(pos).getTitle()+"' di '"+songList.get(pos).getAuthors()+"'?");
+        alertbox.setMessage("Sicuro di voler eliminare la canzone '" + songList.get(pos).getTitle() + "' di '" + songList.get(pos).getAuthors() + "'?");
         alertbox.setTitle("Attenzione");
         alertbox.setIcon(R.drawable.ic_delete);
 
@@ -159,13 +157,14 @@ public class SongListAdapter extends RecyclerView.Adapter<SongListAdapter.SongLi
                         });
         alertbox.show();
     }
+
     @Override
     public int getItemCount() {
         return songList.size();
     }
 
     //Questa classe mi serve per poter gestire le viste varie (il ViewHolder)
-    public class SongListViewHolder extends RecyclerView.ViewHolder {
+    public static class SongListViewHolder extends RecyclerView.ViewHolder {
         public TextView mTitle, mAuthors;
         public ImageView mCover, mPlay;
         public LinearLayout mLayout;
@@ -189,6 +188,7 @@ public class SongListAdapter extends RecyclerView.Adapter<SongListAdapter.SongLi
         editor.putString("playlist_list", json);
         editor.apply();
     }
+
     //funzione che ricarica le playlist salvate
     private void loadPlaylists(View v) {
         SharedPreferences sharedPreferences = v.getContext().getSharedPreferences("saved_playlists", Context.MODE_PRIVATE);
@@ -197,7 +197,7 @@ public class SongListAdapter extends RecyclerView.Adapter<SongListAdapter.SongLi
         Type type = new TypeToken<ArrayList<Playlist>>() {
         }.getType();
         allPlaylists = gson.fromJson(json, type);
-        if(allPlaylists == null)
+        if (allPlaylists == null)
             allPlaylists = new ArrayList<>();
     }
 }

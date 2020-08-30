@@ -23,8 +23,6 @@ import com.google.gson.reflect.TypeToken;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 
 import ml.luiggi.geosongfy.PlaylistActivity;
 import ml.luiggi.geosongfy.R;
@@ -41,8 +39,7 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.PlayLi
     @Override
     public PlayListAdapter.PlayListViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View layoutView = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_playlist, null, false);
-        PlayListAdapter.PlayListViewHolder mPlayVH = new PlayListAdapter.PlayListViewHolder(layoutView);
-        return mPlayVH;
+        return new PlayListViewHolder(layoutView);
     }
 
     @Override
@@ -52,9 +49,9 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.PlayLi
             @Override
             public void onClick(View view) {
                 loadPlaylists(view);
-                Intent intent = new Intent(view.getContext(),PlaylistActivity.class);
+                Intent intent = new Intent(view.getContext(), PlaylistActivity.class);
                 intent.putExtra("playlistSelected", playlists.get(holder.getAdapterPosition()));
-                intent.putExtra("allPlaylists",playlists);
+                intent.putExtra("allPlaylists", playlists);
                 view.getContext().startActivity(intent);
             }
 
@@ -62,27 +59,27 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.PlayLi
         holder.mLayout.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View view) {
-                showMenu(view,position);
+                showMenu(view, position);
                 return true;
             }
         });
     }
 
     private void showMenu(final View v, final int i) {
-        PopupMenu popup = new PopupMenu(v.getContext(),v);
+        PopupMenu popup = new PopupMenu(v.getContext(), v);
         popup.getMenuInflater()
-                .inflate(R.menu.delete_rename_menu,popup.getMenu());
+                .inflate(R.menu.delete_rename_menu, popup.getMenu());
 
         popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem menuItem) {
-                switch (menuItem.getItemId()){
+                switch (menuItem.getItemId()) {
                     case R.id.delete_bi_menu:
-                        deleteDialog(v,i);
+                        deleteDialog(v, i);
                         notifyItemRangeChanged(i, playlists.size());
                         break;
                     case R.id.rename_bi_menu:
-                        renameDialog(v,i);
+                        renameDialog(v, i);
                         break;
                 }
                 return true;
@@ -93,7 +90,7 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.PlayLi
 
     private void deleteDialog(final View v, final int pos) {
         AlertDialog.Builder alertbox = new AlertDialog.Builder(v.getRootView().getContext());
-        alertbox.setMessage("Sicuro di voler eliminare la Playlist '"+playlists.get(pos).getPlaylistName()+"'?");
+        alertbox.setMessage("Sicuro di voler eliminare la Playlist '" + playlists.get(pos).getPlaylistName() + "'?");
         alertbox.setTitle("Attenzione");
         alertbox.setIcon(R.drawable.ic_delete);
 
@@ -106,13 +103,13 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.PlayLi
                         savePlaylists(v);
                     }
                 })
-        .setNegativeButton("No",
-                new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        dialogInterface.dismiss();
-                    }
-                });
+                .setNegativeButton("No",
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                dialogInterface.dismiss();
+                            }
+                        });
         alertbox.show();
     }
 
@@ -151,7 +148,7 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.PlayLi
     }
 
     //Questa classe mi serve per poter gestire le viste varie (il ViewHolder)
-    public class PlayListViewHolder extends RecyclerView.ViewHolder {
+    public static class PlayListViewHolder extends RecyclerView.ViewHolder {
 
         public TextView mName;
         public LinearLayout mLayout;
@@ -172,6 +169,7 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.PlayLi
         editor.putString("playlist_list", json);
         editor.apply();
     }
+
     //funzione che ricarica le playlist salvate
     private void loadPlaylists(View v) {
         SharedPreferences sharedPreferences = v.getContext().getSharedPreferences("saved_playlists", Context.MODE_PRIVATE);
@@ -180,7 +178,7 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.PlayLi
         Type type = new TypeToken<ArrayList<Playlist>>() {
         }.getType();
         playlists = gson.fromJson(json, type);
-        if(playlists == null)
+        if (playlists == null)
             playlists = new ArrayList<>();
     }
 }
