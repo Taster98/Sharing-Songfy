@@ -2,14 +2,17 @@ package ml.luiggi.geosongfy;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 
 import android.Manifest;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.CheckBox;
@@ -34,7 +37,6 @@ public class MainPageActivity extends AppCompatActivity implements BottomNavigat
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        getPermissions();
         initTutorial();
         //carico il fragment principale (quello contenente la lista delle canzoni nel server)
         loadFragment(new FragmentHome());
@@ -128,8 +130,8 @@ public class MainPageActivity extends AppCompatActivity implements BottomNavigat
                 mFragment = new PlaylistFragment();
                 break;
             case R.id.fragment_people:
-                mFragment = new FragmentPeople();
-                break;
+                getPermissions();
+                return true;
         }
         return loadFragment(mFragment);
     }
@@ -137,6 +139,29 @@ public class MainPageActivity extends AppCompatActivity implements BottomNavigat
     private void getPermissions() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             requestPermissions(new String[]{android.Manifest.permission.WRITE_CONTACTS, Manifest.permission.READ_CONTACTS}, 1);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if (requestCode == 1) {
+            if (permissions[0].equals(Manifest.permission.READ_CONTACTS)
+                    && grantResults[0] == PackageManager.PERMISSION_DENIED) {
+                Menu menu = mBottomNavView.getMenu();
+                MenuItem menuItem = menu.findItem(R.id.home_fragment);
+                changeFocus(menuItem.getItemId());
+                FragmentHome.result = true;
+                loadFragment(new FragmentHome());
+            } else if (permissions[0].equals(Manifest.permission.WRITE_CONTACTS)
+                    && grantResults[0] == PackageManager.PERMISSION_DENIED) {
+                Menu menu = mBottomNavView.getMenu();
+                MenuItem menuItem = menu.findItem(R.id.home);
+                changeFocus(menuItem.getItemId());
+                FragmentHome.result = true;
+                loadFragment(new FragmentHome());
+            } else {
+                loadFragment(new FragmentPeople());
+            }
         }
     }
 

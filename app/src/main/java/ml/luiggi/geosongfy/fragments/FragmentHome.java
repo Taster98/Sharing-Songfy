@@ -1,6 +1,8 @@
 package ml.luiggi.geosongfy.fragments;
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -34,11 +36,26 @@ public class FragmentHome extends Fragment {
     private RecyclerView recyclerView;
     //Vista pubblica poichè usata anche in altre funzioni.
     public View bkView;
+    public static boolean result = false;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         bkView = inflater.inflate(R.layout.fragment_home, container, false);
+        if (result) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+            builder.setMessage("Per poter utilizzare questa feature è necessario autorizzare l'accesso ai contatti.")
+                    .setTitle("Attenzione")
+                    .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            dialogInterface.dismiss();
+                        }
+                    });
+            AlertDialog ad = builder.create();
+            ad.show();
+            result = false;
+        }
         //carico canzoni
         initSongs();
         return bkView;
