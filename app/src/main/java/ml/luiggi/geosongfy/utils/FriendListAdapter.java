@@ -1,7 +1,6 @@
 package ml.luiggi.geosongfy.utils;
 
 import android.app.ActivityManager;
-import android.app.Notification;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
@@ -16,7 +15,6 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
-import androidx.core.app.NotificationCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
@@ -31,6 +29,7 @@ Adapter customizzato per l'elenco degli amici che condividono gli ascolti nella 
  */
 public class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.FriendListViewHolder> {
     private final ArrayList<Friend> friendList;
+
     public FriendListAdapter(ArrayList<Friend> friendList) {
         this.friendList = friendList;
     }
@@ -41,7 +40,9 @@ public class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.Fr
         View layoutView = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_friend, null, false);
         return new FriendListViewHolder(layoutView);
     }
+
     int checked = 0;
+
     @Override
     public void onBindViewHolder(@NonNull final FriendListViewHolder holder, final int position) {
         holder.mName.setText(friendList.get(holder.getAdapterPosition()).getName());
@@ -51,38 +52,38 @@ public class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.Fr
             @Override
             public void onClick(final View view) {
                 final Intent intent = new Intent(view.getContext(), FriendPlayerService.class);
-                if(checked == 0){
-                    if(!isMyServiceRunning(FriendPlayerService.class,view.getContext())){
+                if (checked == 0) {
+                    if (!isMyServiceRunning(FriendPlayerService.class, view.getContext())) {
                         holder.mMute.setImageResource(R.drawable.ic_volume);
-                        checked=1;
+                        checked = 1;
                         //avviare musica
-                        intent.putExtra("uid",(friendList.get(holder.getAdapterPosition()).getUid()));
-                        intent.putExtra("songUrl",friendList.get(holder.getAdapterPosition()).getCurrentSong().getUrl());
-                        intent.putExtra("position",friendList.get(holder.getAdapterPosition()).getSongPosition());
-                        if(SongActivity.notificationManager != null)
+                        intent.putExtra("uid", (friendList.get(holder.getAdapterPosition()).getUid()));
+                        intent.putExtra("songUrl", friendList.get(holder.getAdapterPosition()).getCurrentSong().getUrl());
+                        intent.putExtra("position", friendList.get(holder.getAdapterPosition()).getSongPosition());
+                        if (SongActivity.notificationManager != null)
                             SongActivity.notificationManager.cancelAll();
-                        if(SongActivity.mPlayer != null)
+                        if (SongActivity.mPlayer != null)
                             SongActivity.mPlayer.stop();
 
                         view.getContext().startForegroundService(intent);
-                        String info = "In riproduzione: "+friendList.get(holder.getAdapterPosition()).getCurrentSong().getTitle()
-                                    + " di "+friendList.get(holder.getAdapterPosition()).getCurrentSong().getAuthors();
-                        if(!friendList.get(holder.getAdapterPosition()).getCurrentSong().getFeats().equals(""))
-                            info = info + " ft. "+friendList.get(holder.getAdapterPosition()).getCurrentSong().getFeats();
-                        Toast.makeText(view.getContext(),info,Toast.LENGTH_LONG).show();
-                    }else{
+                        String info = "In riproduzione: " + friendList.get(holder.getAdapterPosition()).getCurrentSong().getTitle()
+                                + " di " + friendList.get(holder.getAdapterPosition()).getCurrentSong().getAuthors();
+                        if (!friendList.get(holder.getAdapterPosition()).getCurrentSong().getFeats().equals(""))
+                            info = info + " ft. " + friendList.get(holder.getAdapterPosition()).getCurrentSong().getFeats();
+                        Toast.makeText(view.getContext(), info, Toast.LENGTH_LONG).show();
+                    } else {
                         holder.mMute.setImageResource(R.drawable.ic_mute);
-                        checked=0;
+                        checked = 0;
                         //fermare musica
                         view.getContext().stopService(intent);
                     }
-                }else{
-                    if(isMyServiceRunning(FriendPlayerService.class,view.getContext()) || SongActivity.mPlayer == null){
-                        checked=0;
+                } else {
+                    if (isMyServiceRunning(FriendPlayerService.class, view.getContext()) || SongActivity.mPlayer == null) {
+                        checked = 0;
                         holder.mMute.setImageResource(R.drawable.ic_mute);
                         //fermare musica
                         view.getContext().stopService(intent);
-                    }else {
+                    } else {
                         Toast.makeText(view.getContext(), "Musica già in riproduzione!", Toast.LENGTH_SHORT).show();
                     }
                 }
@@ -94,10 +95,12 @@ public class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.Fr
     public int getItemCount() {
         return friendList.size();
     }
+
     public void clear() {
         friendList.clear();
         notifyDataSetChanged();
     }
+
     public static class FriendListViewHolder extends RecyclerView.ViewHolder {
         public TextView mName, mNumber;
         public LinearLayout mLayout;
@@ -113,9 +116,10 @@ public class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.Fr
             mRelativeLayout = view.findViewById(R.id.friend_item_id);
         }
     }
+
     //Controllo se il servizio in questione è attivo o no (da https://gist.github.com/kevinmcmahon/2988931)
     private boolean isMyServiceRunning(Class<?> serviceClass, Context context) {
-        ActivityManager manager = (ActivityManager)context. getSystemService(Context.ACTIVITY_SERVICE);
+        ActivityManager manager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
         for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
             if (serviceClass.getName().equals(service.service.getClassName())) {
                 return true;

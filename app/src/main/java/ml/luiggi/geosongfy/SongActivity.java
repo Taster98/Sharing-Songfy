@@ -27,7 +27,6 @@ import android.widget.Toast;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
-//import androidx.core.app.NotificationCompat;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
@@ -65,11 +64,8 @@ public class SongActivity extends AppCompatActivity implements Playable, View.On
     protected void onDestroy() {
         volumeBar.setVisibility(View.INVISIBLE);
         super.onDestroy();
-        /*if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            notificationManager.cancelAll();
-        }*/
-        //unregisterReceiver(broadcastReceiver);
     }
+
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -77,7 +73,7 @@ public class SongActivity extends AppCompatActivity implements Playable, View.On
         setContentView(R.layout.song_play_layout);
         //prelevo i dati della canzone
         getSong();
-        if (getIntent().getIntExtra("notify", 0) == 0){
+        if (getIntent().getIntExtra("notify", 0) == 0) {
             //inizializzo il MediaPlayer
             initializeMediaPlayer();
         }
@@ -114,7 +110,6 @@ public class SongActivity extends AppCompatActivity implements Playable, View.On
             if (notificationManager != null) {
                 notificationManager.createNotificationChannel(channel);
             }
-            //NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(SongActivity.this, CreateNotification.CHANNEL_ID);
         }
     }
 
@@ -166,7 +161,7 @@ public class SongActivity extends AppCompatActivity implements Playable, View.On
     private void initRefs() {
         //Ripesco la lista di tutti i brani per i pulsanti Back e Next
         songList = (ArrayList<Song>) getIntent().getSerializableExtra("allSongs");
-        if(mSong != null) {
+        if (mSong != null) {
             //prelevo la posizione attuale nell'arraylist
             actualPos = songList.indexOf(mSong);
         }
@@ -443,7 +438,7 @@ public class SongActivity extends AppCompatActivity implements Playable, View.On
         mText2 = (TextView) findViewById(R.id.song_item_title);
         mTextView = (TextView) findViewById(R.id.song_item_author);
         mLinearLayout = (LinearLayout) findViewById(R.id.lineare_immagine_song);
-        if(mSong != null) {
+        if (mSong != null) {
             Picasso.get().load(mSong.getCover()).into(mImageView);
             String aut_feat = mSong.getAuthors();
             if (!mSong.getFeats().equals(""))

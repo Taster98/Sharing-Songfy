@@ -12,7 +12,6 @@ import android.os.IBinder;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
-import androidx.core.app.NotificationCompat;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -32,6 +31,7 @@ public class FriendPlayerService extends Service {
     Boolean isSharing;
     String uid;
     String titolo = "";
+
     public FriendPlayerService() {
     }
 

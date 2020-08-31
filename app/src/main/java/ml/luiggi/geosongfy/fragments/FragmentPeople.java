@@ -1,10 +1,7 @@
 package ml.luiggi.geosongfy.fragments;
 
-import android.Manifest;
 import android.annotation.SuppressLint;
-import android.app.AlertDialog;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.os.Build;
 import android.os.Bundle;
@@ -21,7 +18,6 @@ import android.widget.Button;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
-import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -70,6 +66,7 @@ public class FragmentPeople extends Fragment {
         initView();
         return bkpView;
     }
+
     private void initView() {
         //Inizializzo innanzitutto la lista degli amici che condividono e i due insiemi
         //(che conterranno tutti i contatti e tutti gli utenti registrati)

@@ -59,13 +59,13 @@ public class CreateNotification {
 
             //Open SongActivity
             Intent openIntent = new Intent(context, SongActivity.class);
+            //Mi serve per mantenere lo stato della canzone senza far riavviare l'activity
             openIntent.setAction(Long.toString(System.currentTimeMillis()));
-            openIntent.putExtra("notify",1);
-            openIntent.putExtra("songSelected",SongActivity.mSong);
-            openIntent.putExtra("allSongs",SongActivity.songList);
+            openIntent.putExtra("notify", 1);
+            openIntent.putExtra("songSelected", SongActivity.mSong);
+            openIntent.putExtra("allSongs", SongActivity.songList);
             openIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-            //openIntent.putExtra("notify", 1);
-            final PendingIntent openingIntent = PendingIntent.getActivity(context,0,openIntent,PendingIntent.FLAG_UPDATE_CURRENT);
+            final PendingIntent openingIntent = PendingIntent.getActivity(context, 0, openIntent, PendingIntent.FLAG_UPDATE_CURRENT);
             //passo anche l'arraylist totale perchè potrebbe servirmi per implementare poi il pulsante avanti/indietro
             final PendingIntent pendingIntentNext = PendingIntent.getBroadcast(context, 0, nextIntent, PendingIntent.FLAG_UPDATE_CURRENT);
             final String picture = song.getCover();
