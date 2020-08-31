@@ -5,10 +5,8 @@ Sharing SongFy è un'app che offre lo streaming di brani musicali on demand, sim
 Su Sharing SongFy è inoltre possibile anche condividere ciò che si sta ascoltando con i propri amici. Questo è il motivo per cui per poter utilizzare l'app bisogna registrarsi tramite numero di telefono, poichè la lista di amici è presa direttamente dai contatti della rubrica che hanno la medesima app. Nella sezione "Ascolta con i tuoi amici", premendo sull'apposito pulsante è possibile condividere ciò che è attualmente in riproduzione con chiunque abbia scaricato l'app e abbia il numero in rubrica. Per poter ascoltare cosa ascolta un amico, è sufficiente premere sul suo nome nella lista. È possibile ascoltare un solo amico per volta (altrimenti l'audio sarebbe sovrapposto), e per rivedere quale canzone sta ascoltando occorre tenere premuto fino alla vibrazione.
 ## Immagini
 
-<img src="img/screen1.jpg" width="24.5%" alt="Screenshots of App #1"> 
-<img src="img/screen2.jpg" width="24.5%" alt="Screenshots of App #2">
-<img src="img/screen3.jpg" width="24.5%" alt="Screenshots of App #2">
-<img src="img/screen4.jpg" width="24.5%" alt="Screenshots of App #2">
+<img src="img/screen1.jpg" width="49.9%" alt="Screenshots of App #1"> <img src="img/screen2.jpg" width="49.9%" alt="Screenshots of App #2">
+<img src="img/screen3.jpg" width="49.9%" alt="Screenshots of App #2"><img src="img/screen4.jpg" width="49.9%" alt="Screenshots of App #2">
 
 ## Struttura
 
