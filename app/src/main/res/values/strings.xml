@@ -32,4 +32,6 @@
     <string name="i_tuoi_amici_ascoltano">I tuoi amici ascoltano:</string>
     <string name="condividi_musica">Condividi musica</string>
     <string name="ferma_condivisione">Ferma condivisione</string>
+    <string name="in_ascolto">In ascolto</string>
+    <string name="ticker_text">Testo</string>
 </resources>

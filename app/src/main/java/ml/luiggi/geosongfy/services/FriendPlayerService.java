@@ -1,5 +1,7 @@
 package ml.luiggi.geosongfy.services;
 
+import android.app.Notification;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
 import android.media.AudioAttributes;
@@ -10,6 +12,7 @@ import android.os.IBinder;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
+import androidx.core.app.NotificationCompat;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -19,13 +22,16 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.io.IOException;
 
+import ml.luiggi.geosongfy.MainPageActivity;
+import ml.luiggi.geosongfy.R;
+
 public class FriendPlayerService extends Service {
     public static MediaPlayer mediaPlayer;
     static String urlMusic;
     int position;
     Boolean isSharing;
     String uid;
-
+    String titolo = "";
     public FriendPlayerService() {
     }
 
@@ -38,6 +44,25 @@ public class FriendPlayerService extends Service {
 
     @Override
     public int onStartCommand(final Intent intent, int flags, int startId) {
+        Intent notificationIntent = new Intent(this, MainPageActivity.class);
+        notificationIntent.setAction("STOP");
+        PendingIntent pendingIntent =
+                PendingIntent.getActivity(this, 0, notificationIntent, PendingIntent.FLAG_ONE_SHOT);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+
+            Notification notification =
+                    new Notification.Builder(this, "geosongfy_player")
+                            .setContentTitle(getText(R.string.app_name))
+                            .setContentText(getText(R.string.in_ascolto))
+                            .setSmallIcon(R.drawable.ic_music)
+                            .setContentIntent(pendingIntent)
+                            .setTicker(getText(R.string.ticker_text))
+                            .build();
+
+
+            startForeground(1, notification);
+
+        }
         //prelevo lo uid dal bundle del servizio:
         Bundle bndl = intent.getExtras();
         if (bndl != null) {
@@ -57,6 +82,7 @@ public class FriendPlayerService extends Service {
                     prevSong = urlMusic;
                     urlMusic = snapshot.child("songUrl").getValue(String.class);
                     position = Math.toIntExact(snapshot.child("position").getValue(Long.class));
+                    titolo = snapshot.child("title").getValue(String.class);
                     isSharing = snapshot.child("isSharing").getValue(Boolean.class);
                     try {
                         if (isSharing != null && isSharing) {

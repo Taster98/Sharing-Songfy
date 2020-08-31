@@ -17,6 +17,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 import ml.luiggi.geosongfy.R;
+import ml.luiggi.geosongfy.SongActivity;
 import ml.luiggi.geosongfy.scaffoldings.Song;
 import ml.luiggi.geosongfy.services.NotificationActionService;
 
@@ -55,6 +56,17 @@ public class CreateNotification {
             //SUCCESSIVO
             Intent nextIntent = new Intent(context, NotificationActionService.class)
                     .setAction(ACTION_NEXT);
+
+            //Open SongActivity
+            Intent openIntent = new Intent(context, SongActivity.class);
+            openIntent.setAction(Long.toString(System.currentTimeMillis()));
+            openIntent.putExtra("notify",1);
+            openIntent.putExtra("songSelected",SongActivity.mSong);
+            openIntent.putExtra("allSongs",SongActivity.songList);
+            openIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+            //openIntent.putExtra("notify", 1);
+            final PendingIntent openingIntent = PendingIntent.getActivity(context,0,openIntent,PendingIntent.FLAG_UPDATE_CURRENT);
+            //passo anche l'arraylist totale perchè potrebbe servirmi per implementare poi il pulsante avanti/indietro
             final PendingIntent pendingIntentNext = PendingIntent.getBroadcast(context, 0, nextIntent, PendingIntent.FLAG_UPDATE_CURRENT);
             final String picture = song.getCover();
 
@@ -83,6 +95,7 @@ public class CreateNotification {
                                         .setShowActionsInCompactView(0, 1, 2)
                                         .setMediaSession(mediaSessionCompat.getSessionToken()))
                                 .setPriority(NotificationCompat.PRIORITY_MAX)
+                                .setContentIntent(openingIntent)
                                 .setLargeIcon(myBitmap)
                                 .build();
                         notificationManagerCompat.notify(1, notification);

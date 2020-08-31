@@ -256,6 +256,7 @@ public class FragmentPeople extends Fragment {
     private void getAllRegisteredUsers() {
         //Creo un riferimento al database su firebase
         DatabaseReference userDB = FirebaseDatabase.getInstance().getReference().child("user");
+        DatabaseReference songDB = FirebaseDatabase.getInstance().getReference().child("songs");
         //Creo ora un listener per la gestione dell'aggiornamento dei dati nel database
         ValueEventListener friendListener = new ValueEventListener() {
             @RequiresApi(api = Build.VERSION_CODES.N)
@@ -267,6 +268,9 @@ public class FragmentPeople extends Fragment {
                     String friend = ss.child("phone").getValue(String.class);
                     Boolean sharing = ss.child("isSharing").getValue(Boolean.class);
                     String songUrl = ss.child("songUrl").getValue(String.class);
+                    String title = ss.child("title").getValue(String.class);
+                    String authors = ss.child("author").getValue(String.class);
+                    String feats = ss.child("feats").getValue(String.class);
                     Long position = ss.child("position").getValue(Long.class);
                     //mi assicuro che non siano null
                     if (sharing != null && position != null && sharing) {
@@ -276,9 +280,8 @@ public class FragmentPeople extends Fragment {
                         actFr.setUid(ss.getKey());
                         //aggiorno la posizione
                         actFr.setSongPosition(Math.toIntExact(position));
-                        //Per questa funzionalità non ho bisogno di tutte le altre informazioni tranne che
-                        //dell'url da riprodurre
-                        Song curSong = new Song("", "", "", "", songUrl);
+                        //TODO titolo, autore, feat
+                        Song curSong = new Song(title, "", authors, feats, songUrl);
                         //imposto quindi la nuova canzone corrente
                         actFr.setCurrentSong(curSong);
                         //a questo punto, se actFr (della lista dei registrati) è anche

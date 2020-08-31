@@ -1,6 +1,10 @@
 package ml.luiggi.geosongfy.utils;
 
+import android.app.ActivityManager;
+import android.app.Notification;
+import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,6 +15,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
+import androidx.core.app.NotificationCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
@@ -41,14 +47,13 @@ public class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.Fr
         holder.mName.setText(friendList.get(holder.getAdapterPosition()).getName());
         holder.mNumber.setText(friendList.get(holder.getAdapterPosition()).getPhoneNumber());
         holder.mRelativeLayout.setOnClickListener(new View.OnClickListener() {
-            int checkedDue = 0;
+            @RequiresApi(api = Build.VERSION_CODES.O)
             @Override
             public void onClick(final View view) {
                 final Intent intent = new Intent(view.getContext(), FriendPlayerService.class);
                 if(checked == 0){
-                    if(checkedDue == 0){
+                    if(!isMyServiceRunning(FriendPlayerService.class,view.getContext())){
                         holder.mMute.setImageResource(R.drawable.ic_volume);
-                        checkedDue=1;
                         checked=1;
                         //avviare musica
                         intent.putExtra("uid",(friendList.get(holder.getAdapterPosition()).getUid()));
@@ -58,17 +63,21 @@ public class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.Fr
                             SongActivity.notificationManager.cancelAll();
                         if(SongActivity.mPlayer != null)
                             SongActivity.mPlayer.stop();
-                        view.getContext().startService(intent);
+
+                        view.getContext().startForegroundService(intent);
+                        String info = "In riproduzione: "+friendList.get(holder.getAdapterPosition()).getCurrentSong().getTitle()
+                                    + " di "+friendList.get(holder.getAdapterPosition()).getCurrentSong().getAuthors();
+                        if(!friendList.get(holder.getAdapterPosition()).getCurrentSong().getFeats().equals(""))
+                            info = info + " ft. "+friendList.get(holder.getAdapterPosition()).getCurrentSong().getFeats();
+                        Toast.makeText(view.getContext(),info,Toast.LENGTH_LONG).show();
                     }else{
                         holder.mMute.setImageResource(R.drawable.ic_mute);
-                        checkedDue=0;
                         checked=0;
                         //fermare musica
                         view.getContext().stopService(intent);
                     }
                 }else{
-                    if(checkedDue==1 || SongActivity.mPlayer == null){
-                        checkedDue=0;
+                    if(isMyServiceRunning(FriendPlayerService.class,view.getContext()) || SongActivity.mPlayer == null){
                         checked=0;
                         holder.mMute.setImageResource(R.drawable.ic_mute);
                         //fermare musica
@@ -103,5 +112,15 @@ public class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.Fr
             mMute = view.findViewById(R.id.friend_mute_id);
             mRelativeLayout = view.findViewById(R.id.friend_item_id);
         }
+    }
+    //Controllo se il servizio in questione è attivo o no (da https://gist.github.com/kevinmcmahon/2988931)
+    private boolean isMyServiceRunning(Class<?> serviceClass, Context context) {
+        ActivityManager manager = (ActivityManager)context. getSystemService(Context.ACTIVITY_SERVICE);
+        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+            if (serviceClass.getName().equals(service.service.getClassName())) {
+                return true;
+            }
+        }
+        return false;
     }
 }

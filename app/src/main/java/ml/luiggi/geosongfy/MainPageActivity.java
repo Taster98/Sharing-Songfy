@@ -6,8 +6,11 @@ import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 
 import android.Manifest;
+import android.app.ActivityManager;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Build;
@@ -27,16 +30,25 @@ import com.google.firebase.database.FirebaseDatabase;
 import ml.luiggi.geosongfy.fragments.FragmentHome;
 import ml.luiggi.geosongfy.fragments.FragmentPeople;
 import ml.luiggi.geosongfy.fragments.PlaylistFragment;
+import ml.luiggi.geosongfy.services.FriendPlayerService;
+
+import static androidx.core.content.ContextCompat.getSystemService;
 
 /*
  * Questa classe rappresenta l'activity principale dell'app. Al suo interno è presente un BottomNavigationView che consente di navigare tra Fragment.*/
 public class MainPageActivity extends AppCompatActivity implements BottomNavigationView.OnNavigationItemSelectedListener, NavigationView.OnNavigationItemSelectedListener {
     private BottomNavigationView mBottomNavView;
-
+    //variabile per la gestione del tasto condividi
+    public static int condividi = 0;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        //STOP SERVIZIO
+        if(getIntent().getAction() != null) {
+            if (getIntent().getAction().equals("STOP"))
+                stopService(new Intent(getApplicationContext(), FriendPlayerService.class));
+        }
         initTutorial();
         //carico il fragment principale (quello contenente la lista delle canzoni nel server)
         loadFragment(new FragmentHome());
