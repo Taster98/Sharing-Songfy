@@ -4,6 +4,8 @@ import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
+import android.os.VibrationEffect;
+import android.os.Vibrator;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -89,6 +91,22 @@ public class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.Fr
                 }
             }
         });
+        holder.mRelativeLayout.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
+                Vibrator vib = (Vibrator) view.getContext().getSystemService(Context.VIBRATOR_SERVICE);
+                //vibra per 200 millisecondi
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    vib.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
+                } else {
+                    vib.vibrate(200);
+                }
+                String finalInfo = "In riproduzione: " + friendList.get(holder.getAdapterPosition()).getCurrentSong().getTitle()
+                        + " di " + friendList.get(holder.getAdapterPosition()).getCurrentSong().getAuthors();
+                Toast.makeText(view.getContext(), finalInfo,Toast.LENGTH_LONG).show();
+                return true;
+            }
+        });
     }
 
     @Override
@@ -101,7 +119,7 @@ public class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.Fr
         notifyDataSetChanged();
     }
 
-    public static class FriendListViewHolder extends RecyclerView.ViewHolder {
+    public static class FriendListViewHolder extends RecyclerView.ViewHolder{
         public TextView mName, mNumber;
         public LinearLayout mLayout;
         public ImageView mMute;
@@ -115,6 +133,7 @@ public class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.Fr
             mMute = view.findViewById(R.id.friend_mute_id);
             mRelativeLayout = view.findViewById(R.id.friend_item_id);
         }
+
     }
 
     //Controllo se il servizio in questione è attivo o no (da https://gist.github.com/kevinmcmahon/2988931)

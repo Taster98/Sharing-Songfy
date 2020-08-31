@@ -38,6 +38,7 @@ import java.util.ArrayList;
 
 import ml.luiggi.sharingsongfy.scaffoldings.Playable;
 import ml.luiggi.sharingsongfy.scaffoldings.Song;
+import ml.luiggi.sharingsongfy.services.FriendPlayerService;
 import ml.luiggi.sharingsongfy.services.OnClearFromRecentService;
 import ml.luiggi.sharingsongfy.utils.CreateNotification;
 
@@ -73,6 +74,8 @@ public class SongActivity extends AppCompatActivity implements Playable, View.On
         setContentView(R.layout.song_play_layout);
         //prelevo i dati della canzone
         getSong();
+        //Killo il servizio
+        stopService(new Intent(getApplicationContext(),FriendPlayerService.class));
         if (getIntent().getIntExtra("notify", 0) == 0) {
             //inizializzo il MediaPlayer
             initializeMediaPlayer();
@@ -198,6 +201,10 @@ public class SongActivity extends AppCompatActivity implements Playable, View.On
                     mPlayer.seekTo(progress * 1000);
                     String seekTitle = getTimeString(mPlayer.getCurrentPosition()) + "/" + getTimeString(mPlayer.getDuration());
                     mSeekTitle.setText(seekTitle);
+                    dbUsers.child("songUrl").setValue(mSong.getUrl());
+                    dbUsers.child("author").setValue(mSong.getAuthors());
+                    dbUsers.child("feats").setValue(mSong.getFeats());
+                    dbUsers.child("title").setValue(mSong.getTitle());
                     progresso = mPlayer.getCurrentPosition();
                     dbUsers.child("position").setValue(progresso);
                 }
@@ -221,6 +228,10 @@ public class SongActivity extends AppCompatActivity implements Playable, View.On
                     mPlay.setImageResource(R.drawable.ic_play);
                     onTrackPause();
                     Boolean b = Boolean.FALSE;
+                    dbUsers.child("songUrl").setValue(mSong.getUrl());
+                    dbUsers.child("author").setValue(mSong.getAuthors());
+                    dbUsers.child("feats").setValue(mSong.getFeats());
+                    dbUsers.child("title").setValue(mSong.getTitle());
                     dbUsers.child("isSharing").setValue(b);
                     progresso = mPlayer.getCurrentPosition();
                     dbUsers.child("position").setValue(progresso);
@@ -234,6 +245,8 @@ public class SongActivity extends AppCompatActivity implements Playable, View.On
                     dbUsers.child("author").setValue(mSong.getAuthors());
                     dbUsers.child("feats").setValue(mSong.getFeats());
                     dbUsers.child("title").setValue(mSong.getTitle());
+                    progresso = mPlayer.getCurrentPosition();
+                    dbUsers.child("position").setValue(progresso);
                     //Creo un handler per gestire la SeekBar
                     final Handler mHandler = new Handler();
                     //Eseguo il tutto nel thread dell'UI
@@ -243,6 +256,12 @@ public class SongActivity extends AppCompatActivity implements Playable, View.On
                             if (mPlayer != null) {
                                 int mCurrentPosition = mPlayer.getCurrentPosition() / 1000;
                                 mSeek.setProgress(mCurrentPosition);
+                                dbUsers.child("songUrl").setValue(mSong.getUrl());
+                                dbUsers.child("author").setValue(mSong.getAuthors());
+                                dbUsers.child("feats").setValue(mSong.getFeats());
+                                dbUsers.child("title").setValue(mSong.getTitle());
+                                progresso = mPlayer.getCurrentPosition();
+                                dbUsers.child("position").setValue(progresso);
                                 progresso = mPlayer.getCurrentPosition();
                                 dbUsers.child("position").setValue(progresso);
                                 String seekTitle = getTimeString(mPlayer.getCurrentPosition()) + "/" + getTimeString(mPlayer.getDuration());
@@ -266,6 +285,12 @@ public class SongActivity extends AppCompatActivity implements Playable, View.On
                         public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                             if (mPlayer != null && fromUser) {
                                 mPlayer.seekTo(progress * 1000);
+                                dbUsers.child("songUrl").setValue(mSong.getUrl());
+                                dbUsers.child("author").setValue(mSong.getAuthors());
+                                dbUsers.child("feats").setValue(mSong.getFeats());
+                                dbUsers.child("title").setValue(mSong.getTitle());
+                                progresso = mPlayer.getCurrentPosition();
+                                dbUsers.child("position").setValue(progresso);
                                 progresso = mPlayer.getCurrentPosition();
                                 dbUsers.child("position").setValue(progresso);
                                 String seekTitle = getTimeString(mPlayer.getCurrentPosition()) + "/" + getTimeString(mPlayer.getDuration());
@@ -392,6 +417,10 @@ public class SongActivity extends AppCompatActivity implements Playable, View.On
                 if (mPlayer != null) {
                     int mCurrentPosition = mPlayer.getCurrentPosition() / 1000;
                     mSeek.setProgress(mCurrentPosition);
+                    dbUsers.child("songUrl").setValue(mSong.getUrl());
+                    dbUsers.child("author").setValue(mSong.getAuthors());
+                    dbUsers.child("feats").setValue(mSong.getFeats());
+                    dbUsers.child("title").setValue(mSong.getTitle());
                     progresso = mPlayer.getCurrentPosition();
                     dbUsers.child("position").setValue(progresso);
                     String seekTitle = getTimeString(mPlayer.getCurrentPosition()) + "/" + getTimeString(mPlayer.getDuration());
@@ -822,6 +851,7 @@ public class SongActivity extends AppCompatActivity implements Playable, View.On
                             dbUsers.child("author").setValue(mSong.getAuthors());
                             dbUsers.child("feats").setValue(mSong.getFeats());
                             dbUsers.child("title").setValue(mSong.getTitle());
+                            dbUsers.child("position").setValue(progresso);
                             //Creo un handler per gestire la SeekBar
                             final Handler mHandler = new Handler();
                             //Eseguo il tutto nel thread dell'UI

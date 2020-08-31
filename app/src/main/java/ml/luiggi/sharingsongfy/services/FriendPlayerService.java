@@ -87,6 +87,9 @@ public class FriendPlayerService extends Service {
                     try {
                         if (isSharing != null && isSharing) {
                             if (!prevSong.equals(urlMusic)) {
+                                if(mediaPlayer == null){
+                                    mediaPlayer = new MediaPlayer();
+                                }
                                 mediaPlayer.reset();
                                 mediaPlayer.setDataSource(urlMusic);
                                 mediaPlayer.prepare();
