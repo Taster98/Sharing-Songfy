@@ -655,8 +655,6 @@ public class SongActivity extends AppCompatActivity implements Playable, View.On
         mPlayer.pause();
         mPlay.setImageResource(R.drawable.ic_play);
         isPlaying = false;
-        /*Boolean b = Boolean.FALSE;
-        dbUsers.child("isSharing").setValue(b);*/
         progresso = mPlayer.getCurrentPosition();
         dbUsers.child("position").setValue(progresso);
     }
@@ -828,8 +826,6 @@ public class SongActivity extends AppCompatActivity implements Playable, View.On
                             mPlayer.pause();
                             mPlay.setImageResource(R.drawable.ic_play);
                             onTrackPause();
-                            /*Boolean b = Boolean.FALSE;
-                            dbUsers.child("isSharing").setValue(b);*/
                             dbUsers.child("author").setValue(mSong.getAuthors());
                             dbUsers.child("feats").setValue(mSong.getFeats());
                             dbUsers.child("title").setValue(mSong.getTitle());

@@ -35,6 +35,8 @@ import ml.luiggi.sharingsongfy.scaffoldings.Song;
 import ml.luiggi.sharingsongfy.utils.DialogListAdapter;
 import ml.luiggi.sharingsongfy.utils.JsonParserUrl;
 import ml.luiggi.sharingsongfy.utils.PlayListAdapter;
+//costanti private
+import static ml.luiggi.sharingsongfy.utils.Constants.*;
 
 public class PlaylistFragment extends Fragment {
     private RecyclerView.Adapter mAdapter;
@@ -168,7 +170,7 @@ public class PlaylistFragment extends Fragment {
     //funzione che parsa dal server il file json contenente l'elenco di canzoni presenti in esso
     private void loadSongs() {
         songList = new ArrayList<>();
-        JsonParserUrl mp = new JsonParserUrl("http://luiggi.altervista.org/song_db.json");
+        JsonParserUrl mp = new JsonParserUrl(SERVER_LINK);
         songList = mp.getSongs();
     }
 
