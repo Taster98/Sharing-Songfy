@@ -136,7 +136,7 @@ public class SongActivity extends AppCompatActivity implements Playable, View.On
             mPlayer.setDataSource(url);
             mPlayer.prepare();
             mPlayer.start();
-            dbUsers.child("isSharing").setValue(true);
+            //dbUsers.child("isSharing").setValue(true);
             dbUsers.child("songUrl").setValue(mSong.getUrl());
             dbUsers.child("author").setValue(mSong.getAuthors());
             dbUsers.child("feats").setValue(mSong.getFeats());
@@ -227,20 +227,20 @@ public class SongActivity extends AppCompatActivity implements Playable, View.On
                     mPlayer.pause();
                     mPlay.setImageResource(R.drawable.ic_play);
                     onTrackPause();
-                    Boolean b = Boolean.FALSE;
+                    //Boolean b = Boolean.FALSE;
                     dbUsers.child("songUrl").setValue(mSong.getUrl());
                     dbUsers.child("author").setValue(mSong.getAuthors());
                     dbUsers.child("feats").setValue(mSong.getFeats());
                     dbUsers.child("title").setValue(mSong.getTitle());
-                    dbUsers.child("isSharing").setValue(b);
+                    //dbUsers.child("isSharing").setValue(b);
                     progresso = mPlayer.getCurrentPosition();
                     dbUsers.child("position").setValue(progresso);
                 } else {
                     //Play:
                     mPlayer.start();
                     onTrackPlay();
-                    Boolean b = Boolean.TRUE;
-                    dbUsers.child("isSharing").setValue(b);
+                    /*Boolean b = Boolean.TRUE;
+                    dbUsers.child("isSharing").setValue(b);*/
                     dbUsers.child("songUrl").setValue(mSong.getUrl());
                     dbUsers.child("author").setValue(mSong.getAuthors());
                     dbUsers.child("feats").setValue(mSong.getFeats());
@@ -606,8 +606,8 @@ public class SongActivity extends AppCompatActivity implements Playable, View.On
         mPlayer.start();
         mPlay.setImageResource(R.drawable.ic_pause);
         isPlaying = true;
-        Boolean b = Boolean.TRUE;
-        dbUsers.child("isSharing").setValue(b);
+        /*Boolean b = Boolean.TRUE;
+        dbUsers.child("isSharing").setValue(b);*/
         dbUsers.child("songUrl").setValue(mSong.getUrl());
         dbUsers.child("author").setValue(mSong.getAuthors());
         dbUsers.child("feats").setValue(mSong.getFeats());
@@ -655,8 +655,8 @@ public class SongActivity extends AppCompatActivity implements Playable, View.On
         mPlayer.pause();
         mPlay.setImageResource(R.drawable.ic_play);
         isPlaying = false;
-        Boolean b = Boolean.FALSE;
-        dbUsers.child("isSharing").setValue(b);
+        /*Boolean b = Boolean.FALSE;
+        dbUsers.child("isSharing").setValue(b);*/
         progresso = mPlayer.getCurrentPosition();
         dbUsers.child("position").setValue(progresso);
     }
@@ -828,8 +828,8 @@ public class SongActivity extends AppCompatActivity implements Playable, View.On
                             mPlayer.pause();
                             mPlay.setImageResource(R.drawable.ic_play);
                             onTrackPause();
-                            Boolean b = Boolean.FALSE;
-                            dbUsers.child("isSharing").setValue(b);
+                            /*Boolean b = Boolean.FALSE;
+                            dbUsers.child("isSharing").setValue(b);*/
                             dbUsers.child("author").setValue(mSong.getAuthors());
                             dbUsers.child("feats").setValue(mSong.getFeats());
                             dbUsers.child("title").setValue(mSong.getTitle());
@@ -845,8 +845,8 @@ public class SongActivity extends AppCompatActivity implements Playable, View.On
                             //Play:
                             mPlayer.start();
                             onTrackPlay();
-                            Boolean b = Boolean.TRUE;
-                            dbUsers.child("isSharing").setValue(b);
+                            /*Boolean b = Boolean.TRUE;
+                            dbUsers.child("isSharing").setValue(b);*/
                             dbUsers.child("songUrl").setValue(mSong.getUrl());
                             dbUsers.child("author").setValue(mSong.getAuthors());
                             dbUsers.child("feats").setValue(mSong.getFeats());
