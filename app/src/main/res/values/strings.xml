@@ -1,6 +1,5 @@
 <resources>
     <string name="app_name">Sharing SongFy</string>
-    <string name="hello_world">helloWorld</string>
     <string name="home">Home</string>
     <string name="friend_listen">Ascolta con i tuoi amici</string>
     <string name="tutte_le_canzoni">Tutte le canzoni</string>
@@ -33,5 +32,5 @@
     <string name="condividi_musica">Condividi musica</string>
     <string name="ferma_condivisione">Ferma condivisione</string>
     <string name="in_ascolto">In ascolto</string>
-    <string name="ticker_text">Testo</string>
+    <string name="ticker_text">In ascolto</string>
 </resources>

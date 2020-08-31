@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="ml.luiggi.geosongfy">
+    package="ml.luiggi.sharingsongfy">
 
     <uses-permission android:name="android.permission.READ_CONTACTS" />
     <uses-permission android:name="android.permission.WRITE_CONTACTS" />
@@ -27,12 +27,12 @@
         android:theme="@style/AppTheme"
         tools:targetApi="n">
         <service
-            android:name=".services.FriendPlayerService"
+            android:name="ml.luiggi.sharingsongfy.services.FriendPlayerService"
             android:enabled="true"
             android:exported="true" />
 
         <activity
-            android:name=".LoginActivity"
+            android:name="ml.luiggi.sharingsongfy.LoginActivity"
             android:theme="@style/Platform.MaterialComponents.Light">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -41,7 +41,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".MainPageActivity"
+            android:name="ml.luiggi.sharingsongfy.MainPageActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="ml.luiggi.geosongfy.action.PAUSE" />
@@ -52,18 +52,18 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".SongActivity"
+            android:name="ml.luiggi.sharingsongfy.SongActivity"
             android:theme="@style/Platform.MaterialComponents.Light" />
         <activity
-            android:name=".PlaylistActivity"
+            android:name="ml.luiggi.sharingsongfy.PlaylistActivity"
             android:theme="@style/Platform.MaterialComponents.Light" />
         <activity
-            android:name=".GestureTestsActivity"
+            android:name="ml.luiggi.sharingsongfy.GestureTestsActivity"
             android:theme="@style/Platform.MaterialComponents.Light" />
 
-        <receiver android:name=".services.NotificationActionService" />
+        <receiver android:name="ml.luiggi.sharingsongfy.services.NotificationActionService" />
 
-        <service android:name=".services.OnClearFromRecentService" />
+        <service android:name="ml.luiggi.sharingsongfy.services.OnClearFromRecentService" />
     </application>
 
 </manifest>
