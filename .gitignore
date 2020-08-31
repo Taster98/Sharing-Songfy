@@ -20,4 +20,5 @@ Constants.java
 **/Constants.java
 **/*.class
 **/*.apk
+*.apk
 
