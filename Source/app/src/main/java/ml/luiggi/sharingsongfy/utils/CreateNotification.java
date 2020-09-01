@@ -97,6 +97,7 @@ public class CreateNotification {
                                 .setPriority(NotificationCompat.PRIORITY_MAX)
                                 .setContentIntent(openingIntent)
                                 .setLargeIcon(myBitmap)
+                                .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
                                 .build();
                         notificationManagerCompat.notify(1, notification);
                     } catch (Exception e) {
