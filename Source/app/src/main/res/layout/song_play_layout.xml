@@ -7,34 +7,53 @@
     android:orientation="vertical"
     android:id="@+id/song_layout"
     android:gravity="center">
-    <ImageView
+
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="0.8"
-        android:id="@+id/song_item_image"/>
+        android:layout_height="315dp"
+        android:layout_weight="0.8">
+
+        <ImageView
+            android:id="@+id/song_item_image"
+            android:layout_width="match_parent"
+
+            android:layout_height="match_parent" />
+        <SeekBar
+            android:id="@+id/volumeBar"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:thumbOffset="10dp"
+            android:visibility="invisible"
+            android:rotation="270"/>
+    </FrameLayout>
+
+
     <LinearLayout
         android:id="@+id/lineare_immagine_song"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_weight="0.2"
         android:orientation="vertical">
+
         <TextView
+            android:id="@+id/song_item_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="30sp"
             android:layout_gravity="center"
-            android:id="@+id/song_item_title"/>
+            android:textSize="30sp" />
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="20sp"
             android:layout_gravity="center"
             android:id="@+id/song_item_author"/>
+
         <SeekBar
-            android:layout_marginTop="50dp"
             android:id="@+id/song_item_seekbar"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content"
+            android:layout_marginTop="30dp" />
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -84,12 +103,6 @@
             android:background="@drawable/round"
             android:src="@drawable/ic_next"
             android:visibility="invisible"/>
-        <SeekBar
-            android:id="@+id/volumeBar"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:thumbOffset="10dp"
-            android:visibility="invisible"
-            android:rotation="270"/>
+
     </LinearLayout>
 </LinearLayout>

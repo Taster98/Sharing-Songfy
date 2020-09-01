@@ -444,7 +444,7 @@ public class SongActivity extends AppCompatActivity implements Playable, View.On
 
         //GESTURE CONTROLS
         mLinearLayout.setOnTouchListener(this);
-        mImageView.setOnTouchListener(this);
+        //mImageView.setOnTouchListener(this);
         container.setOnTouchListener(this);
     }
 

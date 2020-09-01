@@ -57,6 +57,7 @@ public class FriendPlayerService extends Service {
                             .setSmallIcon(R.drawable.ic_music)
                             .setContentIntent(pendingIntent)
                             .setTicker(getText(R.string.ticker_text))
+                            .setVibrate(null)
                             .build();
 
 
