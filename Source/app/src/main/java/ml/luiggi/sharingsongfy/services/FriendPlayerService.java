@@ -54,8 +54,8 @@ public class FriendPlayerService extends Service {
                 PendingIntent.getActivity(this, 0, notificationIntent, PendingIntent.FLAG_ONE_SHOT);
         createNotificationChannel();
         Notification notification = new NotificationCompat.Builder(this, CHANNEL_ID)
-                .setContentTitle("Foreground Service")
-                .setContentText("In ascolto")
+                .setContentTitle("Sharing SongFy")
+                .setContentText("In ascolto: premi per fermare")
                 .setSmallIcon(R.drawable.ic_music)
                 .setContentIntent(pendingIntent)
                 .build();
