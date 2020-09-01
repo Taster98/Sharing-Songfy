@@ -1,6 +1,8 @@
 package ml.luiggi.sharingsongfy.services;
 
 import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
@@ -12,6 +14,7 @@ import android.os.IBinder;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
+import androidx.core.app.NotificationCompat;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -25,6 +28,7 @@ import ml.luiggi.sharingsongfy.MainPageActivity;
 import ml.luiggi.sharingsongfy.R;
 
 public class FriendPlayerService extends Service {
+    public static final String CHANNEL_ID = "sharing_songfy";
     public static MediaPlayer mediaPlayer;
     static String urlMusic;
     int position;
@@ -48,22 +52,14 @@ public class FriendPlayerService extends Service {
         notificationIntent.setAction("STOP");
         PendingIntent pendingIntent =
                 PendingIntent.getActivity(this, 0, notificationIntent, PendingIntent.FLAG_ONE_SHOT);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-
-            Notification notification =
-                    new Notification.Builder(this, "geosongfy_player")
-                            .setContentTitle(getText(R.string.app_name))
-                            .setContentText(getText(R.string.in_ascolto))
-                            .setSmallIcon(R.drawable.ic_music)
-                            .setContentIntent(pendingIntent)
-                            .setTicker(getText(R.string.ticker_text))
-                            .setVibrate(null)
-                            .build();
-
-
-            startForeground(1, notification);
-
-        }
+        createNotificationChannel();
+        Notification notification = new NotificationCompat.Builder(this, CHANNEL_ID)
+                .setContentTitle("Foreground Service")
+                .setContentText("In ascolto")
+                .setSmallIcon(R.drawable.ic_music)
+                .setContentIntent(pendingIntent)
+                .build();
+        startForeground(1, notification);
         //prelevo lo uid dal bundle del servizio:
         Bundle bndl = intent.getExtras();
         if (bndl != null) {
@@ -145,5 +141,16 @@ public class FriendPlayerService extends Service {
         super.onDestroy();
         mediaPlayer.stop();
         mediaPlayer.release();
+    }
+    private void createNotificationChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel serviceChannel = new NotificationChannel(
+                    CHANNEL_ID,
+                    "Foreground Service Channel",
+                    NotificationManager.IMPORTANCE_DEFAULT
+            );
+            NotificationManager manager = getSystemService(NotificationManager.class);
+            manager.createNotificationChannel(serviceChannel);
+        }
     }
 }

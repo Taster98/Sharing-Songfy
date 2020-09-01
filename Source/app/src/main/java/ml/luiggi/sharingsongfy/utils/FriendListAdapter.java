@@ -19,6 +19,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.recyclerview.widget.RecyclerView;
 
+
 import java.util.ArrayList;
 
 import ml.luiggi.sharingsongfy.R;
@@ -44,7 +45,7 @@ public class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.Fr
     }
 
     int checked = 0;
-
+    static int posizione = -1;
     @Override
     public void onBindViewHolder(@NonNull final FriendListViewHolder holder, final int position) {
         holder.mName.setText(friendList.get(holder.getAdapterPosition()).getName());
@@ -56,6 +57,7 @@ public class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.Fr
                 final Intent intent = new Intent(view.getContext(), FriendPlayerService.class);
                 if (checked == 0) {
                     if (!isMyServiceRunning(FriendPlayerService.class, view.getContext())) {
+                        posizione = holder.getAdapterPosition();
                         holder.mMute.setImageResource(R.drawable.ic_volume);
                         checked = 1;
                         //avviare musica
@@ -81,12 +83,14 @@ public class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.Fr
                     }
                 } else {
                     if (isMyServiceRunning(FriendPlayerService.class, view.getContext()) || SongActivity.mPlayer == null) {
-                        checked = 0;
-                        holder.mMute.setImageResource(R.drawable.ic_mute);
-                        //fermare musica
-                        view.getContext().stopService(intent);
-                    } else {
-                        Toast.makeText(view.getContext(), "Musica già in riproduzione!", Toast.LENGTH_SHORT).show();
+                        if(holder.getAdapterPosition() == posizione) {
+                            checked = 0;
+                            holder.mMute.setImageResource(R.drawable.ic_mute);
+                            //fermare musica
+                            view.getContext().stopService(intent);
+                        }else{
+                            Toast.makeText(view.getContext(),"Musica già in riproduzione",Toast.LENGTH_SHORT).show();
+                        }
                     }
                 }
             }
