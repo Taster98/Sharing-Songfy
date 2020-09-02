@@ -84,7 +84,7 @@ public class FriendPlayerService extends Service {
                     try {
                         if (isSharing != null && isSharing) {
                             if (!prevSong.equals(urlMusic)) {
-                                if(mediaPlayer == null){
+                                if (mediaPlayer == null) {
                                     mediaPlayer = new MediaPlayer();
                                 }
                                 mediaPlayer.reset();
@@ -142,6 +142,7 @@ public class FriendPlayerService extends Service {
         mediaPlayer.stop();
         mediaPlayer.release();
     }
+
     private void createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel serviceChannel = new NotificationChannel(

@@ -33,7 +33,8 @@
 
         <activity
             android:name="ml.luiggi.sharingsongfy.LoginActivity"
-            android:theme="@style/Platform.MaterialComponents.Light">
+            android:theme="@style/Platform.MaterialComponents.Light"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -42,7 +43,8 @@
         </activity>
         <activity
             android:name="ml.luiggi.sharingsongfy.MainPageActivity"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:theme="@style/AppTheme.NoActionBar"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="ml.luiggi.geosongfy.action.PAUSE" />
                 <action android:name="ml.luiggi.geosongfy.action.PLAY" />
@@ -53,10 +55,12 @@
         </activity>
         <activity
             android:name="ml.luiggi.sharingsongfy.SongActivity"
-            android:theme="@style/Platform.MaterialComponents.Light" />
+            android:theme="@style/Platform.MaterialComponents.Light"
+            android:screenOrientation="portrait"/>
         <activity
             android:name="ml.luiggi.sharingsongfy.PlaylistActivity"
-            android:theme="@style/Platform.MaterialComponents.Light" />
+            android:theme="@style/Platform.MaterialComponents.Light"
+            android:screenOrientation="portrait"/>
         <activity
             android:name="ml.luiggi.sharingsongfy.GestureTestsActivity"
             android:theme="@style/Platform.MaterialComponents.Light" />
