@@ -265,6 +265,7 @@ public class SongActivity extends AppCompatActivity implements Playable, View.On
         //Gestisco lo spostamento manuale della SeekBar:
         seekBarHandler();
         //INIZIO GESTIONE CONTROLLI
+        playPauseHandler();
         //Ascolto continuo musica
         continueMusic();
 
@@ -329,7 +330,9 @@ public class SongActivity extends AppCompatActivity implements Playable, View.On
         return true;
     }
 
-
+    private void playPauseHandler() {
+        onTrackPlay();
+    }
     boolean isPlaying = false;
     //Creo un nuovo broadcast receiver per gestire le azioni ricevute dalla notifica
     public BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
@@ -607,7 +610,6 @@ public class SongActivity extends AppCompatActivity implements Playable, View.On
                             public void run() {
                                 try {
                                     volumeBar.setVisibility(View.VISIBLE);
-                                    Toast.makeText(getApplicationContext(), "Volume alzato", Toast.LENGTH_SHORT).show();
                                     Thread.sleep(500);
                                     volumeBar.setVisibility(View.INVISIBLE);
                                 } catch (Exception e) {
@@ -641,8 +643,12 @@ public class SongActivity extends AppCompatActivity implements Playable, View.On
                 if (motionEvent.getPointerCount() > 1) {
                     endFingerY1 = motionEvent.getY(0);
                     endFingerY2 = motionEvent.getY(1);
+                    volumeBar.setVisibility(View.INVISIBLE);
+
                     if (endFingerY1 - startFingerY1 >= SOGLIA_MIN_DUE_DITA && endFingerY2 - startFingerY2 >= SOGLIA_MIN_DUE_DITA) {
                         //GESTIONE PLAY E PAUSE
+                        volumeBar.setVisibility(View.INVISIBLE);
+
                         //Pause:
                         if (mPlayer.isPlaying()) {
                             Toast.makeText(getApplicationContext(), "Pausa", Toast.LENGTH_SHORT).show();
@@ -658,7 +664,9 @@ public class SongActivity extends AppCompatActivity implements Playable, View.On
                             dbUsers.child("feats").setValue(mSong.getFeats());
                             dbUsers.child("title").setValue(mSong.getTitle());
                             dbUsers.child("position").setValue(progresso);
+                            volumeBar.setVisibility(View.INVISIBLE);
                         } else {
+                            volumeBar.setVisibility(View.INVISIBLE);
                             Toast.makeText(getApplicationContext(), "  Play", Toast.LENGTH_SHORT).show();
                             //vibra per 200 millisecondi
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
