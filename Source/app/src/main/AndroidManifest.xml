@@ -66,8 +66,6 @@
             android:theme="@style/Platform.MaterialComponents.Light" />
 
         <receiver android:name="ml.luiggi.sharingsongfy.services.NotificationActionService" />
-
-        <service android:name="ml.luiggi.sharingsongfy.services.OnClearFromRecentService" />
     </application>
 
 </manifest>

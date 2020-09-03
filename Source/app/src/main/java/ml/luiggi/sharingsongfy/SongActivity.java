@@ -39,7 +39,6 @@ import java.util.ArrayList;
 import ml.luiggi.sharingsongfy.scaffoldings.Playable;
 import ml.luiggi.sharingsongfy.scaffoldings.Song;
 import ml.luiggi.sharingsongfy.services.FriendPlayerService;
-import ml.luiggi.sharingsongfy.services.OnClearFromRecentService;
 import ml.luiggi.sharingsongfy.utils.CreateNotification;
 
 public class SongActivity extends AppCompatActivity implements Playable, View.OnTouchListener {
@@ -91,7 +90,6 @@ public class SongActivity extends AppCompatActivity implements Playable, View.On
             createChannel();
             //registro il receiver per la notifica
             registerReceiver(broadcastReceiver, new IntentFilter("ALL_SONGS"));
-            startService(new Intent(getBaseContext(), OnClearFromRecentService.class));
         }
         //creo la notifica
         CreateNotification.createNotification(SongActivity.this, mSong, R.drawable.ic_pause);
