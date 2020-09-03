@@ -50,8 +50,9 @@ Su Sharing SongFy è inoltre possibile condividere la musica che si sta ascoltan
 
 Premendo su un contatto, partirà un servizio in background che permette la riproduzione in tempo reale di ciò che l'amico sta ascoltando. In basso inoltre, apparirà una notifica contenente le informazioni sul brano. Per rivedere queste informazioni, basterà tener premuto sul contatto in questione. Per fermare la canzone, occorre invece ripremere sul nome dell'amico di cui si stava ascoltando, oppure, se non si è sull'app, è sufficiente premere sull'icona che appare nella barra delle notifiche. Per condividere invece ciò che si sta ascoltando con gli altri, è sufficiente premere sul pulsante "Condividi Musica" in basso.
 
-## Specifiche tecniche
+## Overview Struttura
 
+<img src="img/struct.png" width="100%" alt="Screenshots of App #2">
 
 
 

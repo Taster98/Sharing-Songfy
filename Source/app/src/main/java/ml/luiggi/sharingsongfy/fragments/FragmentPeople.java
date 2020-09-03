@@ -44,7 +44,7 @@ import ml.luiggi.sharingsongfy.services.FriendPlayerService;
 import ml.luiggi.sharingsongfy.utils.FriendListAdapter;
 import ml.luiggi.sharingsongfy.utils.Iso2Phone;
 
-public class FragmentPeople extends Fragment {
+public class    FragmentPeople extends Fragment {
 
     private RecyclerView.Adapter mAdapter;
     public Button btn;
