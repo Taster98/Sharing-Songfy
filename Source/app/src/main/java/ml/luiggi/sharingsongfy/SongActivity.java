@@ -381,6 +381,7 @@ public class SongActivity extends AppCompatActivity implements Playable, View.On
         dbUsers.child("title").setValue(mSong.getTitle());
         progresso = mPlayer.getCurrentPosition();
         dbUsers.child("position").setValue(progresso);
+        volumeBar.setVisibility(View.INVISIBLE);
     }
 
     //Funzione per andare indietro senza decrementare la posizione (PER NOTIFICA)
@@ -399,6 +400,7 @@ public class SongActivity extends AppCompatActivity implements Playable, View.On
         initializeMediaPlayer();
         handleMusic();
         mPlayer.start();
+        volumeBar.setVisibility(View.INVISIBLE);
     }
 
     //Funzione per andare avanti senza incrementare la posizione (PER NOTIFICA)
@@ -417,6 +419,7 @@ public class SongActivity extends AppCompatActivity implements Playable, View.On
         initializeMediaPlayer();
         handleMusic();
         mPlayer.start();
+        volumeBar.setVisibility(View.INVISIBLE);
     }
 
     @Override
@@ -436,6 +439,7 @@ public class SongActivity extends AppCompatActivity implements Playable, View.On
         dbUsers.child("title").setValue(mSong.getTitle());
         progresso = mPlayer.getCurrentPosition();
         dbUsers.child("position").setValue(progresso);
+        volumeBar.setVisibility(View.INVISIBLE);
     }
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
@@ -463,6 +467,7 @@ public class SongActivity extends AppCompatActivity implements Playable, View.On
         dbUsers.child("title").setValue(mSong.getTitle());
         progresso = mPlayer.getCurrentPosition();
         dbUsers.child("position").setValue(progresso);
+        volumeBar.setVisibility(View.INVISIBLE);
     }
 
     @Override
@@ -478,6 +483,7 @@ public class SongActivity extends AppCompatActivity implements Playable, View.On
         isPlaying = false;
         progresso = mPlayer.getCurrentPosition();
         dbUsers.child("position").setValue(progresso);
+        volumeBar.setVisibility(View.INVISIBLE);
     }
 
     /*LISTENER E ALTRE FUNZIONI PER LE GESTURES CUSTOMIZZATE*/
@@ -545,12 +551,14 @@ public class SongActivity extends AppCompatActivity implements Playable, View.On
                     }
                     if (medium) {
                         if (finaleDes) {
+                            //NEXT
                             //vibra per 200 millisecondi
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                                 vib.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
                             } else {
                                 vib.vibrate(200);
                             }
+                            volumeBar.setVisibility(View.INVISIBLE);
                             actualPos++;
                             if (actualPos >= songList.size()) {
                                 actualPos = 0;
@@ -568,12 +576,14 @@ public class SongActivity extends AppCompatActivity implements Playable, View.On
                             dbUsers.child("position").setValue(progresso);
                             initializeMusicUI();
                         } else if (finaleSin) {
+                            //PREC
                             //vibra per 200 millisecondi
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                                 vib.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
                             } else {
                                 vib.vibrate(200);
                             }
+                            volumeBar.setVisibility(View.INVISIBLE);
                             actualPos--;
                             if (actualPos == -1) {
                                 actualPos = songList.size() - 1;
