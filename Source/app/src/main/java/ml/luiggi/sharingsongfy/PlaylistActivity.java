@@ -116,7 +116,7 @@ public class PlaylistActivity extends AppCompatActivity {
         final AlertDialog.Builder builder = new AlertDialog.Builder(this);
         LayoutInflater inflater = getLayoutInflater();
         View view = inflater.inflate(R.layout.scegli_canzoni, null);
-        RecyclerView list = view.findViewById(R.id.song_list_dialog);
+        RecyclerView list = (RecyclerView)view.findViewById(R.id.song_list_dialog);
         list.setLayoutManager(new LinearLayoutManager(this));
         list.setHasFixedSize(true);
         final DialogListAdapter adapter = new DialogListAdapter(allSongs);

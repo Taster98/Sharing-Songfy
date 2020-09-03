@@ -57,7 +57,7 @@ public class LoginActivity extends AppCompatActivity {
     private void initView() {
         //Imposto il layout principale
         setContentView(R.layout.login_layout);
-        mSend = findViewById(R.id.send);
+        mSend = (Button)findViewById(R.id.send);
         //Se l'utente è già ammesso non riandrà in questa activity
         userAllowed();
         //riferimenti per il layout
@@ -110,9 +110,9 @@ public class LoginActivity extends AppCompatActivity {
     //Funzione che crea i riferimenti con gli elementi del Layout
     private void getRefs() {
         //riferisco gli elementi del layout
-        mPrefix = findViewById(R.id.prefix);
-        mPhoneNumber = findViewById(R.id.phoneNumber);
-        mCode = findViewById(R.id.code);
+        mPrefix = (EditText)findViewById(R.id.prefix);
+        mPhoneNumber = (EditText)findViewById(R.id.phoneNumber);
+        mCode = (EditText)findViewById(R.id.code);
     }
 
     @Override

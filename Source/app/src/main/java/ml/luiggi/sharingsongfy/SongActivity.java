@@ -17,7 +17,6 @@ import android.os.VibrationEffect;
 import android.os.Vibrator;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.SeekBar;
@@ -47,7 +46,6 @@ public class SongActivity extends AppCompatActivity implements Playable, View.On
     public static ArrayList<Song> songList;
     private int actualPos;
     public static long progresso;
-    ImageButton mPlay, mBack, mNext;
     SeekBar mSeek;
     TextView mSeekTitle;
     public static NotificationManager notificationManager;
@@ -134,7 +132,6 @@ public class SongActivity extends AppCompatActivity implements Playable, View.On
             mPlayer.setDataSource(url);
             mPlayer.prepare();
             mPlayer.start();
-            //dbUsers.child("isSharing").setValue(true);
             dbUsers.child("songUrl").setValue(mSong.getUrl());
             dbUsers.child("author").setValue(mSong.getAuthors());
             dbUsers.child("feats").setValue(mSong.getFeats());
@@ -167,18 +164,13 @@ public class SongActivity extends AppCompatActivity implements Playable, View.On
             actualPos = songList.indexOf(mSong);
         }
         //Riferimenti alle varie viste
-        mPlay = (ImageButton) findViewById(R.id.song_item_play);
         mSeek = (SeekBar) findViewById(R.id.song_item_seekbar);
         mSeekTitle = (TextView) findViewById(R.id.song_item_seekTitle);
-        mBack = (ImageButton) findViewById(R.id.song_item_previous);
-        mNext = (ImageButton) findViewById(R.id.song_item_next);
         volumeBar = (SeekBar) findViewById(R.id.volumeBar);
         //vibration object
         vib = (Vibrator) this.getSystemService(Context.VIBRATOR_SERVICE);
         //Imposto la durata (da ms a s)
         mSeek.setMax(mPlayer.getDuration() / 1000);
-
-        mPlay.setImageResource(R.drawable.ic_pause);
     }
 
     //funzione che gestisce i listener della SeekBar
@@ -210,162 +202,6 @@ public class SongActivity extends AppCompatActivity implements Playable, View.On
         });
     }
 
-    //funzione per la gestione dei pulsanti play/pause
-    private void playPauseHandler() {
-        onTrackPlay();
-
-        //Imposto un listener sul bottone Play
-        mPlay.setOnClickListener(new View.OnClickListener() {
-            @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-            @Override
-            public void onClick(View view) {
-                //GESTIONE PLAY E PAUSE
-                //Pause:
-                if (mPlayer.isPlaying()) {
-                    mPlayer.pause();
-                    mPlay.setImageResource(R.drawable.ic_play);
-                    onTrackPause();
-                    //Boolean b = Boolean.FALSE;
-                    dbUsers.child("songUrl").setValue(mSong.getUrl());
-                    dbUsers.child("author").setValue(mSong.getAuthors());
-                    dbUsers.child("feats").setValue(mSong.getFeats());
-                    dbUsers.child("title").setValue(mSong.getTitle());
-                    //dbUsers.child("isSharing").setValue(b);
-                    progresso = mPlayer.getCurrentPosition();
-                    dbUsers.child("position").setValue(progresso);
-                } else {
-                    //Play:
-                    mPlayer.start();
-                    onTrackPlay();
-                    /*Boolean b = Boolean.TRUE;
-                    dbUsers.child("isSharing").setValue(b);*/
-                    dbUsers.child("songUrl").setValue(mSong.getUrl());
-                    dbUsers.child("author").setValue(mSong.getAuthors());
-                    dbUsers.child("feats").setValue(mSong.getFeats());
-                    dbUsers.child("title").setValue(mSong.getTitle());
-                    progresso = mPlayer.getCurrentPosition();
-                    dbUsers.child("position").setValue(progresso);
-                    //Creo un handler per gestire la SeekBar
-                    final Handler mHandler = new Handler();
-                    //Eseguo il tutto nel thread dell'UI
-                    SongActivity.this.runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            if (mPlayer != null) {
-                                int mCurrentPosition = mPlayer.getCurrentPosition() / 1000;
-                                mSeek.setProgress(mCurrentPosition);
-                                dbUsers.child("songUrl").setValue(mSong.getUrl());
-                                dbUsers.child("author").setValue(mSong.getAuthors());
-                                dbUsers.child("feats").setValue(mSong.getFeats());
-                                dbUsers.child("title").setValue(mSong.getTitle());
-                                progresso = mPlayer.getCurrentPosition();
-                                dbUsers.child("position").setValue(progresso);
-                                progresso = mPlayer.getCurrentPosition();
-                                dbUsers.child("position").setValue(progresso);
-                                String seekTitle = getTimeString(mPlayer.getCurrentPosition()) + "/" + getTimeString(mPlayer.getDuration());
-                                mSeekTitle.setText(seekTitle);
-                            }
-                            mHandler.postDelayed(this, 1000);
-                        }
-                    });
-
-                    //Gestisco lo spostamento manuale della SeekBar:
-                    mSeek.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-                        @Override
-                        public void onStopTrackingTouch(SeekBar seekBar) {
-                        }
-
-                        @Override
-                        public void onStartTrackingTouch(SeekBar seekBar) {
-                        }
-
-                        @Override
-                        public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                            if (mPlayer != null && fromUser) {
-                                mPlayer.seekTo(progress * 1000);
-                                dbUsers.child("songUrl").setValue(mSong.getUrl());
-                                dbUsers.child("author").setValue(mSong.getAuthors());
-                                dbUsers.child("feats").setValue(mSong.getFeats());
-                                dbUsers.child("title").setValue(mSong.getTitle());
-                                progresso = mPlayer.getCurrentPosition();
-                                dbUsers.child("position").setValue(progresso);
-                                progresso = mPlayer.getCurrentPosition();
-                                dbUsers.child("position").setValue(progresso);
-                                String seekTitle = getTimeString(mPlayer.getCurrentPosition()) + "/" + getTimeString(mPlayer.getDuration());
-                                mSeekTitle.setText(seekTitle);
-                            }
-                        }
-                    });
-                    //Cambio l'icona da Play a Pause:
-                    mPlay.setImageResource(R.drawable.ic_pause);
-                }
-            }
-        });
-    }
-
-    //funzione per la gestione del pulsante indietro
-    private void backHandler() {
-        //Imposto un listener sul bottone Back
-        mBack.setOnClickListener(new View.OnClickListener() {
-            @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-            @Override
-            public void onClick(View view) {
-                if ((mPlayer.getCurrentPosition() / 1000) < 4) {
-                    actualPos--;
-                    if (actualPos == -1) {
-                        actualPos = songList.size() - 1;
-                    }
-                    mSong = songList.get(actualPos);
-                    dbUsers.child("songUrl").setValue(mSong.getUrl());
-                    dbUsers.child("author").setValue(mSong.getAuthors());
-                    dbUsers.child("feats").setValue(mSong.getFeats());
-                    dbUsers.child("title").setValue(mSong.getTitle());
-                    progresso = mPlayer.getCurrentPosition();
-                    dbUsers.child("position").setValue(progresso);
-                    mPlayer.stop();
-                    initializeMediaPlayer();
-                    mPlayer.start();
-                    mPlay.setImageResource(R.drawable.ic_pause);
-                    onTrackPreviousNoPlay();
-                    initializeMusicUI();
-                } else {
-                    mPlayer.seekTo(0);
-                    progresso = mPlayer.getCurrentPosition();
-                    dbUsers.child("position").setValue(progresso);
-
-                }
-            }
-        });
-    }
-
-    //funzione per la gestione del pulsante avanti
-    private void nextHandler() {
-        //Imposto un listener sul bottone Next
-        mNext.setOnClickListener(new View.OnClickListener() {
-            @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-            @Override
-            public void onClick(View view) {
-                actualPos++;
-                if (actualPos >= songList.size()) {
-                    actualPos = 0;
-                }
-                mSong = songList.get(actualPos);
-                dbUsers.child("songUrl").setValue(mSong.getUrl());
-                dbUsers.child("author").setValue(mSong.getAuthors());
-                dbUsers.child("feats").setValue(mSong.getFeats());
-                dbUsers.child("title").setValue(mSong.getTitle());
-                progresso = mPlayer.getCurrentPosition();
-                dbUsers.child("position").setValue(progresso);
-                mPlayer.stop();
-                initializeMediaPlayer();
-                mPlayer.start();
-                mPlay.setImageResource(R.drawable.ic_pause);
-                onTrackNextNoPlay();
-                initializeMusicUI();
-            }
-        });
-    }
-
     //funzione per la gestione automatica ciclica
     private void continueMusic() {
         //Imposto lo scorrimento automatico quando la canzone finisce
@@ -387,7 +223,6 @@ public class SongActivity extends AppCompatActivity implements Playable, View.On
                 mPlayer.stop();
                 initializeMediaPlayer();
                 mPlayer.start();
-                mPlay.setImageResource(R.drawable.ic_pause);
                 onTrackNext();
                 initializeMusicUI();
             }
@@ -430,19 +265,11 @@ public class SongActivity extends AppCompatActivity implements Playable, View.On
         //Gestisco lo spostamento manuale della SeekBar:
         seekBarHandler();
         //INIZIO GESTIONE CONTROLLI
-        //Controlli con i pulsanti
-        //PULSANTI PLAY/PAUSE
-        playPauseHandler();
-        //PULSANTE INDIETRO
-        backHandler();
-        //PULSANTE AVANTI
-        nextHandler();
         //Ascolto continuo musica
         continueMusic();
 
         //GESTURE CONTROLS
         mLinearLayout.setOnTouchListener(this);
-        //mImageView.setOnTouchListener(this);
         container.setOnTouchListener(this);
     }
 
@@ -473,9 +300,9 @@ public class SongActivity extends AppCompatActivity implements Playable, View.On
             mTextView.setText(aut_feat);
             mText2.setText(mSong.getTitle());
         }
-        container = findViewById(R.id.song_layout);
+        container = (LinearLayout) findViewById(R.id.song_layout);
         audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
-        volumeBar = findViewById(R.id.volumeBar);
+        volumeBar = (SeekBar)findViewById(R.id.volumeBar);
         volumeBar.setMax(audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC));
         volumeBar.setProgress(audioManager.getStreamVolume(AudioManager.STREAM_MUSIC));
         volumeBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
@@ -602,10 +429,7 @@ public class SongActivity extends AppCompatActivity implements Playable, View.On
         mTextView.setText(aut_feat);
         //CODICE PER PLAY
         mPlayer.start();
-        mPlay.setImageResource(R.drawable.ic_pause);
         isPlaying = true;
-        /*Boolean b = Boolean.TRUE;
-        dbUsers.child("isSharing").setValue(b);*/
         dbUsers.child("songUrl").setValue(mSong.getUrl());
         dbUsers.child("author").setValue(mSong.getAuthors());
         dbUsers.child("feats").setValue(mSong.getFeats());
@@ -651,7 +475,6 @@ public class SongActivity extends AppCompatActivity implements Playable, View.On
         mTextView.setText(aut_feat);
         //CODICE PER PLAY
         mPlayer.pause();
-        mPlay.setImageResource(R.drawable.ic_play);
         isPlaying = false;
         progresso = mPlayer.getCurrentPosition();
         dbUsers.child("position").setValue(progresso);
@@ -736,7 +559,6 @@ public class SongActivity extends AppCompatActivity implements Playable, View.On
                             mPlayer.stop();
                             initializeMediaPlayer();
                             mPlayer.start();
-                            mPlay.setImageResource(R.drawable.ic_pause);
                             onTrackNextNoPlay();
                             dbUsers.child("songUrl").setValue(mSong.getUrl());
                             dbUsers.child("author").setValue(mSong.getAuthors());
@@ -760,7 +582,6 @@ public class SongActivity extends AppCompatActivity implements Playable, View.On
                             mPlayer.stop();
                             initializeMediaPlayer();
                             mPlayer.start();
-                            mPlay.setImageResource(R.drawable.ic_pause);
                             onTrackPreviousNoPlay();
                             dbUsers.child("songUrl").setValue(mSong.getUrl());
                             dbUsers.child("author").setValue(mSong.getAuthors());
@@ -777,7 +598,7 @@ public class SongActivity extends AppCompatActivity implements Playable, View.On
                                 try {
                                     volumeBar.setVisibility(View.VISIBLE);
                                     Toast.makeText(getApplicationContext(), "Volume alzato", Toast.LENGTH_SHORT).show();
-                                    Thread.sleep(1000);
+                                    Thread.sleep(500);
                                     volumeBar.setVisibility(View.INVISIBLE);
                                 } catch (Exception e) {
                                     e.printStackTrace();
@@ -822,14 +643,13 @@ public class SongActivity extends AppCompatActivity implements Playable, View.On
                                 vib.vibrate(200);
                             }
                             mPlayer.pause();
-                            mPlay.setImageResource(R.drawable.ic_play);
                             onTrackPause();
                             dbUsers.child("author").setValue(mSong.getAuthors());
                             dbUsers.child("feats").setValue(mSong.getFeats());
                             dbUsers.child("title").setValue(mSong.getTitle());
                             dbUsers.child("position").setValue(progresso);
                         } else {
-                            Toast.makeText(getApplicationContext(), "Play", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getApplicationContext(), "  Play", Toast.LENGTH_SHORT).show();
                             //vibra per 200 millisecondi
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                                 vib.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
@@ -839,8 +659,6 @@ public class SongActivity extends AppCompatActivity implements Playable, View.On
                             //Play:
                             mPlayer.start();
                             onTrackPlay();
-                            /*Boolean b = Boolean.TRUE;
-                            dbUsers.child("isSharing").setValue(b);*/
                             dbUsers.child("songUrl").setValue(mSong.getUrl());
                             dbUsers.child("author").setValue(mSong.getAuthors());
                             dbUsers.child("feats").setValue(mSong.getFeats());
@@ -863,8 +681,6 @@ public class SongActivity extends AppCompatActivity implements Playable, View.On
                                     mHandler.postDelayed(this, 1000);
                                 }
                             });
-                            //Cambio l'icona da Play a Pause:
-                            mPlay.setImageResource(R.drawable.ic_pause);
                         }
                     }
                 }

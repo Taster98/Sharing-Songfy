@@ -96,11 +96,11 @@ public class DialogListAdapter extends RecyclerView.Adapter<DialogListAdapter.Di
 
         public DialogListViewHolder(View view) {
             super(view);
-            mTitle = view.findViewById(R.id.titolo_canzone_dialog);
-            mAuthors = view.findViewById(R.id.autore_canzone_dialog);
-            mLayout = view.findViewById(R.id.item_songs_id_dialog);
-            mCover = view.findViewById(R.id.cover_image_dialog);
-            mCheckBox = view.findViewById(R.id.checkbox_dialog);
+            mTitle = (TextView)view.findViewById(R.id.titolo_canzone_dialog);
+            mAuthors = (TextView)view.findViewById(R.id.autore_canzone_dialog);
+            mLayout = (LinearLayout)view.findViewById(R.id.item_songs_id_dialog);
+            mCover = (ImageView)view.findViewById(R.id.cover_image_dialog);
+            mCheckBox = (CheckBox)view.findViewById(R.id.checkbox_dialog);
             if (mCheckBox != null)
                 mCheckBox.setClickable(false);
         }

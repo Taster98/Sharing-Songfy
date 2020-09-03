@@ -68,7 +68,7 @@ public class PlaylistFragment extends Fragment {
         //inizializzo le canzoni
         initSongs();
         //imposto un listener al bottone per creare una playlist (mostro un dialog):
-        btn = bkpView.findViewById(R.id.crea_playlist);
+        btn = (Button)bkpView.findViewById(R.id.crea_playlist);
         btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(final View view) {
@@ -80,7 +80,7 @@ public class PlaylistFragment extends Fragment {
                         .setPositiveButton(R.string.crea, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
-                                editText = view1.findViewById(R.id.nuovo_nome_playlist);
+                                editText = (EditText)view1.findViewById(R.id.nuovo_nome_playlist);
                                 if (editText.getText().toString().equals(""))
                                     Toast.makeText(getContext(), "Devi inserire un nome valido per la Playlist!", Toast.LENGTH_SHORT).show();
                                 else {
@@ -105,7 +105,7 @@ public class PlaylistFragment extends Fragment {
         final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         LayoutInflater inflater = getLayoutInflater();
         View view = inflater.inflate(R.layout.scegli_canzoni, null);
-        RecyclerView list = view.findViewById(R.id.song_list_dialog);
+        RecyclerView list = (RecyclerView)view.findViewById(R.id.song_list_dialog);
         list.setLayoutManager(new LinearLayoutManager(bkpView.getContext()));
         list.setHasFixedSize(true);
         final DialogListAdapter adapter = new DialogListAdapter(songList);
@@ -144,7 +144,7 @@ public class PlaylistFragment extends Fragment {
             //Per poter fare in modo che tutto il fragment si aggiorni senza "rompere" il bottomNavMenu,
             //mi ci creo un riferimento e controllo anche quello (per lo stato di active/unactive di ciascun
             //fragment relativo al suo menù)
-            BottomNavigationView navigationView = getActivity().findViewById(R.id.bottom_navigation);
+            BottomNavigationView navigationView = (BottomNavigationView)getActivity().findViewById(R.id.bottom_navigation);
             Menu menu = navigationView.getMenu();
             MenuItem menuItem = menu.findItem(R.id.fragment_tue_playlist);
             //uso i metodi implementati nel mainpageactivity
@@ -191,7 +191,7 @@ public class PlaylistFragment extends Fragment {
 
     @SuppressLint("ClickableViewAccessibility")
     private void initGestures() {
-        recyclerView = bkpView.findViewById(R.id.playlistList);
+        recyclerView = (RecyclerView)bkpView.findViewById(R.id.playlistList);
         recyclerView.setOnTouchListener(new OnSwipeTouchListener(bkpView.getContext()) {
             @Override
             public void onSwipeLeft() {
@@ -212,7 +212,7 @@ public class PlaylistFragment extends Fragment {
     public boolean loadFragment(int i) {
         if (getActivity() == null)
             return true;
-        BottomNavigationView navigationView = getActivity().findViewById(R.id.bottom_navigation);
+        BottomNavigationView navigationView = (BottomNavigationView)getActivity().findViewById(R.id.bottom_navigation);
         Menu menu = navigationView.getMenu();
         MenuItem menuItem;
         if (i == 1) {

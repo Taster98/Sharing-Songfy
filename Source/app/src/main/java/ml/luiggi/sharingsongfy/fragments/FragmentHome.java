@@ -112,7 +112,7 @@ public class FragmentHome extends Fragment {
 
     @SuppressLint("ClickableViewAccessibility")
     private void initGestures() {
-        recyclerView = bkView.findViewById(R.id.songList);
+        recyclerView = (RecyclerView) bkView.findViewById(R.id.songList);
         recyclerView.setOnTouchListener(new OnSwipeTouchListener(bkView.getContext()) {
             @Override
             public void onSwipeLeft() {
@@ -139,7 +139,7 @@ public class FragmentHome extends Fragment {
     public boolean loadFragment() {
         if (getActivity() == null)
             return true;
-        BottomNavigationView navigationView = getActivity().findViewById(R.id.bottom_navigation);
+        BottomNavigationView navigationView = (BottomNavigationView) getActivity().findViewById(R.id.bottom_navigation);
         Menu menu = navigationView.getMenu();
         MenuItem menuItem = menu.findItem(R.id.fragment_tue_playlist);
         ((MainPageActivity) getActivity()).changeFocus(R.id.fragment_tue_playlist);

@@ -120,7 +120,7 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.PlayLi
                 .setPositiveButton(R.string.rinomina, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        EditText editText = view.findViewById(R.id.nuovo_nome_playlist);
+                        EditText editText = (EditText)view.findViewById(R.id.nuovo_nome_playlist);
                         if (editText.getText().toString().equals(""))
                             Toast.makeText(v.getRootView().getContext(), "Devi inserire un nome valido per la Playlist!", Toast.LENGTH_SHORT).show();
                         else {
@@ -155,8 +155,8 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.PlayLi
 
         public PlayListViewHolder(View view) {
             super(view);
-            mName = view.findViewById(R.id.titolo_playlist);
-            mLayout = view.findViewById(R.id.item_playlist);
+            mName = (TextView)view.findViewById(R.id.titolo_playlist);
+            mLayout = (LinearLayout)view.findViewById(R.id.item_playlist);
         }
     }
 

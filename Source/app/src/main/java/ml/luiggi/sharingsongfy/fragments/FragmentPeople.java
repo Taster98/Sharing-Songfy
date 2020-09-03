@@ -102,7 +102,7 @@ public class FragmentPeople extends Fragment {
             mAdapter = new FriendListAdapter(songListFriends);
         recyclerView.setAdapter(mAdapter);
         //riferisco ora il bottone per condividere la musica
-        btn = bkpView.findViewById(R.id.crea_podcast);
+        btn = (Button)bkpView.findViewById(R.id.crea_podcast);
         //controllo in che stato è il tasto condivisione, e a seconda di ciò ne cambio il test
         if (condividi == 0) {
             btn.setText(R.string.condividi_musica);
@@ -110,7 +110,7 @@ public class FragmentPeople extends Fragment {
             btn.setText(R.string.ferma_condivisione);
         }
         //riferisco ora lo swiper per aggiornare la lista di amici che condividono
-        mSwiper = bkpView.findViewById(R.id.swipeContainer);
+        mSwiper = (SwipeRefreshLayout)bkpView.findViewById(R.id.swipeContainer);
         //e inizializzo il listener
         mSwiper.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
@@ -167,7 +167,7 @@ public class FragmentPeople extends Fragment {
             //Per poter fare in modo che tutto il fragment si aggiorni senza "rompere" il bottomNavMenu,
             //mi ci creo un riferimento e controllo anche quello (per lo stato di active/unactive di ciascun
             //fragment relativo al suo menù)
-            BottomNavigationView navigationView = getActivity().findViewById(R.id.bottom_navigation);
+            BottomNavigationView navigationView = (BottomNavigationView)getActivity().findViewById(R.id.bottom_navigation);
             Menu menu = navigationView.getMenu();
             MenuItem menuItem = menu.findItem(R.id.fragment_people);
             //uso i metodi implementati nel mainpageactivity
@@ -200,7 +200,7 @@ public class FragmentPeople extends Fragment {
         if (getActivity() == null)
             return true;
         //altrimenti, come sopra, carico il fragment precedente (quello delle playlist)
-        BottomNavigationView navigationView = getActivity().findViewById(R.id.bottom_navigation);
+        BottomNavigationView navigationView = (BottomNavigationView)getActivity().findViewById(R.id.bottom_navigation);
         Menu menu = navigationView.getMenu();
         MenuItem menuItem = menu.findItem(R.id.fragment_tue_playlist);
         ((MainPageActivity) getActivity()).changeFocus(R.id.fragment_tue_playlist);

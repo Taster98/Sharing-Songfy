@@ -171,11 +171,11 @@ public class SongListAdapter extends RecyclerView.Adapter<SongListAdapter.SongLi
 
         public SongListViewHolder(View view) {
             super(view);
-            mTitle = view.findViewById(R.id.titolo_canzone);
-            mAuthors = view.findViewById(R.id.autore_canzone);
-            mLayout = view.findViewById(R.id.item_songs_id);
-            mCover = view.findViewById(R.id.cover_image);
-            mPlay = view.findViewById(R.id.play_right_icon);
+            mTitle = (TextView)view.findViewById(R.id.titolo_canzone);
+            mAuthors = (TextView)view.findViewById(R.id.autore_canzone);
+            mLayout = (LinearLayout)view.findViewById(R.id.item_songs_id);
+            mCover = (ImageView)view.findViewById(R.id.cover_image);
+            mPlay = (ImageView)view.findViewById(R.id.play_right_icon);
         }
     }
 

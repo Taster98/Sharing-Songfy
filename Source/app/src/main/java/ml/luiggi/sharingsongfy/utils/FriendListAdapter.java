@@ -131,11 +131,11 @@ public class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.Fr
 
         public FriendListViewHolder(View view) {
             super(view);
-            mName = view.findViewById(R.id.nome_friend);
-            mNumber = view.findViewById(R.id.numero_friend);
-            mLayout = view.findViewById(R.id.linear_item_id);
-            mMute = view.findViewById(R.id.friend_mute_id);
-            mRelativeLayout = view.findViewById(R.id.friend_item_id);
+            mName = (TextView)view.findViewById(R.id.nome_friend);
+            mNumber = (TextView)view.findViewById(R.id.numero_friend);
+            mLayout = (LinearLayout)view.findViewById(R.id.linear_item_id);
+            mMute = (ImageView)view.findViewById(R.id.friend_mute_id);
+            mRelativeLayout = (RelativeLayout)view.findViewById(R.id.friend_item_id);
         }
 
     }
