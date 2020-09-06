@@ -70,8 +70,14 @@ public class PlaylistActivity extends AppCompatActivity {
 
     //Funzione che carica tutte le canzoni
     private void initSongs() {
-
-        Playlist curPlaylist = (Playlist) getIntent().getSerializableExtra("playlistSelected");
+        //INIZIO TEST
+        String playlistSelectedJson = getIntent().getExtras().getString("playlistSelected");
+        Gson gson = new Gson();
+        Type type = new TypeToken<Playlist>() {
+        }.getType();
+        Playlist curPlaylist = gson.fromJson(playlistSelectedJson,type);
+        //FINE TEST
+        //Playlist curPlaylist = (Playlist) getIntent().getSerializableExtra("playlistSelected");
         Playlist realCur = newPlaylists.get(newPlaylists.indexOf(curPlaylist));
         songList = (ArrayList<Song>) realCur.getSongList();
         initAllSongs();
@@ -130,7 +136,14 @@ public class PlaylistActivity extends AppCompatActivity {
         list.setHasFixedSize(true);
         final DialogListAdapter adapter = new DialogListAdapter(allSongs);
         list.setAdapter(adapter);
-        final Playlist curPlaylist = (Playlist) getIntent().getSerializableExtra("playlistSelected");
+        //INIZIO TEST
+        String playlistSelectedJson = getIntent().getExtras().getString("playlistSelected");
+        Gson gson = new Gson();
+        Type type = new TypeToken<Playlist>() {
+        }.getType();
+        final Playlist curPlaylist = gson.fromJson(playlistSelectedJson,type);
+        //FINE TEST
+        //final Playlist curPlaylist = (Playlist) getIntent().getSerializableExtra("playlistSelected");
         final ArrayList<Song> actualSongs = (ArrayList<Song>) curPlaylist.getSongList();
         builder.setView(view)
                 .setPositiveButton(R.string.aggiungi, new DialogInterface.OnClickListener() {

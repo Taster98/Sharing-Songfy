@@ -7,10 +7,13 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Build;
+import android.os.Bundle;
 import android.support.v4.media.session.MediaSessionCompat;
 
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
+
+import com.google.gson.Gson;
 
 import java.io.InputStream;
 import java.net.HttpURLConnection;
@@ -62,8 +65,18 @@ public class CreateNotification {
             //Mi serve per mantenere lo stato della canzone senza far riavviare l'activity
             openIntent.setAction(Long.toString(System.currentTimeMillis()));
             openIntent.putExtra("notify", 1);
-            openIntent.putExtra("songSelected", SongActivity.mSong);
-            openIntent.putExtra("allSongs", SongActivity.songList);
+            //INIZIO TEST
+            Song curSong = SongActivity.mSong;
+            Gson gson = new Gson();
+            String curSongJson = gson.toJson(curSong);
+            String allSongsJson = gson.toJson(SongActivity.songList);
+            Bundle songBundle = new Bundle();
+            songBundle.putString("songSelected",curSongJson);
+            Bundle arrayBundle = new Bundle();
+            arrayBundle.putString("allSongs",allSongsJson);
+            openIntent.putExtras(songBundle);
+            openIntent.putExtras(arrayBundle);
+            //FINE TEST
             openIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
             final PendingIntent openingIntent = PendingIntent.getActivity(context, 0, openIntent, PendingIntent.FLAG_UPDATE_CURRENT);
             //passo anche l'arraylist totale perchè potrebbe servirmi per implementare poi il pulsante avanti/indietro

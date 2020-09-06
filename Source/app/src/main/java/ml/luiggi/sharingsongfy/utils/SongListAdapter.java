@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -66,40 +67,33 @@ public class SongListAdapter extends RecyclerView.Adapter<SongListAdapter.SongLi
             holder.mAuthors.setText(songList.get(holder.getAdapterPosition()).getAuthors());
         }
         Picasso.get().load(songList.get(holder.getAdapterPosition()).getCover()).into(holder.mCover);
-        holder.mLayout.setOnClickListener(new View.OnClickListener() {
+        //creo il listener
+        View.OnClickListener listener = new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 loadPlaylists(view);
                 Intent intent = new Intent(view.getContext(), SongActivity.class);
-                intent.putExtra("songSelected", songList.get(holder.getAdapterPosition()));
+                //INIZIO TEST
+                Song curSong = songList.get(holder.getAdapterPosition());
+                Gson gson = new Gson();
+                String curSongJson = gson.toJson(curSong);
+                String allSongsJson = gson.toJson(songList);
+                Bundle songBundle = new Bundle();
+                songBundle.putString("songSelected",curSongJson);
+                Bundle arrayBundle = new Bundle();
+                arrayBundle.putString("allSongs",allSongsJson);
+                intent.putExtras(songBundle);
+                intent.putExtras(arrayBundle);
+                //FINE TEST
+                //intent.putExtra("songSelected", songList.get(holder.getAdapterPosition()));
                 //passo anche l'arraylist totale perchè potrebbe servirmi per implementare poi il pulsante avanti/indietro
-                intent.putExtra("allSongs", songList);
+                //intent.putExtra("allSongs", songList);
                 view.getContext().startActivity(intent);
-
             }
-        });
-        holder.mCover.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(view.getContext(), SongActivity.class);
-                intent.putExtra("songSelected", songList.get(holder.getAdapterPosition()));
-                //passo anche l'arraylist totale perchè potrebbe servirmi per implementare poi il pulsante avanti/indietro
-                intent.putExtra("allSongs", songList);
-                view.getContext().startActivity(intent);
-
-            }
-        });
-        holder.mPlay.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(view.getContext(), SongActivity.class);
-                intent.putExtra("songSelected", songList.get(holder.getAdapterPosition()));
-                //passo anche l'arraylist totale perchè potrebbe servirmi per implementare poi il pulsante avanti/indietro
-                intent.putExtra("allSongs", songList);
-                view.getContext().startActivity(intent);
-
-            }
-        });
+        };
+        holder.mLayout.setOnClickListener(listener);
+        holder.mCover.setOnClickListener(listener);
+        holder.mPlay.setOnClickListener(listener);
         if (isPlaylist != null) {
             holder.mLayout.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override

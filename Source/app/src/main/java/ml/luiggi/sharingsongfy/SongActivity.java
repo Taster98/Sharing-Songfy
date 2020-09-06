@@ -30,12 +30,16 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.squareup.picasso.Picasso;
 
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 
 import ml.luiggi.sharingsongfy.scaffoldings.Playable;
+import ml.luiggi.sharingsongfy.scaffoldings.Playlist;
 import ml.luiggi.sharingsongfy.scaffoldings.Song;
 import ml.luiggi.sharingsongfy.services.FriendPlayerService;
 import ml.luiggi.sharingsongfy.utils.CreateNotification;
@@ -157,8 +161,15 @@ public class SongActivity extends AppCompatActivity implements Playable, View.On
 
     //funzione che inizializza i riferimenti per gestire la musica
     private void initRefs() {
+        //INIZIO TEST
+        String arrayJson = getIntent().getExtras().getString("allSongs");
+        Gson gson = new Gson();
+        Type type = new TypeToken<ArrayList<Song>>() {
+        }.getType();
+        songList = gson.fromJson(arrayJson,type);
+        //FINE TEST
         //Ripesco la lista di tutti i brani per i pulsanti Back e Next
-        songList = (ArrayList<Song>) getIntent().getSerializableExtra("allSongs");
+        //songList = (ArrayList<Song>) getIntent().getSerializableExtra("allSongs");
         if (mSong != null) {
             //prelevo la posizione attuale nell'arraylist
             actualPos = songList.indexOf(mSong);
@@ -276,7 +287,14 @@ public class SongActivity extends AppCompatActivity implements Playable, View.On
 
     //riempio la canzone selezionata
     private void getSong() {
-        mSong = (Song) getIntent().getSerializableExtra("songSelected");
+        //INIZIO TEST
+        String songJson = getIntent().getExtras().getString("songSelected");
+        Gson gson = new Gson();
+        Type type = new TypeToken<Song>() {
+        }.getType();
+        mSong = gson.fromJson(songJson,type);
+        //FINE TEST
+        //mSong = (Song) getIntent().getSerializableExtra("songSelected");
     }
 
     @SuppressLint("RestrictedApi")

@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Build;
+import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -34,6 +35,7 @@ import java.util.ArrayList;
 import ml.luiggi.sharingsongfy.PlaylistActivity;
 import ml.luiggi.sharingsongfy.R;
 import ml.luiggi.sharingsongfy.scaffoldings.Playlist;
+import ml.luiggi.sharingsongfy.scaffoldings.Song;
 
 public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.PlayListViewHolder> {
     private ArrayList<Playlist> playlists;
@@ -57,8 +59,20 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.PlayLi
             public void onClick(View view) {
                 loadPlaylists(view);
                 Intent intent = new Intent(view.getContext(), PlaylistActivity.class);
-                intent.putExtra("playlistSelected", playlists.get(holder.getAdapterPosition()));
-                intent.putExtra("allPlaylists", playlists);
+                //INIZIO TEST
+                Playlist curPlaylist = playlists.get(holder.getAdapterPosition());
+                Gson gson = new Gson();
+                String curPlaylistJson = gson.toJson(curPlaylist);
+                String allPlaylistJson = gson.toJson(playlists);
+                Bundle playlistBundle = new Bundle();
+                playlistBundle.putString("playlistSelected",curPlaylistJson);
+                Bundle arrayBundle = new Bundle();
+                arrayBundle.putString("allPlaylists",allPlaylistJson);
+                intent.putExtras(playlistBundle);
+                intent.putExtras(arrayBundle);
+                //FINE TEST
+                //intent.putExtra("playlistSelected", playlists.get(holder.getAdapterPosition()));
+                //intent.putExtra("allPlaylists", playlists);
                 view.getContext().startActivity(intent);
             }
 
@@ -103,6 +117,7 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.PlayLi
 
         alertbox.setPositiveButton("Sì",
                 new DialogInterface.OnClickListener() {
+                    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         playlists.remove(pos);

@@ -4,12 +4,11 @@ import android.os.Build;
 
 import androidx.annotation.RequiresApi;
 
-import java.io.Serializable;
 import java.util.List;
 import java.util.Objects;
 
 //Oggetto che rappresenta una playlist
-public class Playlist implements Serializable {
+public class Playlist{
     //ha una lista di canzoni associata a un nome
     private String playlistName;
     private List<Song> songList;

@@ -4,11 +4,10 @@ import android.os.Build;
 
 import androidx.annotation.RequiresApi;
 
-import java.io.Serializable;
 import java.util.Objects;
 
 //implementa serializable per poter esser passata come extra tra intent
-public class Friend implements Serializable {
+public class Friend{
     //Mi servono lo uid, che coincide con l'id di Firebase
     private String uid,
     //nome e numero per poterli mostrare nel recycler view

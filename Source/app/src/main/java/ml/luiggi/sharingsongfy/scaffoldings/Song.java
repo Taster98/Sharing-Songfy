@@ -4,13 +4,12 @@ import android.os.Build;
 
 import androidx.annotation.RequiresApi;
 
-import java.io.Serializable;
 import java.util.Objects;
 
 /*
  *Questa classe serve per contenere invece in un oggetto i dati parsati dal file Json. Deve implementare Serializable per poter essere passata come extra all'interno di un Intent.
  */
-public class Song implements Serializable {
+public class Song{
     String title,
             author,
             feat,
