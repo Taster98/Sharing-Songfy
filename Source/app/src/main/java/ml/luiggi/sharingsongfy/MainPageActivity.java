@@ -3,6 +3,7 @@ package ml.luiggi.sharingsongfy;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 
 import android.Manifest;
 import android.app.AlertDialog;
@@ -117,6 +118,7 @@ public class MainPageActivity extends AppCompatActivity implements BottomNavigat
             getSupportFragmentManager()
                     .beginTransaction()
                     .replace(R.id.fragment_container, mFragment)
+                    .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
                     .commit();
             return true;
         }
