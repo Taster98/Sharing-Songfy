@@ -4,6 +4,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -17,7 +18,6 @@ import java.util.ArrayList;
 
 import ml.luiggi.sharingsongfy.R;
 import ml.luiggi.sharingsongfy.scaffoldings.Song;
-import ml.luiggi.sharingsongfy.scaffoldings.SongSelected;
 
 /*
  * Questa classe rappresenta l'Adapter per poter correttamente visualizzare la lista delle canzoni all'interno dell'oggetto RecyclerView.
@@ -40,46 +40,33 @@ public class DialogListAdapter extends RecyclerView.Adapter<DialogListAdapter.Di
 
     @Override
     public void onBindViewHolder(@NonNull final DialogListViewHolder holder, final int position) {
-        final Song curSong = songList.get(holder.getAdapterPosition());
-        holder.mTitle.setText(songList.get(holder.getAdapterPosition()).getTitle());
-        final SongSelected songSelected = new SongSelected() {
-            @Override
-            public void newSongsSelected(ArrayList<Song> selectedList) {
-                checkedList = selectedList;
-            }
-        };
-        if (!songList.get(holder.getAdapterPosition()).getFeats().equals("")) {
-            String aut_feat = songList.get(holder.getAdapterPosition()).getAuthors() + " ft. " + songList.get(holder.getAdapterPosition()).getFeats();
+        final Song curSong = songList.get(position);
+        //inizializzo il checkbox per evitare errori
+        holder.mCheckBox.setOnCheckedChangeListener(null);
+        //imposto il checkbox in base all'oggetto
+        holder.mCheckBox.setChecked(curSong.isSelected());
+        //Imposto il layout
+        holder.mTitle.setText(curSong.getTitle());
+        if (!curSong.getFeats().equals("")) {
+            String aut_feat = curSong.getAuthors() + " ft. " + curSong.getFeats();
             holder.mAuthors.setText(aut_feat);
         } else {
-            holder.mAuthors.setText(songList.get(holder.getAdapterPosition()).getAuthors());
+            holder.mAuthors.setText(curSong.getAuthors());
         }
-        Picasso.get().load(songList.get(holder.getAdapterPosition()).getCover()).into(holder.mCover);
-        holder.mLayout.setOnClickListener(new View.OnClickListener() {
+        Picasso.get().load(curSong.getCover()).into(holder.mCover);
+        //Imposto il listener per lo stato della checkbox
+        holder.mCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
-            public void onClick(View view) {
-                holder.mCheckBox.setChecked(!holder.mCheckBox.isChecked());
-                if (holder.mCheckBox.isChecked()) {
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                //imposto "selected" della canzone selezionata
+                curSong.setSelected(b);
+                if(curSong.isSelected()){
                     checkedList.add(curSong);
-                } else {
+                }else{
                     checkedList.remove(curSong);
                 }
-                songSelected.newSongsSelected(checkedList);
             }
         });
-        holder.mCover.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                holder.mCheckBox.setChecked(!holder.mCheckBox.isChecked());
-                if (holder.mCheckBox.isChecked()) {
-                    checkedList.add(curSong);
-                } else {
-                    checkedList.remove(curSong);
-                }
-                songSelected.newSongsSelected(checkedList);
-            }
-        });
-
     }
 
     @Override
@@ -101,8 +88,6 @@ public class DialogListAdapter extends RecyclerView.Adapter<DialogListAdapter.Di
             mLayout = (LinearLayout)view.findViewById(R.id.item_songs_id_dialog);
             mCover = (ImageView)view.findViewById(R.id.cover_image_dialog);
             mCheckBox = (CheckBox)view.findViewById(R.id.checkbox_dialog);
-            if (mCheckBox != null)
-                mCheckBox.setClickable(false);
         }
     }
 }

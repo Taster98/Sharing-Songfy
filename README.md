@@ -7,7 +7,7 @@ Su Sharing SongFy è inoltre possibile anche condividere ciò che si sta ascolta
 
 ## Utilizzo
 
-Dopo l'installazione, verrà chiesto di autenticarsi mediante il numero di telefono. Una volta inserito il codice di verifica, si aprirà poi la home page dell'app, contenente l'elenco completo delle canzoni disponibili attualmente nel server. Al primo avvio apparirà un breve tutorial che spiegano il funzionamento delle gestures.
+Dopo l'installazione, verrà chiesto di autenticarsi mediante il numero di telefono. Una volta inserito il codice di verifica, si aprirà poi la home page dell'app, contenente l'elenco completo delle canzoni disponibili attualmente nel server. Al primo avvio apparirà un breve tutorial che spiega il funzionamento delle gestures.
 
 <img src="img/screen1.jpg" width="49.5%" alt="Screenshots of App #1"> <img src="img/screen5.jpg" width="49.5%" alt="Screenshots of App #5">
 
@@ -60,7 +60,7 @@ Sono inoltre presenti anche una serie di classi custom.
 
 Questa classe serve per gestire gli swipe per la navigazione tra un fragment e l'altro. Questo tramite l'inner class che estende SimpleGestureListener della classe GestureDetector.
 
-Per fare questo ho usato questa classe in Kotlin come riferimento:
+Ho preso spunto dalla seguente classe in Kotlin che ho trovato in rete:
 
 https://www.codegrepper.com/code-examples/whatever/kotlin+swipe+listener
 
@@ -85,4 +85,4 @@ Sono stati necessari diversi oggetti custom per rappresentare gli elementi utili
 L'interfaccia SongSelected è servita sostanzialmente per poter capire quali fossero le canzoni selezionate dalla RecyclerView, per esempio nell'adapter relativo al dialog per creare una Playlist. L'interfaccia Playable invece è servita per la rappresentazione degli elementi "Riproducibili", ovvero per interpretare le varie azioni da compiere sul brano in base a ciò che viene ricevuto in broadcast.
 
 ### Altri riferimenti
-Per molti aspetti del progetto, quali ad esempio l'oggetto MediaPlayer per la riproduzione dei brani, ho fatto un largo uso della documentazione ufficiale di Android (https://developer.android.com/guide). Ho inoltre anche consultato le documentazioni ufficiali per l'utilizzo dell'autenticazione tramite numero di telefono e per l'utilizzo del Realtime Database di Firebase (https://firebase.google.com/docs/auth ) e (https://firebase.google.com/docs/database).
+Per molti aspetti del progetto, quali ad esempio l'oggetto MediaPlayer per la riproduzione dei brani, ho fatto un largo uso della documentazione ufficiale di Android (https://developer.android.com/guide). Ho inoltre anche consultato le documentazioni ufficiali per l'utilizzo dell'autenticazione tramite numero di telefono e per l'utilizzo del Realtime Database di Firebase (https://firebase.google.com/docs/auth ) e (https://firebase.google.com/docs/database). Per il caricamento delle cover degli album musicali ho inoltre usato la libreria Picasso (https://square.github.io/picasso/).

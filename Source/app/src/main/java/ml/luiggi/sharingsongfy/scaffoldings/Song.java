@@ -16,13 +16,14 @@ public class Song implements Serializable {
             feat,
             url,
             cover;
-
+    boolean selected;
     public Song(String title, String cover, String author, String feat, String url) {
         this.title = title;
         this.author = author;
         this.cover = cover;
         this.feat = feat;
         this.url = url;
+        selected=false;
     }
 
     public Song() {
@@ -48,7 +49,9 @@ public class Song implements Serializable {
     public String getTitle() {
         return title;
     }
+    public boolean isSelected(){return selected;}
 
+    public void setSelected(boolean selected) {this.selected = selected;}
 
     //sovrascrivo equals e hashCode per poter comparare oggetti di tipo Song (mi servono per trovare la loro posizione in un'ArrayList):
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
