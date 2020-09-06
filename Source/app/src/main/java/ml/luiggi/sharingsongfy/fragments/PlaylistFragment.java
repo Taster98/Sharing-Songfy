@@ -4,7 +4,7 @@ import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -17,6 +17,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -25,6 +26,12 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 
@@ -112,6 +119,7 @@ public class PlaylistFragment extends Fragment {
         list.setAdapter(adapter);
         builder.setView(view)
                 .setPositiveButton(R.string.aggiungi, new DialogInterface.OnClickListener() {
+                    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         //Aggiungi canzoni
@@ -119,8 +127,6 @@ public class PlaylistFragment extends Fragment {
                         playlistList.add(curPlaylist);
                         Toast.makeText(getContext(), "Playlist " + curName + " creata con successo!", Toast.LENGTH_SHORT).show();
                         mAdapter.notifyDataSetChanged();
-                        reloadFragment();
-                        reloadFragment();
                         reloadFragment();
                         //salvare nello shared preferences
                         savePlaylists();
@@ -226,28 +232,48 @@ public class PlaylistFragment extends Fragment {
     }
 
     //funzione che salva le playlists
-    private void savePlaylists() {
-        SharedPreferences sharedPreferences = bkpView.getContext().getSharedPreferences("saved_playlists", Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+    private void savePlaylists(){
         Gson gson = new Gson();
         String json = gson.toJson(playlistList);
-        editor.putString("playlist_list", json);
-        editor.apply();
+        String filename = "saved_playlists.txt";
+        try {
+            FileOutputStream fos = getActivity().openFileOutput(filename,Context.MODE_PRIVATE);
+            fos.write(json.getBytes());
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
         reloadFragment();
     }
-
     //funzione che ricarica le playlist salvate
-    private void loadPlaylists() {
-        SharedPreferences sharedPreferences = bkpView.getContext().getSharedPreferences("saved_playlists", Context.MODE_PRIVATE);
+    private void loadPlaylists(){
+        String filename = "saved_playlists.txt";
         Gson gson = new Gson();
-        String json = sharedPreferences.getString("playlist_list", null);
         Type type = new TypeToken<ArrayList<Playlist>>() {
         }.getType();
-        playlistList = gson.fromJson(json, type);
+        try {
+            FileInputStream fis = getActivity().openFileInput(filename);
+            InputStreamReader isr = new InputStreamReader(fis);
+            BufferedReader streamReader = new BufferedReader(isr);
+
+            StringBuilder json = new StringBuilder();
+
+            String inputStr;
+            while ((inputStr = streamReader.readLine()) != null)
+                json.append(inputStr);
+
+            playlistList = gson.fromJson(String.valueOf(json),type);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         if (playlistList == null)
             playlistList = new ArrayList<>();
     }
-
     @Override
     public void onDestroy() {
         super.onDestroy();

@@ -4,7 +4,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
+import android.os.Build;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -16,11 +16,18 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 
@@ -118,6 +125,7 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.PlayLi
         final View view = LayoutInflater.from(v.getRootView().getContext()).inflate(R.layout.rename_playlist, null);
         builder.setView(view)
                 .setPositiveButton(R.string.rinomina, new DialogInterface.OnClickListener() {
+                    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         EditText editText = (EditText)view.findViewById(R.id.nuovo_nome_playlist);
@@ -161,23 +169,43 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.PlayLi
     }
 
     //funzione che salva le playlists
-    private void savePlaylists(View v) {
-        SharedPreferences sharedPreferences = v.getContext().getSharedPreferences("saved_playlists", Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+    private void savePlaylists(View v){
         Gson gson = new Gson();
         String json = gson.toJson(playlists);
-        editor.putString("playlist_list", json);
-        editor.apply();
+        String filename = "saved_playlists.txt";
+        try {
+            FileOutputStream fos = v.getContext().openFileOutput(filename,Context.MODE_PRIVATE);
+            fos.write(json.getBytes());
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
-
     //funzione che ricarica le playlist salvate
-    private void loadPlaylists(View v) {
-        SharedPreferences sharedPreferences = v.getContext().getSharedPreferences("saved_playlists", Context.MODE_PRIVATE);
+    private void loadPlaylists(View v){
+        String filename = "saved_playlists.txt";
         Gson gson = new Gson();
-        String json = sharedPreferences.getString("playlist_list", null);
         Type type = new TypeToken<ArrayList<Playlist>>() {
         }.getType();
-        playlists = gson.fromJson(json, type);
+        try {
+            FileInputStream fis = v.getContext().openFileInput(filename);
+            InputStreamReader isr = new InputStreamReader(fis);
+            BufferedReader streamReader = new BufferedReader(isr);
+
+            StringBuilder json = new StringBuilder();
+
+            String inputStr;
+            while ((inputStr = streamReader.readLine()) != null)
+                json.append(inputStr);
+
+            playlists = gson.fromJson(String.valueOf(json),type);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         if (playlists == null)
             playlists = new ArrayList<>();
     }

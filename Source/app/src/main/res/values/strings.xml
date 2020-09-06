@@ -2,19 +2,11 @@
     <string name="app_name">Sharing SongFy</string>
     <string name="home">Home</string>
     <string name="friend_listen">Ascolta con i tuoi amici</string>
-    <string name="tutte_le_canzoni">Tutte le canzoni</string>
-    <string name="navigation_drawer_open">Sfoglia</string>
-    <string name="navigation_drawer_close">Menu</string>
-    <string name="naviga">Naviga</string>
-    <string name="playlists">Le tue Playlist</string>
-    <string name="crea_playlist">Crea Playlist</string>
-    <string name="app_title">Sharing Songfy</string>
     <string name="_39">+39</string>
     <string name="phone_number">Numero di telefono</string>
     <string name="button">Invia codice</string>
     <string name="codice">Codice</string>
     <string name="access_text">Registrati o accedi a Sharing SongFy</string>
-    <string name="scrivi">Scrivi</string>
     <string name="le_tue_playlist">Le tue Playlist</string>
     <string name="crea_nuova_playlist">+ Crea nuova playlist</string>
     <string name="annulla">Annulla</string>
@@ -25,12 +17,8 @@
     <string name="elimina">Elimina</string>
     <string name="rinomina">Rinomina</string>
     <string name="rinomina_playlist">Rinomina playlist</string>
-    <string name="nascondi_pulsanti">Nascondi pulsanti</string>
-    <string name="mostra_pulsanti">Mostra pulsanti</string>
     <string name="non_mostrare_questo_tutorial_in_futuro">Non mostrare questo tutorial in futuro</string>
     <string name="i_tuoi_amici_ascoltano">I tuoi amici ascoltano:</string>
     <string name="condividi_musica">Condividi musica</string>
     <string name="ferma_condivisione">Ferma condivisione</string>
-    <string name="in_ascolto">In ascolto</string>
-    <string name="ticker_text">In ascolto</string>
 </resources>
