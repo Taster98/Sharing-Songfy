@@ -56,6 +56,10 @@ public class PlaylistFragment extends Fragment {
     public View bkpView;
     private RecyclerView recyclerView;
     private TextView emptyList;
+    //listeners
+    private View.OnClickListener creaPlaylistListener;
+    private RecyclerView.AdapterDataObserver adapterDataObserver;
+    private OnSwipeTouchListener swipeTouchListener;
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -77,36 +81,40 @@ public class PlaylistFragment extends Fragment {
         initSongs();
         //imposto un listener al bottone per creare una playlist (mostro un dialog):
         btn = (Button)bkpView.findViewById(R.id.crea_playlist);
-        btn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(final View view) {
-                final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-                LayoutInflater inflater = getLayoutInflater();
-                //Fornisco il mio layout customizzato
-                final View view1 = inflater.inflate(R.layout.nuova_playlist, null);
-                builder.setView(view1)
-                        .setPositiveButton(R.string.crea, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                editText = (EditText)view1.findViewById(R.id.nuovo_nome_playlist);
-                                if (editText.getText().toString().equals(""))
-                                    Toast.makeText(getContext(), "Devi inserire un nome valido per la Playlist!", Toast.LENGTH_SHORT).show();
-                                else {
-                                    curName = editText.getText().toString();
-                                    scegliCanzoni();
+        //inizializzo il listener
+        if(creaPlaylistListener == null){
+            creaPlaylistListener = new View.OnClickListener() {
+                @Override
+                public void onClick(final View view) {
+                    final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                    LayoutInflater inflater = getLayoutInflater();
+                    //Fornisco il mio layout customizzato
+                    final View view1 = inflater.inflate(R.layout.nuova_playlist, null);
+                    builder.setView(view1)
+                            .setPositiveButton(R.string.crea, new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    editText = (EditText)view1.findViewById(R.id.nuovo_nome_playlist);
+                                    if (editText.getText().toString().equals(""))
+                                        Toast.makeText(getContext(), "Devi inserire un nome valido per la Playlist!", Toast.LENGTH_SHORT).show();
+                                    else {
+                                        curName = editText.getText().toString();
+                                        scegliCanzoni();
+                                    }
                                 }
-                            }
-                        })
-                        .setNegativeButton(R.string.annulla, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                dialogInterface.dismiss();
-                            }
-                        });
-                AlertDialog dialog = builder.create();
-                dialog.show();
-            }
-        });
+                            })
+                            .setNegativeButton(R.string.annulla, new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    dialogInterface.dismiss();
+                                }
+                            });
+                    AlertDialog dialog = builder.create();
+                    dialog.show();
+                }
+            };
+        }
+        btn.setOnClickListener(creaPlaylistListener);
         //Testo da mostrare se la lista è vuota
         emptyList = (TextView)bkpView.findViewById(R.id.emptySongs);
         if(mAdapter.getItemCount() == 0)
@@ -200,41 +208,49 @@ public class PlaylistFragment extends Fragment {
         //imposto un adapter per i dati della recycler view
         mAdapter = new PlayListAdapter(playlistList);
         recyclerView.setAdapter(mAdapter);
-        mAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
-            private void checkChange(){
-                //Testo da mostrare se la lista è vuota
-                emptyList = (TextView)bkpView.findViewById(R.id.emptySongs);
-                if(mAdapter.getItemCount() == 0)
-                    emptyList.setVisibility(View.VISIBLE);
-                else{
-                    emptyList.setVisibility(View.INVISIBLE);
+        //inizializzo l'observer
+        if(adapterDataObserver == null){
+            adapterDataObserver = new RecyclerView.AdapterDataObserver() {
+                private void checkChange(){
+                    //Testo da mostrare se la lista è vuota
+                    emptyList = (TextView)bkpView.findViewById(R.id.emptySongs);
+                    if(mAdapter.getItemCount() == 0)
+                        emptyList.setVisibility(View.VISIBLE);
+                    else{
+                        emptyList.setVisibility(View.INVISIBLE);
+                    }
                 }
-            }
-            @Override
-            public void onItemRangeChanged(int positionStart, int itemCount) {
-                super.onItemRangeChanged(positionStart, itemCount);
-                checkChange();
-            }
-        });
+                @Override
+                public void onItemRangeChanged(int positionStart, int itemCount) {
+                    super.onItemRangeChanged(positionStart, itemCount);
+                    checkChange();
+                }
+            };
+        }
+        mAdapter.registerAdapterDataObserver(adapterDataObserver);
         initGestures();
     }
 
     @SuppressLint("ClickableViewAccessibility")
     private void initGestures() {
         recyclerView = (RecyclerView)bkpView.findViewById(R.id.playlistList);
-        recyclerView.setOnTouchListener(new OnSwipeTouchListener(bkpView.getContext()) {
-            @Override
-            public void onSwipeLeft() {
-                super.onSwipeLeft();
-                loadFragment(0); //amici
-            }
+        //inizializzo il listener
+        if(swipeTouchListener == null){
+            swipeTouchListener = new OnSwipeTouchListener(bkpView.getContext()) {
+                @Override
+                public void onSwipeLeft() {
+                    super.onSwipeLeft();
+                    loadFragment(0); //amici
+                }
 
-            @Override
-            public void onSwipeRight() {
-                super.onSwipeRight();
-                loadFragment(1); //home
-            }
-        });
+                @Override
+                public void onSwipeRight() {
+                    super.onSwipeRight();
+                    loadFragment(1); //home
+                }
+            };
+        }
+        recyclerView.setOnTouchListener(swipeTouchListener);
         //Gestisco le gestures per passare da un fragment all'altro
     }
 

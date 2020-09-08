@@ -34,6 +34,10 @@ import ml.luiggi.sharingsongfy.services.FriendPlayerService;
 public class MainPageActivity extends AppCompatActivity implements BottomNavigationView.OnNavigationItemSelectedListener{
     private BottomNavigationView mBottomNavView;
     private boolean serviceStopped = false;
+    //listeners
+    private DialogInterface.OnClickListener dialogListener;
+    private CompoundButton.OnCheckedChangeListener checkListener;
+    private BottomNavigationView.OnNavigationItemReselectedListener reselectedListener;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -65,21 +69,29 @@ public class MainPageActivity extends AppCompatActivity implements BottomNavigat
         mBuilder.setTitle("Utilizza le Gestures per ascoltare la musica!");
         mBuilder.setMessage("1- Puoi scorrere col dito a sinistra e a destra per navigare tra le sezioni dell'app. \n2- Scorri con due dita verso il basso per riprodurre o mettere in pausa il brano. \n3- Disegna una freccia a sinistra (o a destra) per andare al brano precedente (o successivo) \n5- Fai swipe verso l'alto o verso il basso, nell'immagine di copertina, per regolare il volume. \n6- Per rivedere questo tutorial, fai swipe verso sinistra dalla home oppure premi su 'La tua musica'.");
         mBuilder.setView(mView);
-        mBuilder.setPositiveButton("OK, Ho capito", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                dialogInterface.dismiss();
-            }
-        });
+        //inizializzo il listener
+        if(dialogListener == null){
+            dialogListener = new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    dialogInterface.dismiss();
+                }
+            };
+        }
+        mBuilder.setPositiveButton("OK, Ho capito", dialogListener);
         AlertDialog mDialog = mBuilder.create();
         mDialog.show();
         //se il dialogo non dovrà essere più visualizzato, salvo questa scelta nello Shared Preferences
-        mCheck.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                storeDialogStatus(compoundButton.isChecked());
-            }
-        });
+        //inizializzo il listener
+        if(checkListener == null){
+            checkListener = new CompoundButton.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                    storeDialogStatus(compoundButton.isChecked());
+                }
+            };
+        }
+        mCheck.setOnCheckedChangeListener(checkListener);
         if (getDialogStatus()) {
             mDialog.hide();
         } else {
@@ -106,12 +118,16 @@ public class MainPageActivity extends AppCompatActivity implements BottomNavigat
         mBottomNavView = (BottomNavigationView) findViewById(R.id.bottom_navigation);
         mBottomNavView.setOnNavigationItemSelectedListener(this);
         //imposto questo listener per evitare che il fragment si ricarichi se riselezionato
-        mBottomNavView.setOnNavigationItemReselectedListener(new BottomNavigationView.OnNavigationItemReselectedListener() {
-            @Override
-            public void onNavigationItemReselected(@NonNull MenuItem item) {
+        //inizializzo il listener
+        if(reselectedListener == null){
+            reselectedListener = new BottomNavigationView.OnNavigationItemReselectedListener() {
+                @Override
+                public void onNavigationItemReselected(@NonNull MenuItem item) {
 
-            }
-        });
+                }
+            };
+        }
+        mBottomNavView.setOnNavigationItemReselectedListener(reselectedListener);
     }
 
     //funzione per cambiare l'itemId selezionato del bottomNav

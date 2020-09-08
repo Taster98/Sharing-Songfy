@@ -53,7 +53,8 @@ public class FragmentPeople extends Fragment {
     private TextView emptyList;
     //variabile per la gestione del tasto condividi
     static int condividi = 0;
-
+    //listeners
+    private ValueEventListener friendListener;
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -66,9 +67,12 @@ public class FragmentPeople extends Fragment {
     private void initView() {
         //Inizializzo innanzitutto la lista degli amici che condividono e i due insiemi
         //(che conterranno tutti i contatti e tutti gli utenti registrati)
-        songListFriends = new ArrayList<>();
-        contactList = new LinkedHashSet<>();
-        allRegistered = new LinkedHashSet<>();
+        if(songListFriends == null)
+            songListFriends = new ArrayList<>();
+        if(contactList == null)
+            contactList = new LinkedHashSet<>();
+        if(allRegistered == null)
+            allRegistered = new LinkedHashSet<>();
         //inizializzo il fragment
         initPlaylistFragment();
         //Carico tutti i contatti della mia rubrica
@@ -257,70 +261,72 @@ public class FragmentPeople extends Fragment {
         //Creo un riferimento al database su firebase
         DatabaseReference userDB = FirebaseDatabase.getInstance().getReference().child("user");
         //Creo ora un listener per la gestione dell'aggiornamento dei dati nel database
-        ValueEventListener friendListener = new ValueEventListener() {
-            @RequiresApi(api = Build.VERSION_CODES.N)
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                //Scorro ogni id degli utenti registrati
-                for (DataSnapshot ss : snapshot.getChildren()) {
-                    //prelevo i dati che mi servono
-                    String friend = ss.child("phone").getValue(String.class);
-                    Boolean sharing = ss.child("isSharing").getValue(Boolean.class);
-                    String songUrl = ss.child("songUrl").getValue(String.class);
-                    String title = ss.child("title").getValue(String.class);
-                    String authors = ss.child("author").getValue(String.class);
-                    String feats = ss.child("feats").getValue(String.class);
-                    Long position = ss.child("position").getValue(Long.class);
-                    //mi assicuro che non siano null
-                    if (sharing != null && position != null && sharing) {
-                        //creo un nuovo amico (prendendo il numero di telefono dal db)
-                        Friend actFr = new Friend(friend);
-                        //cambio l'uid con quello di firebase
-                        actFr.setUid(ss.getKey());
-                        //aggiorno la posizione
-                        actFr.setSongPosition(Math.toIntExact(position));
-                        //TODO titolo, autore, feat
-                        Song curSong = new Song(title, "", authors, feats, songUrl);
-                        //imposto quindi la nuova canzone corrente
-                        actFr.setCurrentSong(curSong);
-                        //a questo punto, se actFr (della lista dei registrati) è anche
-                        //presente nella rubrica, allora posso prelevarne il nome
-                        if (contactList.contains(actFr)) {
-                            //dato che è un insieme lo devo cercare, appena lo trovo esco
-                            for (Friend tmp : contactList) {
-                                if (tmp.equals(actFr)) {
-                                    actFr.setName(tmp.getName());
-                                    break;
+        if(friendListener == null) {
+            friendListener = new ValueEventListener() {
+                @RequiresApi(api = Build.VERSION_CODES.N)
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    //Scorro ogni id degli utenti registrati
+                    for (DataSnapshot ss : snapshot.getChildren()) {
+                        //prelevo i dati che mi servono
+                        String friend = ss.child("phone").getValue(String.class);
+                        Boolean sharing = ss.child("isSharing").getValue(Boolean.class);
+                        String songUrl = ss.child("songUrl").getValue(String.class);
+                        String title = ss.child("title").getValue(String.class);
+                        String authors = ss.child("author").getValue(String.class);
+                        String feats = ss.child("feats").getValue(String.class);
+                        Long position = ss.child("position").getValue(Long.class);
+                        //mi assicuro che non siano null
+                        if (sharing != null && position != null && sharing) {
+                            //creo un nuovo amico (prendendo il numero di telefono dal db)
+                            Friend actFr = new Friend(friend);
+                            //cambio l'uid con quello di firebase
+                            actFr.setUid(ss.getKey());
+                            //aggiorno la posizione
+                            actFr.setSongPosition(Math.toIntExact(position));
+                            //TODO titolo, autore, feat
+                            Song curSong = new Song(title, "", authors, feats, songUrl);
+                            //imposto quindi la nuova canzone corrente
+                            actFr.setCurrentSong(curSong);
+                            //a questo punto, se actFr (della lista dei registrati) è anche
+                            //presente nella rubrica, allora posso prelevarne il nome
+                            if (contactList.contains(actFr)) {
+                                //dato che è un insieme lo devo cercare, appena lo trovo esco
+                                for (Friend tmp : contactList) {
+                                    if (tmp.equals(actFr)) {
+                                        actFr.setName(tmp.getName());
+                                        break;
+                                    }
                                 }
+                                //posso quindi togliere l'amico dalla contact list (in quanto non avrebbe l'uid)
+                                contactList.remove(actFr);
+                                //e inserisco quello aggiornato
+                                contactList.add(actFr);
                             }
-                            //posso quindi togliere l'amico dalla contact list (in quanto non avrebbe l'uid)
-                            contactList.remove(actFr);
-                            //e inserisco quello aggiornato
-                            contactList.add(actFr);
+                            //actFr è un utente registrato, ma ovviamente devo escludervi me stesso
+                            //(questo perchè potrei avere il mio stesso numero salvato in rubrica,
+                            //e con questo controllo evito crash)
+                            if (!actFr.getUid().equals(FirebaseAuth.getInstance().getUid()))
+                                allRegistered.add(actFr);
                         }
-                        //actFr è un utente registrato, ma ovviamente devo escludervi me stesso
-                        //(questo perchè potrei avere il mio stesso numero salvato in rubrica,
-                        //e con questo controllo evito crash)
-                        if (!actFr.getUid().equals(FirebaseAuth.getInstance().getUid()))
-                            allRegistered.add(actFr);
+
                     }
+                    //Ora aggiorno la mia contactList prendendo solamente gli utenti che sono registrati e che ho in rubrica
+                    contactList.retainAll(allRegistered);
+                    //pulisco la lista di amici precedentemente creata
+                    songListFriends.clear();
+                    //la aggiorno
+                    songListFriends.addAll(contactList);
+                    //notifico il mio adapter che dei dati sono stati cambiati, per aggiornare la recycler View
+                    mAdapter.notifyDataSetChanged();
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
 
                 }
-                //Ora aggiorno la mia contactList prendendo solamente gli utenti che sono registrati e che ho in rubrica
-                contactList.retainAll(allRegistered);
-                //pulisco la lista di amici precedentemente creata
-                songListFriends.clear();
-                //la aggiorno
-                songListFriends.addAll(contactList);
-                //notifico il mio adapter che dei dati sono stati cambiati, per aggiornare la recycler View
-                mAdapter.notifyDataSetChanged();
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        };
+            };
+        }
         //aggiungo il listener al database utenti
         userDB.addValueEventListener(friendListener);
     }
