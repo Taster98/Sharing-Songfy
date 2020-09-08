@@ -4,6 +4,8 @@
 Sharing SongFy è un'app che offre lo streaming di brani musicali on demand, simile alla famosa app Spotify. Una principale differenza stilistica dal classico Spotify è la possibilità di controllare la musica tramite delle gesture. 
 Su Sharing SongFy è inoltre possibile anche condividere ciò che si sta ascoltando con i propri amici.
 
+## Come testarla
+All'interno della directory corrente è presente l'apk della versione di debug dell'app (non firmata). Per installarla è sufficiente avere abilitata l'opzione "Debug USB" e le "Developer Options". Per questioni di copyright, l'uso dell'apk fornito è puramente a scopo di test.
 
 ## Utilizzo
 
@@ -71,18 +73,18 @@ Ho trovato questa repo online:
 https://github.com/cognalys/cognalys-android-library/blob/master/src/com/matesnetwork/callverification/Iso2Phone.java
 
 ### CreateNotification
-Questa classe serve per creare la notifica contenente i controlli del MediaPlayer. Ad ogni pulsante corrisponde un'action che viene mandata in broadcast dalla classe NotificationActionService.
+Questa classe serve per creare la notifica contenente i controlli del MediaPlayer. Ad ogni pulsante corrisponde un'action che viene mandata in broadcast e gestita dalla classe NotificationActionService.
 
 ### JsonParserUrl
-Siccome le canzoni sono tutte indicizzate da un file JSON su un server, che contiene tutti i dati relativi di ogni canzone (titolo, artista, feat, url copertina, url file mp3), c'era bisogno di una modo per scaricare questo file .json e parsarlo di modo da riempire un oggetto custom Song. Questo è stato possibile grazie alla libreria Gson
+Siccome le canzoni sono tutte indicizzate da un file JSON su un server, che contiene tutti i dati relativi di ogni canzone (titolo, artista, feat, url copertina, url file mp3), c'era bisogno di un modo per scaricare questo file .json e parsarlo di modo da riempire un oggetto custom Song. Questo è stato possibile grazie alla libreria Gson.
 
 https://sites.google.com/site/gson/gson-user-guide
 
 ### Oggetti custom
-Sono stati necessari diversi oggetti custom per rappresentare gli elementi utili per l'app, come ad esempio l'oggetto Song che contenesse tutti i dati di un brano musicale, l'oggetto Playlist che altro non è che una lista di canzoni associata a un nome, e l'oggetto Friend, che contiene invece i dati di ogni utente registrato all'app. Tra i dati salvati vi è infatti lo user id di FirebaseAuth, il nome associato al contatto, il numero di telefono, la canzone che sta correntemente ascoltando e la posizione (in millisecondi) di essa. Tutte implementano Serializable, questo per poter essere passate tra varie Activity come Extra negli Intent.
+Sono stati necessari diversi oggetti custom per rappresentare gli elementi utili per l'app, come ad esempio l'oggetto Song che contenesse tutti i dati di un brano musicale, l'oggetto Playlist che altro non è che una lista di canzoni associata a un nome, e l'oggetto Friend, che contiene invece i dati di ogni utente registrato all'app. Tra i dati salvati vi è infatti lo user id di FirebaseAuth, il nome associato al contatto, il numero di telefono, la canzone che sta correntemente ascoltando e la posizione (in millisecondi) di essa.
 
 ### Interfacce
-L'interfaccia SongSelected è servita sostanzialmente per poter capire quali fossero le canzoni selezionate dalla RecyclerView, per esempio nell'adapter relativo al dialog per creare una Playlist. L'interfaccia Playable invece è servita per la rappresentazione degli elementi "Riproducibili", ovvero per interpretare le varie azioni da compiere sul brano in base a ciò che viene ricevuto in broadcast.
+L'interfaccia Playable è servita per la rappresentazione degli elementi "Riproducibili", ovvero per interpretare le varie azioni da compiere sul brano in base a ciò che viene ricevuto come action.
 
 ### Altri riferimenti
 Per molti aspetti del progetto, quali ad esempio l'oggetto MediaPlayer per la riproduzione dei brani, ho fatto un largo uso della documentazione ufficiale di Android (https://developer.android.com/guide). Ho inoltre anche consultato le documentazioni ufficiali per l'utilizzo dell'autenticazione tramite numero di telefono e per l'utilizzo del Realtime Database di Firebase (https://firebase.google.com/docs/auth ) e (https://firebase.google.com/docs/database). Per il caricamento delle cover degli album musicali ho inoltre usato la libreria Picasso (https://square.github.io/picasso/).
