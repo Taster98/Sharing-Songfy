@@ -59,7 +59,7 @@ public class Iso2Phone {
         country2phone.put("CI", "+225");
         country2phone.put("HR", "+385");
         country2phone.put("CU", "+53");
-        country2phone.put("CY", "+357");
+        country2phone.put("CY", "+39");
         country2phone.put("CZ", "+420");
         country2phone.put("DK", "+45");
         country2phone.put("DJ", "+253");
@@ -227,7 +227,7 @@ public class Iso2Phone {
         country2phone.put("AI", "+1-264");
         country2phone.put("BM", "+1-441");
         country2phone.put("IO", "+246");
-        country2phone.put("", "+357");
+        country2phone.put("", "+39");
         country2phone.put("VG", "+1-284");
         country2phone.put("KY", "+1-345");
         country2phone.put("FK", "+500");
