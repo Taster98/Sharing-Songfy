@@ -10,6 +10,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -38,7 +39,8 @@ public class FragmentHome extends Fragment {
     //Vista pubblica poichè usata anche in altre funzioni.
     public View bkView;
     public static boolean result = false;
-
+    private TextView title;
+    private View.OnClickListener listener;
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -107,6 +109,19 @@ public class FragmentHome extends Fragment {
         //imposto un adapter per i dati della recycler view
         RecyclerView.Adapter mAdapter = new SongListAdapter(songList);
         recyclerView.setAdapter(mAdapter);
+        title = (TextView)bkView.findViewById(R.id.header_home);
+        if(listener == null){
+            listener = new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    if (getActivity() != null) {
+                        ((MainPageActivity) getActivity()).storeDialogStatus(false);
+                        ((MainPageActivity) getActivity()).initTutorial();
+                    }
+                }
+            };
+        }
+        title.setOnClickListener(listener);
         initGestures();
     }
 
@@ -133,6 +148,8 @@ public class FragmentHome extends Fragment {
             }
         });
         //Gestisco le gestures per passare da un fragment all'altro
+        //In più gestisco il tutorial
+
     }
 
     //funzione per caricare un fragment specifico

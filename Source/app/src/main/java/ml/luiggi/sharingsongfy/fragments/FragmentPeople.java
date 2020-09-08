@@ -6,7 +6,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.telephony.TelephonyManager;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -105,7 +104,6 @@ public class FragmentPeople extends Fragment {
                 if(check>1){
                     reloadFragment();
                 }
-                Log.d("CHANGE","Sì, "+String.valueOf(mAdapter.getItemCount()));
                 //Testo da mostrare se la lista è vuota
                 emptyList = (TextView)bkpView.findViewById(R.id.emptySongs);
                 if(mAdapter.getItemCount() == 0)

@@ -63,7 +63,7 @@ public class MainPageActivity extends AppCompatActivity implements BottomNavigat
         View mView = getLayoutInflater().inflate(R.layout.tutorial_gestures, null);
         CheckBox mCheck = (CheckBox)mView.findViewById(R.id.tutorial_checkbox);
         mBuilder.setTitle("Utilizza le Gestures per ascoltare la musica!");
-        mBuilder.setMessage("1- Puoi scorrere col dito a sinistra e a destra per navigare tra le sezioni dell'app. \n2- Scorri con due dita verso il basso per riprodurre o mettere in pausa il brano. \n3- Disegna una freccia a sinistra (o a destra) per andare al brano precedente (o successivo) \n5- Fai swipe verso l'alto o verso il basso, nell'immagine di copertina, per regolare il volume. \n6- Per rivedere questo tutorial, fai swipe verso sinistra dalla home.");
+        mBuilder.setMessage("1- Puoi scorrere col dito a sinistra e a destra per navigare tra le sezioni dell'app. \n2- Scorri con due dita verso il basso per riprodurre o mettere in pausa il brano. \n3- Disegna una freccia a sinistra (o a destra) per andare al brano precedente (o successivo) \n5- Fai swipe verso l'alto o verso il basso, nell'immagine di copertina, per regolare il volume. \n6- Per rivedere questo tutorial, fai swipe verso sinistra dalla home oppure premi su 'La tua musica'.");
         mBuilder.setView(mView);
         mBuilder.setPositiveButton("OK, Ho capito", new DialogInterface.OnClickListener() {
             @Override
@@ -159,14 +159,14 @@ public class MainPageActivity extends AppCompatActivity implements BottomNavigat
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         if (requestCode == 1) {
-            if (permissions[0].equals(Manifest.permission.READ_CONTACTS)
+            if (permissions.length>=1 && permissions[0].equals(Manifest.permission.READ_CONTACTS)
                     && grantResults[0] == PackageManager.PERMISSION_DENIED) {
                 Menu menu = mBottomNavView.getMenu();
                 MenuItem menuItem = menu.findItem(R.id.home_fragment);
                 changeFocus(menuItem.getItemId());
                 FragmentHome.result = true;
                 loadFragment(new FragmentHome());
-            } else if (permissions[0].equals(Manifest.permission.WRITE_CONTACTS)
+            } else if (permissions.length>=1 && permissions[0].equals(Manifest.permission.WRITE_CONTACTS)
                     && grantResults[0] == PackageManager.PERMISSION_DENIED) {
                 Menu menu = mBottomNavView.getMenu();
                 MenuItem menuItem = menu.findItem(R.id.home);
