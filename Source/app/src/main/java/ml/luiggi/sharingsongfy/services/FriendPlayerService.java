@@ -53,9 +53,10 @@ public class FriendPlayerService extends Service {
         PendingIntent pendingIntent =
                 PendingIntent.getActivity(this, 0, notificationIntent, PendingIntent.FLAG_ONE_SHOT);
         createNotificationChannel();
+        String contactName = intent.getExtras().getString("contactName"), songName=intent.getExtras().getString("songName");
         Notification notification = new NotificationCompat.Builder(this, CHANNEL_ID)
                 .setContentTitle("Sharing SongFy")
-                .setContentText("In ascolto: premi per fermare")
+                .setContentText("In ascolto da "+contactName+": "+songName+". Premi per fermare")
                 .setSmallIcon(R.drawable.ic_music)
                 .setContentIntent(pendingIntent)
                 .build();
@@ -112,6 +113,8 @@ public class FriendPlayerService extends Service {
             //inizialmente prelevo le informazioni dal bundle
             urlMusic = intent.getExtras().getString("songUrl");
             position = intent.getExtras().getInt("position");
+            contactName = intent.getExtras().getString("contactName");
+            songName = intent.getExtras().getString("songName");
             mediaPlayer.reset();
             mediaPlayer.setDataSource(urlMusic);
             mediaPlayer.prepare();

@@ -139,6 +139,7 @@ public class SongListAdapter extends RecyclerView.Adapter<SongListAdapter.SongLi
                         allPlaylists.remove(isPlaylist);
                         allPlaylists.add(isPlaylist);
                         notifyItemRemoved(pos);
+                        notifyItemRangeChanged(pos,getItemCount());
                         savePlaylists(v);
                     }
                 })

@@ -61,6 +61,8 @@ public class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.Fr
                         holder.mMute.setImageResource(R.drawable.ic_volume);
                         checked = 1;
                         //avviare musica
+                        intent.putExtra("contactName",friendList.get(holder.getAdapterPosition()).getName());
+                        intent.putExtra("songName",friendList.get(holder.getAdapterPosition()).getCurrentSong().getTitle());
                         intent.putExtra("uid", (friendList.get(holder.getAdapterPosition()).getUid()));
                         intent.putExtra("songUrl", friendList.get(holder.getAdapterPosition()).getCurrentSong().getUrl());
                         intent.putExtra("position", friendList.get(holder.getAdapterPosition()).getSongPosition());
@@ -70,7 +72,7 @@ public class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.Fr
                             SongActivity.mPlayer.stop();
 
                         view.getContext().startForegroundService(intent);
-                        String info = "In riproduzione: " + friendList.get(holder.getAdapterPosition()).getCurrentSong().getTitle()
+                        String info = "In riproduzione: da "+friendList.get(holder.getAdapterPosition()).getName()+": " + friendList.get(holder.getAdapterPosition()).getCurrentSong().getTitle()
                                 + " di " + friendList.get(holder.getAdapterPosition()).getCurrentSong().getAuthors();
                         if (!friendList.get(holder.getAdapterPosition()).getCurrentSong().getFeats().equals(""))
                             info = info + " ft. " + friendList.get(holder.getAdapterPosition()).getCurrentSong().getFeats();
@@ -105,7 +107,7 @@ public class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.Fr
                 } else {
                     vib.vibrate(200);
                 }
-                String finalInfo = "In riproduzione: " + friendList.get(holder.getAdapterPosition()).getCurrentSong().getTitle()
+                String finalInfo = "In riproduzione da "+friendList.get(holder.getAdapterPosition()).getName()+": " + friendList.get(holder.getAdapterPosition()).getCurrentSong().getTitle()
                         + " di " + friendList.get(holder.getAdapterPosition()).getCurrentSong().getAuthors();
                 Toast.makeText(view.getContext(), finalInfo,Toast.LENGTH_LONG).show();
                 return true;

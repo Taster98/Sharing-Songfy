@@ -9,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
@@ -38,15 +39,15 @@ import static ml.luiggi.sharingsongfy.utils.Constants.*;
 
 public class PlaylistActivity extends AppCompatActivity {
     private ArrayList<Song> songList;
-    private RecyclerView.Adapter mAdapter;
+    public static RecyclerView.Adapter mAdapter;
     private ArrayList<Playlist> newPlaylists;
     private ArrayList<Song> allSongs;
-
+    private TextView emptyList;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         loadPlaylists();
-        setContentView(R.layout.fragment_home);
+        setContentView(R.layout.playlist_activity);
         initUI();
         initSongs();
         mAdapter.notifyDataSetChanged();
@@ -91,8 +92,36 @@ public class PlaylistActivity extends AppCompatActivity {
         //imposto un adapter per i dati della recycler view
         mAdapter = new SongListAdapter(songList, curPlaylist);
         recyclerView.setAdapter(mAdapter);
-    }
+        //Testo da mostrare se la lista è vuota
+        emptyList = (TextView)findViewById(R.id.emptySongs);
+        if(mAdapter.getItemCount() == 0)
+            emptyList.setVisibility(View.VISIBLE);
+        else{
+            emptyList.setVisibility(View.INVISIBLE);
+        }
+        mAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
+            private void checkChange(){
+                //Testo da mostrare se la lista è vuota
+                emptyList = (TextView)findViewById(R.id.emptySongs);
+                if(mAdapter.getItemCount() == 0)
+                    emptyList.setVisibility(View.VISIBLE);
+                else{
+                    emptyList.setVisibility(View.INVISIBLE);
+                }
+            }
+            @Override
+            public void onChanged() {
+                super.onChanged();
+                checkChange();
+            }
 
+            @Override
+            public void onItemRangeChanged(int positionStart, int itemCount) {
+                super.onItemRangeChanged(positionStart, itemCount);
+                checkChange();
+            }
+        });
+    }
     //Bottone indietro
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
@@ -126,7 +155,6 @@ public class PlaylistActivity extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
     }
-
     private void addDialog() {
         final AlertDialog.Builder builder = new AlertDialog.Builder(this);
         LayoutInflater inflater = getLayoutInflater();

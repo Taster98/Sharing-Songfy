@@ -123,6 +123,7 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.PlayLi
                         playlists.remove(pos);
                         savePlaylists(v);
                         notifyItemRemoved(pos);
+                        notifyItemRangeChanged(pos,getItemCount());
                     }
                 })
                 .setNegativeButton("No",

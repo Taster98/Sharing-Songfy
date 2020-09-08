@@ -33,21 +33,28 @@ import ml.luiggi.sharingsongfy.services.FriendPlayerService;
  * Questa classe rappresenta l'activity principale dell'app. Al suo interno è presente un BottomNavigationView che consente di navigare tra Fragment.*/
 public class MainPageActivity extends AppCompatActivity implements BottomNavigationView.OnNavigationItemSelectedListener{
     private BottomNavigationView mBottomNavView;
-
+    private boolean serviceStopped = false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         //STOP SERVIZIO
         if (getIntent().getAction() != null) {
-            if (getIntent().getAction().equals("STOP"))
+            if (getIntent().getAction().equals("STOP")) {
                 stopService(new Intent(getApplicationContext(), FriendPlayerService.class));
+                serviceStopped = true;
+            }
         }
-        initTutorial();
-        //carico il fragment principale (quello contenente la lista delle canzoni nel server)
-        loadFragment(new FragmentHome());
         //Inizializzo il bottom nav menu
         initBottomView();
+        //carico il fragment principale (quello contenente la lista delle canzoni nel server)
+        if(!serviceStopped){
+            initTutorial();
+            loadFragment(new FragmentHome());
+        }else{
+            changeFocus(R.id.fragment_people);
+            loadFragment(new FragmentPeople());
+        }
     }
 
     public void initTutorial() {

@@ -13,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -54,7 +55,7 @@ public class PlaylistFragment extends Fragment {
     public String curName;
     public View bkpView;
     private RecyclerView recyclerView;
-
+    private TextView emptyList;
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -106,6 +107,13 @@ public class PlaylistFragment extends Fragment {
                 dialog.show();
             }
         });
+        //Testo da mostrare se la lista è vuota
+        emptyList = (TextView)bkpView.findViewById(R.id.emptySongs);
+        if(mAdapter.getItemCount() == 0)
+            emptyList.setVisibility(View.VISIBLE);
+        else{
+            emptyList.setVisibility(View.INVISIBLE);
+        }
     }
 
     private void scegliCanzoni() {
@@ -192,6 +200,22 @@ public class PlaylistFragment extends Fragment {
         //imposto un adapter per i dati della recycler view
         mAdapter = new PlayListAdapter(playlistList);
         recyclerView.setAdapter(mAdapter);
+        mAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
+            private void checkChange(){
+                //Testo da mostrare se la lista è vuota
+                emptyList = (TextView)bkpView.findViewById(R.id.emptySongs);
+                if(mAdapter.getItemCount() == 0)
+                    emptyList.setVisibility(View.VISIBLE);
+                else{
+                    emptyList.setVisibility(View.INVISIBLE);
+                }
+            }
+            @Override
+            public void onItemRangeChanged(int positionStart, int itemCount) {
+                super.onItemRangeChanged(positionStart, itemCount);
+                checkChange();
+            }
+        });
         initGestures();
     }
 

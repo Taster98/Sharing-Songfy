@@ -13,21 +13,29 @@
         android:layout_marginTop="5dp"
         android:text="@string/i_tuoi_amici_ascoltano"
         android:gravity="center_horizontal" />
-    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-        android:id="@+id/swipeContainer"
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingBottom="55dp"
-        android:layout_marginBottom="135dp"
-        android:layout_marginTop="60dp">
+        android:layout_height="match_parent">
         <androidx.recyclerview.widget.RecyclerView
             android:layout_marginTop="60dp"
             android:id="@+id/songListFriends"
             android:scrollbars="vertical"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:layout_marginBottom="135dp"
             tools:ignore="ObsoleteLayoutParam" />
-    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+        <TextView
+            android:id="@+id/emptySongs"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="@string/no_online_amici"
+            android:textAlignment="center"
+            android:layout_marginTop="300dp"
+            android:textSize="32sp"
+            android:visibility="invisible"/>
+    </FrameLayout>
+
     <Button
         android:id="@+id/crea_podcast"
         android:layout_width="wrap_content"

@@ -18,7 +18,11 @@
     <string name="rinomina">Rinomina</string>
     <string name="rinomina_playlist">Rinomina playlist</string>
     <string name="non_mostrare_questo_tutorial_in_futuro">Non mostrare questo tutorial in futuro</string>
-    <string name="i_tuoi_amici_ascoltano">I tuoi amici ascoltano:</string>
+    <string name="i_tuoi_amici_ascoltano">I tuoi amici</string>
     <string name="condividi_musica">Condividi musica</string>
     <string name="ferma_condivisione">Ferma condivisione</string>
+    <string name="la_tua_musica">La tua musica</string>
+    <string name="no_canzoni">Non ci sono canzoni</string>
+    <string name="no_playlist">Non ci sono Playlist</string>
+    <string name="no_online_amici">Non ci sono amici online</string>
 </resources>

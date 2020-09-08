@@ -1,19 +1,19 @@
 package ml.luiggi.sharingsongfy.fragments;
 
 import android.annotation.SuppressLint;
-import android.content.Intent;
 import android.database.Cursor;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
 import android.provider.ContactsContract;
 import android.telephony.TelephonyManager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -21,7 +21,6 @@ import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
@@ -40,11 +39,10 @@ import ml.luiggi.sharingsongfy.R;
 import ml.luiggi.sharingsongfy.SongActivity;
 import ml.luiggi.sharingsongfy.scaffoldings.Friend;
 import ml.luiggi.sharingsongfy.scaffoldings.Song;
-import ml.luiggi.sharingsongfy.services.FriendPlayerService;
 import ml.luiggi.sharingsongfy.utils.FriendListAdapter;
 import ml.luiggi.sharingsongfy.utils.Iso2Phone;
 
-public class    FragmentPeople extends Fragment {
+public class FragmentPeople extends Fragment {
 
     private RecyclerView.Adapter mAdapter;
     public Button btn;
@@ -52,9 +50,8 @@ public class    FragmentPeople extends Fragment {
     public View bkpView;
     private RecyclerView recyclerView;
     private RecyclerView.LayoutManager mLayoutManager;
-    private SwipeRefreshLayout mSwiper;
     private Set<Friend> allRegistered, contactList;
-
+    private TextView emptyList;
     //variabile per la gestione del tasto condividi
     static int condividi = 0;
 
@@ -101,6 +98,34 @@ public class    FragmentPeople extends Fragment {
         if (mAdapter == null)
             mAdapter = new FriendListAdapter(songListFriends);
         recyclerView.setAdapter(mAdapter);
+        mAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
+            int check=0;
+            private void checkChange(){
+                check++;
+                if(check>1){
+                    reloadFragment();
+                }
+                Log.d("CHANGE","Sì, "+String.valueOf(mAdapter.getItemCount()));
+                //Testo da mostrare se la lista è vuota
+                emptyList = (TextView)bkpView.findViewById(R.id.emptySongs);
+                if(mAdapter.getItemCount() == 0)
+                    emptyList.setVisibility(View.VISIBLE);
+                else{
+                    emptyList.setVisibility(View.INVISIBLE);
+                }
+            }
+            @Override
+            public void onItemRangeChanged(int positionStart, int itemCount) {
+                super.onItemRangeChanged(positionStart, itemCount);
+                checkChange();
+            }
+
+            @Override
+            public void onChanged() {
+                super.onChanged();
+                checkChange();
+            }
+        });
         //riferisco ora il bottone per condividere la musica
         btn = (Button)bkpView.findViewById(R.id.crea_podcast);
         //controllo in che stato è il tasto condivisione, e a seconda di ciò ne cambio il test
@@ -109,26 +134,6 @@ public class    FragmentPeople extends Fragment {
         } else {
             btn.setText(R.string.ferma_condivisione);
         }
-        //riferisco ora lo swiper per aggiornare la lista di amici che condividono
-        mSwiper = (SwipeRefreshLayout)bkpView.findViewById(R.id.swipeContainer);
-        //e inizializzo il listener
-        mSwiper.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                //come prima cosa, se stavo ascoltando una canzone di un amico, al refresh la fermo
-                //per evitare sovrapposizioni di riproduzione di brani
-                bkpView.getContext().stopService(new Intent(bkpView.getContext(), FriendPlayerService.class));
-                //dopodichè ricarico il fragment per assicurarmi che il recycler view si aggiorni correttamente
-                reloadFragment();
-                //uso un handler per attendere 3 secondi per il refresh
-                new Handler().postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        mSwiper.setRefreshing(false);
-                    }
-                }, 3000);
-            }
-        });
         //imposto un listener ora per il bottone della condivisione
         btn.setOnClickListener(new View.OnClickListener() {
             //intanto creo un riferimento al database utenti
@@ -253,7 +258,6 @@ public class    FragmentPeople extends Fragment {
     private void getAllRegisteredUsers() {
         //Creo un riferimento al database su firebase
         DatabaseReference userDB = FirebaseDatabase.getInstance().getReference().child("user");
-        DatabaseReference songDB = FirebaseDatabase.getInstance().getReference().child("songs");
         //Creo ora un listener per la gestione dell'aggiornamento dei dati nel database
         ValueEventListener friendListener = new ValueEventListener() {
             @RequiresApi(api = Build.VERSION_CODES.N)
