@@ -45,13 +45,6 @@
             android:name="ml.luiggi.sharingsongfy.MainPageActivity"
             android:theme="@style/AppTheme.NoActionBar"
             android:screenOrientation="portrait">
-            <intent-filter>
-                <action android:name="ml.luiggi.geosongfy.action.PAUSE" />
-                <action android:name="ml.luiggi.geosongfy.action.PLAY" />
-                <action android:name="ml.luiggi.geosongfy.action.NEXT" />
-                <action android:name="ml.luiggi.geosongfy.action.PREV" />
-                <action android:name="ml.luiggi.geosongfy.action.STOP" />
-            </intent-filter>
         </activity>
         <activity
             android:name="ml.luiggi.sharingsongfy.SongActivity"

@@ -52,13 +52,9 @@ public class MainPageActivity extends AppCompatActivity implements BottomNavigat
         //Inizializzo il bottom nav menu
         initBottomView();
         //carico il fragment principale (quello contenente la lista delle canzoni nel server)
-        if(!serviceStopped){
+        if(!serviceStopped)
             initTutorial();
-            loadFragment(new FragmentHome());
-        }else{
-            changeFocus(R.id.fragment_people);
-            loadFragment(new FragmentPeople());
-        }
+        loadFragment(new FragmentHome());
     }
 
     public void initTutorial() {
@@ -189,7 +185,7 @@ public class MainPageActivity extends AppCompatActivity implements BottomNavigat
                 changeFocus(menuItem.getItemId());
                 FragmentHome.result = true;
                 loadFragment(new FragmentHome());
-            } else {
+            } else if(permissions.length>=1){
                 loadFragment(new FragmentPeople());
             }
         }
