@@ -202,6 +202,7 @@ public class SongActivity extends AppCompatActivity implements Playable, View.On
                     mPlayer.seekTo(progress * 1000);
                     String seekTitle = getTimeString(mPlayer.getCurrentPosition()) + "/" + getTimeString(mPlayer.getDuration());
                     mSeekTitle.setText(seekTitle);
+                    //Migliorare efficienza scrittura db
                     dbUsers.child("songUrl").setValue(mSong.getUrl());
                     dbUsers.child("author").setValue(mSong.getAuthors());
                     dbUsers.child("feats").setValue(mSong.getFeats());
